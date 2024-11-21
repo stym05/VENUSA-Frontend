@@ -9,6 +9,7 @@ export default function App() {
 
   const [fontsLoaded] = useFonts({
     'Roboto': require('./assets/fonts/Roboto-Regular.ttf'),
+    'Didot': require('./assets/fonts/GFSDidot-Regular.ttf')
   });
 
   if (!fontsLoaded) {
