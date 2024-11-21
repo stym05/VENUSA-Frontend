@@ -1,6 +1,6 @@
-import { Platform } from "react-native"
-
+import { Dimensions, Platform } from "react-native"
 
 export const isMobile = () => {
-    return !Platform.OS == "web";
-}
+    const { width } = Dimensions.get("window");
+    return width  < 640
+ } 
