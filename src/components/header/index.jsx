@@ -12,8 +12,9 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { isMobile } from "../../utils/index.js";
+import Modal from "react-native-modal";
 
-const Header = ({props}) => {
+const Header = (props) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -45,8 +46,10 @@ const Header = ({props}) => {
   };
 
   const handleProfileNavigation = () => {
-    console.log("abhi", props)
-    props.navigation.navigate("Login");
+    props.navigation.navigate("App", {
+      screen: "Profile",
+      params: {},
+    });
   };
 
   return (
@@ -74,7 +77,17 @@ const Header = ({props}) => {
               <TouchableOpacity>
                 <Text style={styles.text}>Women</Text>
               </TouchableOpacity>
-              {renderDropdown("Women")}
+              <Modal
+                isVisible={dropdownVisible}
+                onBackdropPress={handleMouseLeave}
+                style={styles.modal}
+              >
+                <View style={styles.dropdown}>
+                  <Text style={styles.dropdownItem}>Option 1</Text>
+                  <Text style={styles.dropdownItem}>Option 2</Text>
+                  <Text style={styles.dropdownItem}>Option 3</Text>
+                </View>
+              </Modal>
             </View>
           )}
           {!isMobile() && (
@@ -86,7 +99,6 @@ const Header = ({props}) => {
               <TouchableOpacity>
                 <Text style={styles.text}>Men</Text>
               </TouchableOpacity>
-              {renderDropdown("Men")}
             </View>
           )}
           {!isMobile() && (
@@ -96,11 +108,6 @@ const Header = ({props}) => {
               </TouchableOpacity>
             </View>
           )}
-        </View>
-        <View>
-          <Text onPress={()=> props.navigation.navigate("App", {
-            screen: "Dashboard"
-          })} style={{fontSize: 32, fontFamily: "Roboto", fontWeight: '800'}}>VENUSA</Text>
         </View>
         <View style={styles.rightSubContainer}>
           <View style={styles.paddingContainer}>
@@ -137,7 +144,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#808080",
     borderBottomWidth: 1,
   },
-  subContainer: { 
+  subContainer: {
     width: "100%",
     display: "flex",
     flexDirection: "row",
@@ -169,20 +176,15 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   dropdown: {
-    position: "absolute",
-    top: 40,
-    backgroundColor: "#fff",
-    borderColor: "#ccc",
-    borderWidth: 1,
+    backgroundColor: "white",
     padding: 10,
-    zIndex: 1000,
+    borderRadius: 8,
+    marginBottom: 400
   },
   dropdownItem: {
-    zIndex: 10000,
-    padding: 5,
-    fontSize: 14,
-    color: "black",
-  },
+    padding: 10,
+    fontSize: 16,
+  }
 });
 
 export default Header;
