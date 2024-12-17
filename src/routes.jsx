@@ -7,6 +7,7 @@ import * as Linking from "expo-linking";
 import Login from "./screens/login";
 import Dashboard from "./screens/dashboard";
 import { isMobile } from "./utils";
+import ItemSection from "./screens/ItemSection";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -23,7 +24,8 @@ const linking = {
             App: {
                 screens: {
                     Dashboard: "/",
-                    Login: "/login"
+                    Login: "/login",
+                    ItemSection: '/itemSections'
                 },
             },
         },
@@ -44,16 +46,20 @@ const App = () => {
             <Tab.Screen
                 name="Dashboard"
                 component={Dashboard}
-                options={{ tabBarLabel: "Dashboard",tabBarStyle: {
-                    display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
-                  }, }}
+                options={{
+                    tabBarLabel: "Dashboard", tabBarStyle: {
+                        display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                    },
+                }}
             />
             <Tab.Screen
                 name="Login"
                 component={Login}
-                options={{ tabBarLabel: "Login",tabBarStyle: {
-                    display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
-                  }, }}
+                options={{
+                    tabBarLabel: "Login", tabBarStyle: {
+                        display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                    },
+                }}
             />
         </Tab.Navigator>
     );
@@ -70,9 +76,14 @@ const Routes = () => {
                     options={{ headerShown: false }}
                 />
                 <Stack.Screen
-                name="Login"
-                component={Login}
-                options={{ headerShown: false }}
+                    name="Login"
+                    component={Login}
+                    options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                    name="ItemSection"
+                    component={ItemSection}
+                    options={{ headerShown: false }}
                 />
             </Stack.Navigator>
         </NavigationContainer>

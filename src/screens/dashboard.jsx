@@ -70,7 +70,7 @@ export default class Dashboard extends Component {
                   <Text style={{ fontSize: 50, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
-                  <TouchableOpacity style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
+                  <TouchableOpacity onPress={()=> this.props.navigation.navigate("ItemSection")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
