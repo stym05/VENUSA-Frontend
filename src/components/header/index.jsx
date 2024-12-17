@@ -13,7 +13,7 @@ import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { isMobile } from "../../utils/index.js";
 
-const Header = (props) => {
+const Header = ({props}) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
@@ -45,10 +45,8 @@ const Header = (props) => {
   };
 
   const handleProfileNavigation = () => {
-    props.navigation.navigate("App", {
-      screen: "Profile",
-      params: {},
-    });
+    console.log("abhi", props)
+    props.navigation.navigate("Login");
   };
 
   return (
@@ -98,6 +96,11 @@ const Header = (props) => {
               </TouchableOpacity>
             </View>
           )}
+        </View>
+        <View>
+          <Text onPress={()=> props.navigation.navigate("App", {
+            screen: "Dashboard"
+          })} style={{fontSize: 32, fontFamily: "Roboto", fontWeight: '800'}}>VENUSA</Text>
         </View>
         <View style={styles.rightSubContainer}>
           <View style={styles.paddingContainer}>

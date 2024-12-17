@@ -50,7 +50,7 @@ export default class Login extends Component {
     const { theme, mobileNumber, otp, isChecked, isLoading } = this.state;
     return (
       <SafeAreaView style={styles(theme).container}>
-        <Header />
+        <Header props={this.props}/>
         <ScrollView style={styles(theme).subContainer}>
           <View style={styles(theme).mainContainer}>
             <Text style={styles(theme).header}>MY ACCOUNT</Text>

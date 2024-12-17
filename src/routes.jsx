@@ -6,6 +6,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import * as Linking from "expo-linking";
 import Login from "./screens/login";
 import Dashboard from "./screens/dashboard";
+import { isMobile } from "./utils";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -38,18 +39,21 @@ const App = () => {
         <Tab.Navigator
             screenOptions={{
                 headerShown: false,
-                
             }}
         >
             <Tab.Screen
                 name="Dashboard"
                 component={Dashboard}
-                options={{ tabBarLabel: "Dashboard" }}
+                options={{ tabBarLabel: "Dashboard",tabBarStyle: {
+                    display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                  }, }}
             />
             <Tab.Screen
                 name="Login"
                 component={Login}
-                options={{ tabBarLabel: "Login" }}
+                options={{ tabBarLabel: "Login",tabBarStyle: {
+                    display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                  }, }}
             />
         </Tab.Navigator>
     );
@@ -64,6 +68,11 @@ const Routes = () => {
                     name="App"
                     component={App}
                     options={{ headerShown: false }}
+                />
+                <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ headerShown: false }}
                 />
             </Stack.Navigator>
         </NavigationContainer>
