@@ -37,7 +37,6 @@ export default class Dashboard extends Component {
     const { theme } = this.state;
     return (
       <SafeAreaView style={styles(theme).container}>
-        <Header props={this.props}/>
         <ScrollView>
           <View style={styles(theme).subContainer}>
             <View style={{ height: isMobile() ? 400 : 800, backgroundColor: "#fff", marginBottom: 50 }}>

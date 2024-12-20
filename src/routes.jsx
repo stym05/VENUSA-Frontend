@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, Platform, Text } from "react-native";
+import { Dimensions, Platform, SafeAreaView, Text } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
@@ -8,6 +8,8 @@ import Login from "./screens/login";
 import Dashboard from "./screens/dashboard";
 import { isMobile } from "./utils";
 import ItemSection from "./screens/ItemSection";
+import Header from "./components/header";
+import ItemDescription from "./screens/ItemSection/ItemDescription";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -68,25 +70,33 @@ const App = () => {
 // Main Stack Navigator
 const Routes = () => {
     return (
-        <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
-            <Stack.Navigator initialRouteName="App">
-                <Stack.Screen
-                    name="App"
-                    component={App}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="Login"
-                    component={Login}
-                    options={{ headerShown: false }}
-                />
-                <Stack.Screen
-                    name="ItemSection"
-                    component={ItemSection}
-                    options={{ headerShown: false }}
-                />
-            </Stack.Navigator>
-        </NavigationContainer>
+        <SafeAreaView style={{flex: 1}}>
+            <Header props={this.props} />
+            <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+                <Stack.Navigator initialRouteName="App">
+                    <Stack.Screen
+                        name="App"
+                        component={App}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Login"
+                        component={Login}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="ItemSection"
+                        component={ItemSection}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="ItemDescription"
+                        component={ItemDescription}
+                        options={{ headerShown: false }}
+                    />
+                </Stack.Navigator>
+            </NavigationContainer>
+        </SafeAreaView>
     );
 };
 

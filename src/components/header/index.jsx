@@ -33,7 +33,6 @@ const Header = (props) => {
   };
 
   const renderDropdown = (menu) => {
-    if (dropdownVisible && activeDropdown === menu) {
       return (
         <View style={styles.dropdown}>
           <Text style={styles.dropdownItem}>Option 1</Text>
@@ -41,8 +40,6 @@ const Header = (props) => {
           <Text style={styles.dropdownItem}>Option 3</Text>
         </View>
       );
-    }
-    return null;
   };
 
   const handleProfileNavigation = () => {
@@ -77,7 +74,7 @@ const Header = (props) => {
               <TouchableOpacity>
                 <Text style={styles.text}>Women</Text>
               </TouchableOpacity>
-              <Modal
+              {/* <Modal
                 isVisible={dropdownVisible}
                 onBackdropPress={handleMouseLeave}
                 style={styles.modal}
@@ -87,7 +84,7 @@ const Header = (props) => {
                   <Text style={styles.dropdownItem}>Option 2</Text>
                   <Text style={styles.dropdownItem}>Option 3</Text>
                 </View>
-              </Modal>
+              </Modal> */}
             </View>
           )}
           {!isMobile() && (
