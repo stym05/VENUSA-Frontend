@@ -69,7 +69,7 @@ export default class Dashboard extends Component {
                   <Text style={{ fontSize: 50, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
-                  <TouchableOpacity onPress={()=> this.props.navigation.navigate("ItemSection")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ItemSection")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
@@ -79,8 +79,25 @@ export default class Dashboard extends Component {
                 </View>
               </View>
             </View>
-            <View>
-              
+            <View style={styles(theme).imageContainer}>
+              <View style={{ height: '100%', width: '50%' }}>
+                <Image
+                  contentFit="fill"
+                  source={require("../../assets/images/prod1/1.jpg")}
+                  style={{
+                    height: "100%",
+                  }}
+                />
+              </View>
+              <View style={{ height: '100%', width: '50%' }}>
+                <Image
+                  contentFit="fill"
+                  source={require("../../assets/images/prod1/1.jpg")}
+                  style={{
+                    height: "100%",
+                  }}
+                />
+              </View>
             </View>
           </View>
           <Footer />
@@ -102,7 +119,8 @@ const styles = (theme) => StyleSheet.create({
   imageContainer: {
     display: 'flex',
     flexDirection: isMobile() ? "column" : 'row',
-    minHeight: 800
+    minHeight: 800,
+    marginBottom: 50
   },
   circularStrip: {
     padding: 50,
