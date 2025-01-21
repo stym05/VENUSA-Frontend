@@ -46,7 +46,7 @@ const Header = (props) => {
   const handleProfileNavigation = () => {
     console.log("yes i'm pressed")
     navigation.navigate("App", {
-      screen: "Login",
+      screen: "PaySuccessScreen",
       params: {},
     });
   };
