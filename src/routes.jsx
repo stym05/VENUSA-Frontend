@@ -70,9 +70,9 @@ const App = () => {
 // Main Stack Navigator
 const Routes = () => {
     return (
-        <SafeAreaView style={{flex: 1}}>
-            <Header props={this.props} />
+        <SafeAreaView style={{ flex: 1 }}>
             <NavigationContainer linking={linking} fallback={<Text>Loading...</Text>}>
+                <Header props={this.props} />
                 <Stack.Navigator initialRouteName="App">
                     <Stack.Screen
                         name="App"

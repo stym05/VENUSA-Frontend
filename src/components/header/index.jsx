@@ -12,11 +12,12 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { isMobile } from "../../utils/index.js";
-import Modal from "react-native-modal";
+import { useNavigation } from '@react-navigation/native';
 
 const Header = (props) => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const navigation = useNavigation();
 
   const handleMouseEnter = (menu) => {
     if (Platform.OS === "web") {
@@ -43,8 +44,9 @@ const Header = (props) => {
   };
 
   const handleProfileNavigation = () => {
-    props.navigation.navigate("App", {
-      screen: "Profile",
+    console.log("yes i'm pressed")
+    navigation.navigate("App", {
+      screen: "Login",
       params: {},
     });
   };
