@@ -4,26 +4,34 @@ import {
     View,
     Text,
     SafeAreaView,
-    StyleSheet
+    StyleSheet,
+    ScrollView,
+    Dimensions
 } from 'react-native';
+import Footer from '../footer';
 
 
 class PaySuccessScreen extends React.Component {
     render() {
         return (
             <SafeAreaView style={styles.container}>
-                <FontAwesome name="check-circle-o" size={65} color="#00966D" />
-                <Text style={styles.heading}>Payment Successful</Text>
-                <View style={styles.mid}>
-                    <Text style={styles.text1}>Thank you for choosing Modimal, Your order will be generated based on your delivery request. </Text>
-                    <Text style={styles.text1}>the Receipt has been sent to your email.</Text>
-                </View>
-                <View style={styles.mid}>
-                    <Text style={styles.text2}>Please Contact Us For Any Query</Text>
-                    <Text style={styles.text2}>+91 - 887 766 4332</Text>
-                    <Text style={styles.text2}>or</Text>
-                    <Text style={styles.text2}>customercare@venusa.co.in</Text>
-                </View>
+                <ScrollView>
+                    <View style={styles.subContainer}>
+                        <FontAwesome name="check-circle-o" size={65} color="#00966D" />
+                        <Text style={styles.heading}>Payment Successful</Text>
+                        <View style={styles.mid}>
+                            <Text style={styles.text1}>Thank you for choosing Modimal, Your order will be generated based on your delivery request. </Text>
+                            <Text style={styles.text1}>the Receipt has been sent to your email.</Text>
+                        </View>
+                        <View style={styles.mid}>
+                            <Text style={styles.text2}>Please Contact Us For Any Query</Text>
+                            <Text style={styles.text2}>+91 - 887 766 4332</Text>
+                            <Text style={styles.text2}>or</Text>
+                            <Text style={styles.text2}>customercare@venusa.co.in</Text>
+                        </View>
+                    </View>
+                    <Footer />
+                </ScrollView>
             </SafeAreaView>
         )
     }
@@ -33,8 +41,12 @@ class PaySuccessScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#fff"
+    },
+    subContainer: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        minHeight: Dimensions.get("window").height * 0.8
     },
     heading: {
         fontFamily: "Roboto",

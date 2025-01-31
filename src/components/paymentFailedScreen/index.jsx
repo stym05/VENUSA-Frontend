@@ -5,12 +5,15 @@ import {
     Text,
     SafeAreaView,
     StyleSheet,
-    TouchableOpacity
+    TouchableOpacity,
+    Dimensions
 } from 'react-native';
+import Footer from '../footer';
+import { ScrollView } from 'react-native-web';
 
 
 class PaymentFailedScreen extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props);
         this.state = {
             defaultError: "Please ensure that the billing address you provided is the same one where your debit/credit card is registered."
@@ -19,24 +22,29 @@ class PaymentFailedScreen extends React.Component {
     render() {
         return (
             <SafeAreaView style={styles.container}>
-                <MaterialIcons name="error-outline" size={65} color="#C30000" />
-                <Text style={styles.heading}>Sorry, Payment failed</Text>
-                <View style={styles.mid}>
-                    <Text style={styles.text1}>Unfortunately, your order Cannot Be Completed.</Text>
-                    <Text style={styles.text1}>{this.state.defaultError}</Text>
-                    <Text style={styles.text1}>Alternatively, please try a different payment method.</Text>
-                </View>
-                <View style={{width: 300}}>
-                    <TouchableOpacity style={styles.button}>
-                        <Text style={styles.buttonText}>Pay Now</Text>
-                    </TouchableOpacity>
-                </View>
-                {/* <View style={styles.mid}>
+                <ScrollView>
+                    <View style={styles.subContainer}>
+                        <MaterialIcons name="error-outline" size={65} color="#C30000" />
+                        <Text style={styles.heading}>Sorry, Payment failed</Text>
+                        <View style={styles.mid}>
+                            <Text style={styles.text1}>Unfortunately, your order Cannot Be Completed.</Text>
+                            <Text style={styles.text1}>{this.state.defaultError}</Text>
+                            <Text style={styles.text1}>Alternatively, please try a different payment method.</Text>
+                        </View>
+                        <View style={{ width: 300 }}>
+                            <TouchableOpacity style={styles.button}>
+                                <Text style={styles.buttonText}>Pay Now</Text>
+                            </TouchableOpacity>
+                        </View>
+                        {/* <View style={styles.mid}>
                     <Text style={styles.text2}>Please Contact Us For Any Query</Text>
                     <Text style={styles.text2}>+91 - 887 766 4332</Text>
                     <Text style={styles.text2}>or</Text>
                     <Text style={styles.text2}>customercare@venusa.co.in</Text>
                 </View> */}
+                    </View>
+                    <Footer />
+                </ScrollView>
             </SafeAreaView>
         )
     }
@@ -46,8 +54,12 @@ class PaymentFailedScreen extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        backgroundColor: "#fff"
+    },
+    subContainer: {
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        minHeight: Dimensions.get("window").height*0.8
     },
     heading: {
         fontFamily: "Roboto",

@@ -73,7 +73,7 @@ export default class Dashboard extends Component {
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("PaymentFailedScreen")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30 }}>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate("PaySuccessScreen")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
                 </View>
