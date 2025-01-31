@@ -125,7 +125,7 @@ class ItemSection extends React.Component {
                             />
                         </View>
                     </View>
-                    <Footer />
+                    <Footer navigation={this.props.navigation}/>
                 </ScrollView>
             </SafeAreaView>
         )

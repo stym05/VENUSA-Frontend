@@ -171,7 +171,7 @@ class ItemDescription extends React.Component {
                             </View>
                         </View>
                     </View>
-                    <Footer />
+                    <Footer navigation={this.props.navigation}/>
                 </ScrollView>
             </SafeAreaView>
         );

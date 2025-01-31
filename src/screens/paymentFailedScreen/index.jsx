@@ -8,8 +8,8 @@ import {
     TouchableOpacity,
     Dimensions
 } from 'react-native';
-import Footer from '../footer';
 import { ScrollView } from 'react-native-web';
+import Footer from '../../components/footer';
 
 
 class PaymentFailedScreen extends React.Component {
@@ -36,14 +36,8 @@ class PaymentFailedScreen extends React.Component {
                                 <Text style={styles.buttonText}>Pay Now</Text>
                             </TouchableOpacity>
                         </View>
-                        {/* <View style={styles.mid}>
-                    <Text style={styles.text2}>Please Contact Us For Any Query</Text>
-                    <Text style={styles.text2}>+91 - 887 766 4332</Text>
-                    <Text style={styles.text2}>or</Text>
-                    <Text style={styles.text2}>customercare@venusa.co.in</Text>
-                </View> */}
                     </View>
-                    <Footer />
+                    <Footer navigation={this.props.navigation}/>
                 </ScrollView>
             </SafeAreaView>
         )

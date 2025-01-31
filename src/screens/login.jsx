@@ -89,7 +89,7 @@ export default class Login extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <Footer />
+          <Footer navigation={this.props.navigation}/>
         </ScrollView>
       </SafeAreaView>
     )

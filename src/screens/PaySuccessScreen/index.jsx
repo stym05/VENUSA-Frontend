@@ -8,10 +8,13 @@ import {
     ScrollView,
     Dimensions
 } from 'react-native';
-import Footer from '../footer';
+import Footer from '../../components/footer';
 
 
 class PaySuccessScreen extends React.Component {
+    constructor(props){
+        super(props);
+    }
     render() {
         return (
             <SafeAreaView style={styles.container}>
@@ -30,7 +33,7 @@ class PaySuccessScreen extends React.Component {
                             <Text style={styles.text2}>customercare@venusa.co.in</Text>
                         </View>
                     </View>
-                    <Footer />
+                    <Footer navigation={this.props.navigation}/>
                 </ScrollView>
             </SafeAreaView>
         )

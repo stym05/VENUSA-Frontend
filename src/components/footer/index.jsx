@@ -13,6 +13,7 @@ import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from "@expo/vector-icons/Entypo";
 import { isMobile } from "../../utils";
 
+
 class Footer extends React.Component {
 
     constructor(props) {
@@ -33,6 +34,10 @@ class Footer extends React.Component {
 
     handleSubscribe = () => {
         this.setState({ isLoading: !this.state.isLoading })
+    }
+
+    openFAQ = () => {
+        this.props.navigation.navigate("FAQs")
     }
 
     render() {
@@ -87,7 +92,7 @@ class Footer extends React.Component {
                                     <Text style={styles.iconText}>Return Policy</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>FAQ</Text>
+                                    <Text onPress={this.openFAQ} style={styles.iconText}>FAQ</Text>
                                 </View>
                             </View>
                         </View>

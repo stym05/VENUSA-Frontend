@@ -10,8 +10,10 @@ import { isMobile } from "./utils";
 import ItemSection from "./screens/ItemSection";
 import Header from "./components/header";
 import ItemDescription from "./screens/ItemSection/ItemDescription";
-import PaySuccessScreen from "./components/PaySuccessScreen";
-import PaymentFailedScreen from "./components/paymentFailedScreen";
+import PaySuccessScreen from "./screens/PaySuccessScreen";
+import PaymentFailedScreen from "./screens/paymentFailedScreen";
+import FAQs from "./screens/faq";
+
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -31,7 +33,8 @@ const linking = {
                     Login: "/login",
                     ItemSection: '/itemSections',
                     PaySuccessScreen: '/PaySuccessScreen',
-                    PaymentFailedScreen: "/PaymentFailedScreen"
+                    PaymentFailedScreen: "/PaymentFailedScreen",
+                    FAQs: "/faqs"
                 },
             },
         },
@@ -106,6 +109,11 @@ const Routes = () => {
                     <Stack.Screen
                         name="PaymentFailedScreen"
                         component={PaymentFailedScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FAQs"
+                        component={FAQs}
                         options={{ headerShown: false }}
                     />
                 </Stack.Navigator>
