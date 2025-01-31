@@ -11,6 +11,7 @@ import ItemSection from "./screens/ItemSection";
 import Header from "./components/header";
 import ItemDescription from "./screens/ItemSection/ItemDescription";
 import PaySuccessScreen from "./components/PaySuccessScreen";
+import PaymentFailedScreen from "./components/paymentFailedScreen";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -29,7 +30,8 @@ const linking = {
                     Dashboard: "/",
                     Login: "/login",
                     ItemSection: '/itemSections',
-                    PaySuccessScreen: '/PaySuccessScreen'
+                    PaySuccessScreen: '/PaySuccessScreen',
+                    PaymentFailedScreen: "/PaymentFailedScreen"
                 },
             },
         },
@@ -99,6 +101,11 @@ const Routes = () => {
                     <Stack.Screen
                         name="PaySuccessScreen"
                         component={PaySuccessScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="PaymentFailedScreen"
+                        component={PaymentFailedScreen}
                         options={{ headerShown: false }}
                     />
                 </Stack.Navigator>
