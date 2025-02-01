@@ -7,7 +7,7 @@ import {
     StyleSheet
 } from 'react-native';
 
-class WishList extends React.Component {
+class Cart extends React.Component {
     constructor(props){
         super(props);
         this.state = {
@@ -34,4 +34,4 @@ const styles = StyleSheet.create({
     ]
 })
 
-export default WishList;
+export default Cart;

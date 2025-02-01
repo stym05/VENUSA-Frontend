@@ -13,6 +13,8 @@ import ItemDescription from "./screens/ItemSection/ItemDescription";
 import PaySuccessScreen from "./screens/PaySuccessScreen";
 import PaymentFailedScreen from "./screens/paymentFailedScreen";
 import FAQs from "./screens/faq";
+import WishList from "./screens/wishList";
+import Cart from "./screens/cartScreen";
 
 
 // Get screen dimensions for responsiveness
@@ -34,7 +36,9 @@ const linking = {
                     ItemSection: '/itemSections',
                     PaySuccessScreen: '/PaySuccessScreen',
                     PaymentFailedScreen: "/PaymentFailedScreen",
-                    FAQs: "/faqs"
+                    FAQs: "/faqs",
+                    WishList: "/WishList",
+                    Cart: "/Cart"
                 },
             },
         },
@@ -115,6 +119,16 @@ const Routes = () => {
                         name="FAQs"
                         component={FAQs}
                         options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="WishList"
+                        component={WishList}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="Cart"
+                        component={Cart}
+                        options={{ headerShown: false}}
                     />
                 </Stack.Navigator>
             </NavigationContainer>

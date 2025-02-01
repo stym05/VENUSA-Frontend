@@ -50,6 +50,12 @@ const Header = (props) => {
     });
   };
 
+  const handleWishListNavigation = () => {
+    navigation.navigate("WishList");
+  };
+  const handleCartNavigation = () => {
+    navigation.navigate("Cart");
+  };
   return (
     <View style={styles.container}>
       <OfferStrip />
@@ -114,12 +120,12 @@ const Header = (props) => {
             </TouchableOpacity>
           </View>
           <View style={styles.paddingContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleWishListNavigation}>
               <AntDesign name="hearto" size={24} color="black" />
             </TouchableOpacity>
           </View>
           <View style={styles.paddingContainer}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleCartNavigation}>
               <Feather name="shopping-bag" size={24} color="black" />
             </TouchableOpacity>
           </View>
