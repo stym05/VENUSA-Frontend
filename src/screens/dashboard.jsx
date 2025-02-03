@@ -28,7 +28,8 @@ export default class Dashboard extends Component {
     this.state = {
       isLoading: false,
       theme,
-      allCategoriesData: []
+      allCategoriesData: [],
+      categorie: {}
     }
   }
 
@@ -38,13 +39,22 @@ export default class Dashboard extends Component {
       const allCategoriesData = await getAllCategories();
       console.log("data we got is ", allCategoriesData);
       if (allCategoriesData && allCategoriesData.success) {
-        this.setState({ allCategoriesData: allCategoriesData.categories })
+        const data = allCategoriesData.categories;
+        let categorie = {};
+        data.forEach((item) => {
+          categorie[item.name] = {
+            id: item._id,
+            categoryImage: item.categoryImage,
+          }
+        })
+        console.log("data we filtered", categorie);
+        this.setState({ isLoading: false, categorie, allCategoriesData: data });
       }
-      this.setState({ isLoading: false });
     } catch (err) {
       this.setState({ isLoading: false });
       console.log("Error at ITEM :: ", err);
     }
+    this.setState({ isLoading: false });
   }
 
   onBuffer = () => {
@@ -53,7 +63,7 @@ export default class Dashboard extends Component {
 
 
   render() {
-    const { isLoading, theme } = this.state;
+    const { isLoading, theme, categorie } = this.state;
     return isLoading ? (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size={"large"} color={"black"} />
@@ -93,13 +103,13 @@ export default class Dashboard extends Component {
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: "men"
+                    categorie: categorie["men"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ItemSection", {
-                    categorie: "women"
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
+                    categorie: categorie["women"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
