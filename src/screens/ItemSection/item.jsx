@@ -9,6 +9,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import { getAllCategories } from "../../apis";
 
 
 class Item extends React.Component {
@@ -20,7 +21,20 @@ class Item extends React.Component {
             isSelected: false,
             isSale: true,
             name: "basic cloth",
-            price: 0.0
+            price: 0.0,
+            allCategoriesData: []
+        }
+    }
+
+    componentDidMount = async () => {
+        try {
+            const allCategoriesData = await getAllCategories();
+            console.log("data we got is ", allCategoriesData);
+            if (allCategoriesData && allCategoriesData.success) {
+                this.setState({ allCategoriesData: allCategoriesData.categories })
+            }
+        } catch (err) {
+            console.log("Error at ITEM :: ", err);
         }
     }
 
@@ -30,7 +44,7 @@ class Item extends React.Component {
 
     toggleSelected = () => {
         console.log("selected ko toggle kro");
-        this.setState({isSelected: !this.state.isSelected})
+        this.setState({ isSelected: !this.state.isSelected })
     }
 
     render() {
@@ -45,7 +59,7 @@ class Item extends React.Component {
             <ActivityIndicator size={"small"} color={"#000"} />
         ) : (
             <View style={styles.container}>
-                
+
                 <ImageBackground
                     style={{
                         width: 350,
@@ -54,14 +68,14 @@ class Item extends React.Component {
                     }}
                     source={require("../../../assets/images/prod1/2.jpg")}
                 >
-                {isSale && (
-                    <View style={styles.saleContainer}>
-                        <Text style={styles.saleText}>Sale</Text>
+                    {isSale && (
+                        <View style={styles.saleContainer}>
+                            <Text style={styles.saleText}>Sale</Text>
+                        </View>
+                    )}
+                    <View style={styles.heart}>
+                        {isSelected ? <AntDesign name="heart" size={24} color="red" onPress={this.toggleSelected} /> : <AntDesign onPress={this.toggleSelected} name="hearto" size={24} color="black" />}
                     </View>
-                )}
-                <View style={styles.heart}>
-                    {isSelected ? <AntDesign name="heart" size={24} color="red" onPress={this.toggleSelected} /> : <AntDesign onPress={this.toggleSelected} name="hearto" size={24} color="black" /> }
-                </View>
                 </ImageBackground>
                 <TouchableOpacity style={styles.upperDetails} onPress={this.handlePress}>
                     <Text style={styles.clothName}>{name}</Text>
@@ -115,8 +129,8 @@ const styles = StyleSheet.create({
         width: '100%',
         display: 'flex',
         flexDirection: 'row',
-        justifyContent: 'space-between', 
-        alignItems: 'center', 
+        justifyContent: 'space-between',
+        alignItems: 'center',
         paddingHorizontal: 10,
         marginTop: 10
     },

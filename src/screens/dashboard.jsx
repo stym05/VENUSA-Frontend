@@ -5,7 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import Store from '../store/index.js';
 import Header from '../components/header/index.jsx';
@@ -15,6 +16,7 @@ import MovingTextStrip from '../components/MovingTextStrip/index.jsx';
 import Video, { VideoRef } from 'react-native-video';
 import { isMobile } from '../utils/index.js';
 import { Image } from 'expo-image';
+import { getAllCategories } from '../apis/index.js';
 
 export default class Dashboard extends Component {
 
@@ -24,7 +26,24 @@ export default class Dashboard extends Component {
     let theme = Store.getState().settings.theme;
     this.VideoRef = useRef < VideoRef > (null);
     this.state = {
-      theme
+      isLoading: false,
+      theme,
+      allCategoriesData: []
+    }
+  }
+
+  componentDidMount = async () => {
+    try {
+      this.setState({ isLoading: true });
+      const allCategoriesData = await getAllCategories();
+      console.log("data we got is ", allCategoriesData);
+      if (allCategoriesData && allCategoriesData.success) {
+        this.setState({ allCategoriesData: allCategoriesData.categories })
+      }
+      this.setState({ isLoading: false });
+    } catch (err) {
+      this.setState({ isLoading: false });
+      console.log("Error at ITEM :: ", err);
     }
   }
 
@@ -34,8 +53,12 @@ export default class Dashboard extends Component {
 
 
   render() {
-    const { theme } = this.state;
-    return (
+    const { isLoading, theme } = this.state;
+    return isLoading ? (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size={"large"} color={"black"} />
+      </View>
+    ) : (
       <SafeAreaView style={styles(theme).container}>
         <ScrollView>
           <View style={styles(theme).subContainer}>
@@ -69,11 +92,15 @@ export default class Dashboard extends Component {
                   <Text style={{ fontSize: 50, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ItemSection")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
+                    categorie: "men"
+                  })} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30, marginRight: 50 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("FAQs")} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30 }}>
+                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ItemSection", {
+                    categorie: "women"
+                  })} style={{ backgroundColor: '#F8F3F0', paddingVertical: 20, paddingHorizontal: 30 }}>
                     <Text style={{ fontSize: 24, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
                 </View>
@@ -100,7 +127,7 @@ export default class Dashboard extends Component {
               </View>
             </View>
           </View>
-          <Footer navigation={this.props.navigation}/>
+          <Footer navigation={this.props.navigation} />
         </ScrollView>
       </SafeAreaView>
     )

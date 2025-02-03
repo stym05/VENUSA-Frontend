@@ -15,6 +15,7 @@ import PaymentFailedScreen from "./screens/paymentFailedScreen";
 import FAQs from "./screens/faq";
 import WishList from "./screens/wishList";
 import Cart from "./screens/cartScreen";
+import ShopCategories from "./screens/shopCategories";
 
 
 // Get screen dimensions for responsiveness
@@ -33,6 +34,7 @@ const linking = {
                 screens: {
                     Dashboard: "/",
                     Login: "/login",
+                    ShopCategories: "/ShopCategories",
                     ItemSection: '/itemSections',
                     PaySuccessScreen: '/PaySuccessScreen',
                     PaymentFailedScreen: "/PaymentFailedScreen",
@@ -95,6 +97,11 @@ const Routes = () => {
                         component={Login}
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name="ShopCategories"
+                        component={ShopCategories}
+                        options={{ headerShown: false }}
+                        />
                     <Stack.Screen
                         name="ItemSection"
                         component={ItemSection}
