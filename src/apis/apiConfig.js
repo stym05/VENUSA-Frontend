@@ -1,6 +1,6 @@
 import { Platform } from "react-native";
 
-const apiMainURL = "http://localhost:8000/"; // Replace with your API base URL.
+const apiMainURL = "http://139.59.44.49:8000/"; // Replace with your API base URL.
 
 const setAuthorizationHeader = (url) => {
   return {

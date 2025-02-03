@@ -11,18 +11,46 @@ import Item from "./item";
 import { isMobile } from "../../utils";
 import Footer from "../../components/footer";
 import { Picker } from '@react-native-picker/picker';
+import { getProductBySubCategory } from "../../apis";
 
 class ItemSection extends React.Component {
     constructor(props) {
         super(props);
+
+        let productId = ""
+        let productName = ""
+        if(this.props.route && this.props.route.params) {
+            productId = this.props.route.params.productId;
+            productName = this.props.route.params.productName;
+        }
+
         this.state = {
             loading: false,
-            array: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            productName,
+            productId,
+            productarray: [],
             selectedLanguage: null,
             productCount: 0
         }
     }
     pickerRef = React.createRef();
+
+    componentDidMount = async () => {
+        try {
+            const {
+                productId
+            } = this.state;
+            this.setState({ isloading: true })
+            const response = await getProductBySubCategory(productId);
+            if (response && response.success) {
+                const { products } = response;
+                this.setState({ productarray: products, isloading: false })
+            }
+        } catch (err) {
+            console.log("error in shopCategories is = ", err)
+        }
+        this.setState({ isloading: false })
+    }
 
 
     open() {
@@ -36,7 +64,7 @@ class ItemSection extends React.Component {
     render() {
         const {
             loading,
-            array,
+            productarray,
             selectedLanguage,
             productCount
         } = this.state;
@@ -68,12 +96,12 @@ class ItemSection extends React.Component {
                             </View>
                         </View>
                         <View style={styles.itemList}>
-                            <View style={{marginHorizontal: 20}}>
+                            <View style={{ marginHorizontal: 20 }}>
                                 <View style={[styles.row, { justifyContent: 'space-between' }]}>
                                     <Text style={styles.text}><Text style={styles.text2}>Category/</Text>Tops</Text>
                                     <Text style={styles.text2}>Products {"("}{productCount}{")"}</Text>
                                 </View>
-                                <View style={[styles.row,{marginVertical: 25}]}>
+                                <View style={[styles.row, { marginVertical: 25 }]}>
                                     <Picker
                                         selectedValue={selectedLanguage}
                                         onValueChange={(itemValue) =>
@@ -118,14 +146,14 @@ class ItemSection extends React.Component {
 
                             </View>
                             <FlatList
-                                data={array}
-                                renderItem={({ item }) => <Item item={item} navigation={this.props.navigation} />}
+                                data={productarray}
+                                renderItem={(item ) => <Item item={item} navigation={this.props.navigation} />}
                                 keyExtractor={(item) => item.toString()}
                                 numColumns={!isMobile() ? 3 : 2} // 3 columns for web, 2 for other platforms
                             />
                         </View>
                     </View>
-                    <Footer navigation={this.props.navigation}/>
+                    <Footer navigation={this.props.navigation} />
                 </ScrollView>
             </SafeAreaView>
         )

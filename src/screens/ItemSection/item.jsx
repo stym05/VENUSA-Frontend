@@ -15,31 +15,25 @@ import { getAllCategories } from "../../apis";
 class Item extends React.Component {
     constructor(props) {
         super(props);
-
+        let item = {}
+        console.log("this props is =", this.props)
+        if(this.props.item && this.props.item.item) {
+            item = this.props.item.item
+        }
         this.state = {
             loading: false,
             isSelected: false,
             isSale: true,
-            name: "basic cloth",
-            price: 0.0,
-            allCategoriesData: []
+            imageUrl: item.images[0],
+            name: item.name || "name",
+            price: item.price || 0.0,
         }
     }
 
-    componentDidMount = async () => {
-        try {
-            const allCategoriesData = await getAllCategories();
-            console.log("data we got is ", allCategoriesData);
-            if (allCategoriesData && allCategoriesData.success) {
-                this.setState({ allCategoriesData: allCategoriesData.categories })
-            }
-        } catch (err) {
-            console.log("Error at ITEM :: ", err);
-        }
-    }
-
-    handlePress = () => {
-        this.props.navigation.navigate("ItemDescription");
+    handlePress = (prodId) => {
+        this.props.navigation.navigate("ItemDescription", {
+            productId: prodId
+        });
     }
 
     toggleSelected = () => {
@@ -53,6 +47,7 @@ class Item extends React.Component {
             isSelected,
             isSale,
             name,
+            imageUrl,
             price
         } = this.state;
         return loading ? (
@@ -66,7 +61,7 @@ class Item extends React.Component {
                         height: 350,
                         resizeMode: 'contain',
                     }}
-                    source={require("../../../assets/images/prod1/2.jpg")}
+                    source={{ uri: imageUrl }}
                 >
                     {isSale && (
                         <View style={styles.saleContainer}>
