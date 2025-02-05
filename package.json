@@ -11,6 +11,7 @@
   "dependencies": {
     "@expo/metro-runtime": "^4.0.0",
     "@expo/vector-icons": "^14.0.4",
+    "@expo/webpack-config": "^19.0.1",
     "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-native-masked-view/masked-view": "^0.3.2",
@@ -21,13 +22,15 @@
     "@react-navigation/native-stack": "^7.0.2",
     "@react-navigation/stack": "^7.0.2",
     "@reduxjs/toolkit": "^2.3.0",
-    "expo": "~52.0.4",
+    "crypto-browserify": "^3.12.1",
+    "expo": "~50.0.0",
     "expo-app-loading": "^2.1.1",
     "expo-checkbox": "^4.0.0",
     "expo-font": "^13.0.1",
     "expo-image": "^2.0.3",
     "expo-linking": "^7.0.2",
     "expo-status-bar": "~2.0.0",
+    "html-loader": "^5.1.0",
     "install": "^0.13.0",
     "npm": "^10.9.2",
     "react": "18.3.1",
@@ -43,7 +46,8 @@
     "redux": "^5.0.1",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",
-    "redux-thunk": "^3.1.0"
+    "redux-thunk": "^3.1.0",
+    "stream-browserify": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"
