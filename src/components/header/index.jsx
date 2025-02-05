@@ -113,6 +113,12 @@ const Header = (props) => {
             </View>
           )}
         </View>
+        { !isMobile() && <Text onPress={()=>{ navigation.navigate("App",{
+          screen: "Dashboard"
+        }) }} style={{
+          fontFamily: "Roboto",
+          fontWeight: "600", fontSize: 24
+        }}>VENUSA</Text>}
         <View style={styles.rightSubContainer}>
           <View style={styles.paddingContainer}>
             <TouchableOpacity>

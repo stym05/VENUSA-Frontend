@@ -28,3 +28,12 @@ export const getProductBySubCategory = (id) => {
         console.log("error in getProductBySubCategory", err);
     }
 }
+
+export const getProductById = (id) => {
+    try {
+        const result = get(URL.getProductById+`/${id}`)
+        return result;
+    } catch (err) {
+        console.log("error in getProductBySubCategory", err);
+    }
+}

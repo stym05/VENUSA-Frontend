@@ -2,5 +2,6 @@
 export const URL = {
     getAllCategories: "api/categories",
     getSubCategorieById: "api/subcategories",
-    getProductBySubCategory: "api/products/subcategory"
+    getProductBySubCategory: "api/products/subcategory",
+    getProductById: "api/products"
 }

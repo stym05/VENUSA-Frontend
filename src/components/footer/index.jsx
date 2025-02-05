@@ -119,9 +119,6 @@ class Footer extends React.Component {
                                 <View style={styles.row}>
                                     <Text style={styles.iconText}>Profile</Text>
                                 </View>
-                                <View style={styles.row}>
-                                    <Text style={styles.iconText}>Voucher</Text>
-                                </View>
                             </View>
                         </View>
                     </View>

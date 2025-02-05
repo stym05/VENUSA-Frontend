@@ -27,10 +27,12 @@ class Item extends React.Component {
             imageUrl: item.images[0],
             name: item.name || "name",
             price: item.price || 0.0,
+            id: item._id
         }
     }
 
     handlePress = (prodId) => {
+        console.log("product id = ", prodId);
         this.props.navigation.navigate("ItemDescription", {
             productId: prodId
         });
@@ -48,7 +50,8 @@ class Item extends React.Component {
             isSale,
             name,
             imageUrl,
-            price
+            price,
+            id
         } = this.state;
         return loading ? (
             <ActivityIndicator size={"small"} color={"#000"} />
@@ -72,7 +75,7 @@ class Item extends React.Component {
                         {isSelected ? <AntDesign name="heart" size={24} color="red" onPress={this.toggleSelected} /> : <AntDesign onPress={this.toggleSelected} name="hearto" size={24} color="black" />}
                     </View>
                 </ImageBackground>
-                <TouchableOpacity style={styles.upperDetails} onPress={this.handlePress}>
+                <TouchableOpacity style={styles.upperDetails} onPress={() => this.handlePress(id)}>
                     <Text style={styles.clothName}>{name}</Text>
                     <Text style={styles.priceText}>₹ {price}</Text>
                 </TouchableOpacity>

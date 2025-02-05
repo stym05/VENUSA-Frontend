@@ -1,8 +1,8 @@
-import { USER_DATA } from "../actions/types"
+import { USER_DATA, AUTH } from "../actions/types"
 
 const initialState = {
     userData: {},
-    isLoggedIn: false
+    isAunthenicated: false
 }
 
 const userDataReducers = (state = initialState, action) => {
@@ -14,6 +14,12 @@ const userDataReducers = (state = initialState, action) => {
                     ...state.userData
                 }
             }
+        case AUTH : {
+            return {
+                ...state,
+                isAunthenicated: action.payload.isAunthenicated
+            }
+        }
         default:
             return state;
     }

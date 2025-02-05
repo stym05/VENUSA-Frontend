@@ -64,7 +64,7 @@ export default class Login extends Component {
                   onChangeText={this.handleTextChange}
                 />
               </View>
-              <View style={styles(theme).inputContainer}>
+              {<View style={styles(theme).inputContainer}>
                 <Text style={styles(theme).text}>Enter OTP*</Text>
                 <TextInput
                   style={styles(theme).input}
@@ -73,7 +73,7 @@ export default class Login extends Component {
                   value={otp}
                   onChangeText={this.handleOTPChange}
                 />
-              </View>
+              </View>}
             </View>
             <View style={[styles(theme).row, { marginHorizontal: isMobile() ? 25 : 0 }]}>
               <Checkbox

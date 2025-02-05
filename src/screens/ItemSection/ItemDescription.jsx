@@ -11,24 +11,54 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Footer from "../../components/footer";
+import { getProductById } from "../../apis";
 
 const { width } = Dimensions.get("window");
 
 class ItemDescription extends React.Component {
     constructor(props) {
         super(props);
+        let productId = "";
+        if (this.props && this.props.route) {
+            productId = this.props.route.params.productId;
+        }
         this.state = {
-            images: [
-                "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                "https://images.unsplash.com/photo-1518806118471-f28b20a1d79d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                "https://images.unsplash.com/photo-1519985176271-adb1088fa94c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                "https://images.unsplash.com/photo-1535930749574-1399327ce78f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-            ],
+            productId,
+            images: [],
             activeIndex: 0,
             colors: ["#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#FF33A1"],
-            isLoading: false
+            isLoading: false,
+            name: "",
+            price: 0,
+            description: "",
+            sizeAvailable: []
         };
+    }
+
+    componentDidMount = async () => {
+        try {
+            this.setState({ isloading: true });
+            const { productId } = this.state;
+            const response = await getProductById(productId);
+            console.log(response)
+            if (response && response.success) {
+                let size = response.product.stock.filter((item) => {
+                    return item.quantity > 0
+                })
+                this.setState({
+                    images: response.product.images,
+                    colors: response.product.colors,
+                    name: response.product.name,
+                    price: response.product.price,
+                    description: response.product.description,
+                    sizeAvailable: size
+                })
+                console.log("error is on", this.state.images)
+            }
+            this.setState({ isloading: false })
+        } catch (err) {
+            console.log("ItemDescription error is ", err);
+        }
     }
 
     handleScroll = (event) => {
@@ -38,7 +68,8 @@ class ItemDescription extends React.Component {
 
     render() {
         const {
-            isLoading
+            isLoading,
+            sizeAvailable
         } = this.state;
         return (
             <SafeAreaView style={styles.container}>
@@ -55,7 +86,11 @@ class ItemDescription extends React.Component {
                                 keyExtractor={(item, index) => index.toString()}
                                 renderItem={({ item }) => (
                                     <View style={{ height: 400 }}>
-                                        <Image source={{ uri: item }} style={styles.image} />
+                                        <Image source={{ uri: item }} style={{
+                                            width: width * 0.45,
+                                            height: "100%",
+                                            resizeMode: "cover",
+                                        }} />
                                     </View>
                                 )}
                             />
@@ -90,7 +125,7 @@ class ItemDescription extends React.Component {
                                     fontWeight: '400',
                                     lineHeight: 24,
                                     color: '#000'
-                                }}>{"Georgie Petite Trim Insert Top  "}</Text>
+                                }}>{this.state.name}</Text>
                             </View>
                             <View style={styles.paddedItem}>
                                 <Text style={{
@@ -99,7 +134,7 @@ class ItemDescription extends React.Component {
                                     fontWeight: '400',
                                     lineHeight: 24,
                                     color: '#000'
-                                }}>{"₹1,400.00"}</Text>
+                                }}>{"₹"}{this.state.price}</Text>
                             </View>
                             <View style={styles.paddedItem}>
                                 <Text style={{
@@ -117,7 +152,7 @@ class ItemDescription extends React.Component {
                                     fontWeight: '400',
                                     lineHeight: 20,
                                     color: '#808080'
-                                }}>{"This feminine top is an elevated style that pairs back with denim or tailored pants for easy week to weekend wear."}</Text>
+                                }}>{this.state.description}</Text>
                             </View>
                             <View style={[styles.paddedItem]}>
                                 <Text style={{
@@ -148,18 +183,18 @@ class ItemDescription extends React.Component {
                                     marginBottom: 10
                                 }}>Sizes</Text>
                                 <View style={{ display: 'flex', flexDirection: 'row' }}>
-                                    {["S", "M", "L", "XL", "XXL"].map((size, index) => (
+                                    {sizeAvailable.map((item, index) => (
                                         <TouchableOpacity
                                             key={index}
                                             style={[styles.colorButton, { backgroundColor: "#ddd", justifyContent: 'center', alignItems: 'center' }]}
-                                            onPress={() => console.log(`Selected size: ${size}`)}
+                                            onPress={() => console.log(`Selected size: ${item.size}`)}
                                         >
                                             <Text style={{
                                                 fontSize: 14,
                                                 fontWeight: "bold",
                                                 textAlign: 'center',
                                                 color: "#333",
-                                            }}>{size}</Text>
+                                            }}>{item.size}</Text>
                                         </TouchableOpacity>
                                     ))}
                                 </View>
@@ -171,7 +206,7 @@ class ItemDescription extends React.Component {
                             </View>
                         </View>
                     </View>
-                    <Footer navigation={this.props.navigation}/>
+                    <Footer navigation={this.props.navigation} />
                 </ScrollView>
             </SafeAreaView>
         );
@@ -182,11 +217,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-    },
-    image: {
-        width: width * 0.45,
-        height: "100%",
-        resizeMode: "cover",
     },
     dotContainer: {
         flexDirection: "row",
