@@ -16,7 +16,8 @@ import FAQs from "./screens/faq";
 import WishList from "./screens/wishList";
 import Cart from "./screens/cartScreen";
 import ShopCategories from "./screens/shopCategories";
-
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import Fontisto from '@expo/vector-icons/Fontisto';
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -63,8 +64,11 @@ const App = () => {
                 component={Dashboard}
                 options={{
                     tabBarLabel: "Dashboard", tabBarStyle: {
-                        display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                        display: isMobile() ? undefined : 'none', 
                     },
+                    tabBarIcon: ({size, color}) => {
+                        return <FontAwesome name="home" size={size} color={color} />
+                    }
                 }}
             />
             <Tab.Screen
@@ -72,8 +76,11 @@ const App = () => {
                 component={Login}
                 options={{
                     tabBarLabel: "Login", tabBarStyle: {
-                        display: isMobile() ? undefined : 'none', // Hides the bottom tab navigation
+                        display: isMobile() ? undefined : 'none', 
                     },
+                    tabBarIcon: ({size, color}) => {
+                        return <Fontisto name="person" size={size} color={color} />
+                    }
                 }}
             />
         </Tab.Navigator>
