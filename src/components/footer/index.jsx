@@ -57,8 +57,20 @@ class Footer extends React.Component {
         this.props.navigation.navigate("FAQs")
     }
 
+    openContactUs = () => {
+        this.props.navigation.navigate("ContactUs")
+    }
+
+    openAboutUs = () => {
+        this.props.navigation.navigate("AboutUs")
+    }
+
     openReturnPolicy = () => {
         this.props.navigation.navigate("ReturnPolicy");
+    }
+
+    openDeliveryPolicy = () => {
+        this.props.navigation.navigate("DeliveryPolicy");
     }
 
     handleMail = () => {
@@ -106,8 +118,7 @@ class Footer extends React.Component {
                                     <Text style={styles.iconText} onPress={this.copyToClipboard}>+91-7838356424</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <EvilIcons name="location" size={22} color="black" />
-                                    <Text style={styles.iconText}>C-608B, JVTS GARDEN, CHATTARPUR, NEW DELHI</Text>
+                                    <Text style={styles.iconText} onPress={this.openAboutUs}>About Us</Text>
                                 </View>
                             </View>
                         </View>
@@ -115,7 +126,7 @@ class Footer extends React.Component {
                             <Text style={styles.text2}>CUSTOMERS</Text>
                             <View style={styles.subTextContainer}>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>Start a return</Text>
+                                    <Text style={styles.iconText} onPress={this.openDeliveryPolicy}>Shipping & Delivery Policy</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Text style={styles.iconText} onPress={this.openReturnPolicy}>Return Policy</Text>
@@ -129,7 +140,7 @@ class Footer extends React.Component {
                             <Text style={styles.text2}>COMPANY</Text>
                             <View style={styles.subTextContainer}>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>About Us</Text>
+                                    <Text style={styles.iconText} onPress={this.openContactUs}>Contact Us</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Text style={styles.iconText} onPress={this.openTermsAndConditions}>Terms & Conditions</Text>

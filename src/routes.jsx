@@ -21,6 +21,9 @@ import Fontisto from '@expo/vector-icons/Fontisto';
 import TermsAndConditions from "./screens/termsAndCondition";
 import Policy from "./screens/Policy";
 import ReturnPolicy from "./screens/returnPolicy";
+import ContactUs from "./screens/ContactUs";
+import AboutUs from "./screens/AboutUs";
+import DeliveryPolicy from "./screens/DeliveryPolicy";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -47,7 +50,9 @@ const linking = {
                     Cart: "/Cart",
                     TermsAndConditions: "/TermsAndConditions",
                     Policy: "/Policy",
-                    ReturnPolicy: "/ReturnPolicy"
+                    ReturnPolicy: "/ReturnPolicy",
+                    ContactUs: "/ContactUs",
+                    AboutUs: "/AboutUs"
                 },
             },
         },
@@ -70,9 +75,9 @@ const App = () => {
                 component={Dashboard}
                 options={{
                     tabBarLabel: "Dashboard", tabBarStyle: {
-                        display: isMobile() ? undefined : 'none', 
+                        display: isMobile() ? undefined : 'none',
                     },
-                    tabBarIcon: ({size, color}) => {
+                    tabBarIcon: ({ size, color }) => {
                         return <FontAwesome name="home" size={size} color={color} />
                     }
                 }}
@@ -82,9 +87,9 @@ const App = () => {
                 component={Login}
                 options={{
                     tabBarLabel: "Login", tabBarStyle: {
-                        display: isMobile() ? undefined : 'none', 
+                        display: isMobile() ? undefined : 'none',
                     },
-                    tabBarIcon: ({size, color}) => {
+                    tabBarIcon: ({ size, color }) => {
                         return <Fontisto name="person" size={size} color={color} />
                     }
                 }}
@@ -114,7 +119,7 @@ const Routes = () => {
                         name="ShopCategories"
                         component={ShopCategories}
                         options={{ headerShown: false }}
-                        />
+                    />
                     <Stack.Screen
                         name="ItemSection"
                         component={ItemSection}
@@ -148,12 +153,12 @@ const Routes = () => {
                     <Stack.Screen
                         name="Cart"
                         component={Cart}
-                        options={{ headerShown: false}}
+                        options={{ headerShown: false }}
                     />
                     <Stack.Screen
                         name="TermsAndConditions"
                         component={TermsAndConditions}
-                        options={{ headerShown: false}}
+                        options={{ headerShown: false }}
                     />
                     <Stack.Screen
                         name="Policy"
@@ -163,6 +168,21 @@ const Routes = () => {
                     <Stack.Screen
                         name="ReturnPolicy"
                         component={ReturnPolicy}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="ContactUs"
+                        component={ContactUs}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="AboutUs"
+                        component={AboutUs}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="DeliveryPolicy"
+                        component={DeliveryPolicy}
                         options={{ headerShown: false }}
                     />
                 </Stack.Navigator>
