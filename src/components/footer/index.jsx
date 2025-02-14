@@ -5,14 +5,17 @@ import {
     StyleSheet,
     TextInput,
     TouchableOpacity,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform,
+    Linking
 } from "react-native";
 import Feather from '@expo/vector-icons/Feather';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from "@expo/vector-icons/Entypo";
 import { isMobile } from "../../utils";
-
+import * as Clipboard from 'expo-clipboard';
+import Toast from 'react-native-toast-message';
 
 class Footer extends React.Component {
 
@@ -28,9 +31,23 @@ class Footer extends React.Component {
         this.setState({ text: value });
     };
 
-    handleNavigateToPolicyAndTerms = () => {
-        console.log("handleNavigateToPolicyAndTerms pressed")
+
+    openTermsAndConditions = () => {
+        this.props.navigation.navigate("TermsAndConditions");
     }
+
+    openPrivacyPolicy = () => {
+        this.props.navigation.navigate("Policy");
+    }
+
+    copyToClipboard = async () => {
+        await Clipboard.setStringAsync('7838356424');
+        Toast.show({
+            type: 'success',
+            text1: 'Text Copied to Clipboard',
+            visibilityTime: 5000
+          });
+    };
 
     handleSubscribe = () => {
         this.setState({ isLoading: !this.state.isLoading })
@@ -38,6 +55,18 @@ class Footer extends React.Component {
 
     openFAQ = () => {
         this.props.navigation.navigate("FAQs")
+    }
+
+    openReturnPolicy = () => {
+        this.props.navigation.navigate("ReturnPolicy");
+    }
+
+    handleMail = () => {
+        if(Platform.OS == "web") {
+            global.open("mailto:admin@venusa.co.in");
+        }else{
+            Linking.openURL("mailto:admin@venusa.co.in")
+        }
     }
 
     render() {
@@ -54,9 +83,9 @@ class Footer extends React.Component {
                 />
                 <View style={styles.middleContainer}>
                     <Text style={styles.text2}>By signing up, you agree to our{" "}
-                        <Text style={styles.underlinedText} onPress={this.handleNavigateToPolicyAndTerms}>Privacy Policy</Text>
+                        <Text style={styles.underlinedText} onPress={this.openPrivacyPolicy}>Privacy Policy</Text>
                         {" "}and{" "}
-                        <Text style={styles.underlinedText} onPress={this.handleNavigateToPolicyAndTerms}>Terms of Service.</Text>
+                        <Text style={styles.underlinedText} onPress={this.openTermsAndConditions}>Terms of Service.</Text>
                     </Text>
 
                     <TouchableOpacity style={styles.button} onPress={this.handleSubscribe}>
@@ -70,15 +99,15 @@ class Footer extends React.Component {
                             <View style={styles.subTextContainer}>
                                 <View style={styles.row}>
                                     <Feather name="mail" size={16} color="black" />
-                                    <Text style={styles.iconText}>abc@gmail.com</Text>
+                                    <Text style={styles.iconText} onPress={this.handleMail}>admin@venusa.co.in</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Feather name="phone" size={16} color="black" />
-                                    <Text style={styles.iconText}>+91-00000 00000</Text>
+                                    <Text style={styles.iconText} onPress={this.copyToClipboard}>+91-7838356424</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <EvilIcons name="location" size={16} color="black" />
-                                    <Text style={styles.iconText}>sector 24, lane 1 delhi</Text>
+                                    <EvilIcons name="location" size={22} color="black" />
+                                    <Text style={styles.iconText}>C-608B, JVTS GARDEN, CHATTARPUR, NEW DELHI</Text>
                                 </View>
                             </View>
                         </View>
@@ -89,7 +118,7 @@ class Footer extends React.Component {
                                     <Text style={styles.iconText}>Start a return</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>Return Policy</Text>
+                                    <Text style={styles.iconText} onPress={this.openReturnPolicy}>Return Policy</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Text onPress={this.openFAQ} style={styles.iconText}>FAQ</Text>
@@ -103,10 +132,10 @@ class Footer extends React.Component {
                                     <Text style={styles.iconText}>About Us</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>Terms & Conditions</Text>
+                                    <Text style={styles.iconText} onPress={this.openTermsAndConditions}>Terms & Conditions</Text>
                                 </View>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText}>Privacy Policy</Text>
+                                    <Text style={styles.iconText} onPress={this.openPrivacyPolicy}>Privacy Policy</Text>
                                 </View>
                             </View>
                         </View>
@@ -134,7 +163,7 @@ class Footer extends React.Component {
                         </View>
                     </View>
                 </View>
-                <Text style={{marginTop: 50}}>2023 Venusa. All Rights Reserved.</Text>
+                <Text style={{marginTop: 50}}>2025 Venusa. All Rights Reserved.</Text>
             </View>
         )
     }
@@ -216,7 +245,8 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 5
+        marginTop: 5,
+        textAlign: 'center'
     },
     subTextContainer: {
         paddingVertical: 5,

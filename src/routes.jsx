@@ -18,6 +18,9 @@ import Cart from "./screens/cartScreen";
 import ShopCategories from "./screens/shopCategories";
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import Fontisto from '@expo/vector-icons/Fontisto';
+import TermsAndConditions from "./screens/termsAndCondition";
+import Policy from "./screens/Policy";
+import ReturnPolicy from "./screens/returnPolicy";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -41,7 +44,10 @@ const linking = {
                     PaymentFailedScreen: "/PaymentFailedScreen",
                     FAQs: "/faqs",
                     WishList: "/WishList",
-                    Cart: "/Cart"
+                    Cart: "/Cart",
+                    TermsAndConditions: "/TermsAndConditions",
+                    Policy: "/Policy",
+                    ReturnPolicy: "/ReturnPolicy"
                 },
             },
         },
@@ -143,6 +149,21 @@ const Routes = () => {
                         name="Cart"
                         component={Cart}
                         options={{ headerShown: false}}
+                    />
+                    <Stack.Screen
+                        name="TermsAndConditions"
+                        component={TermsAndConditions}
+                        options={{ headerShown: false}}
+                    />
+                    <Stack.Screen
+                        name="Policy"
+                        component={Policy}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="ReturnPolicy"
+                        component={ReturnPolicy}
+                        options={{ headerShown: false }}
                     />
                 </Stack.Navigator>
             </NavigationContainer>

@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 import Routes from './src/routes';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
+import Toast from 'react-native-toast-message';
+
 
 export default function App() {
 
@@ -18,6 +20,7 @@ export default function App() {
   return (
     <Provider store={Store}>
       <Routes />
+      <Toast />
     </Provider>
   );
 }

@@ -75,7 +75,7 @@ export default class Dashboard extends Component {
             <View style={{ height: isMobile() ? 400 : 800, backgroundColor: "#fff", marginBottom: isMobile() ? 15 : 50 }}>
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }}
+                source={{ uri: "http://localhost:8000/uploads/video.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 // Callback when remote video is buffering                                      
@@ -84,6 +84,7 @@ export default class Dashboard extends Component {
                 // Callback when video cannot be loaded              
                 onError={() => console.log("something went wrong")}
                 style={styles(theme).backgroundVideo}
+                repeat
               />
             </View>
             <View style={styles(theme).imageContainer}>
