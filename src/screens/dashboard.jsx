@@ -248,7 +248,7 @@ const styles = (theme) => StyleSheet.create({
     right: 0,
   },
   modalContainer: {
-    width: isMobile? "95%" :  Dimensions.get("window").width * 0.6,
+    width: isMobile() ? "95%" :  Dimensions.get("window").width * 0.6,
     height: Dimensions.get("window").height * 0.6,
     backgroundColor: '#fff'
   }
