@@ -28,13 +28,13 @@ const Header = (props) => {
   const renderDropdown = (category) => (
     <View style={styles.dropdown}>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>T-Shirts</Text>
+        <Text style={styles.dropdownItem}>{category == "men" ? "T-Shirts" : "Tops"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>Jeans</Text>
+        <Text style={styles.dropdownItem}>{category == "men" ? "Pents" : "Dresses"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>Shoes</Text>
+        <Text style={styles.dropdownItem}>{category == "men" ? "Jogger" : "bottom"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -63,7 +63,7 @@ const Header = (props) => {
               <Pressable
                 onPress={() => setMenDropdownVisible(!menDropdownVisible)} // Click for Mobile
                 onMouseEnter={() => setMenDropdownVisible(true)}  // Hover for Web
-                onMouseLeave={() => setMenDropdownVisible(false)}
+                // onMouseLeave={() => setMenDropdownVisible(false)}
               >
                 <Text style={styles.text}>Men</Text>
               </Pressable>
@@ -77,7 +77,7 @@ const Header = (props) => {
               <Pressable
                 onPress={() => setWomenDropdownVisible(!womenDropdownVisible)}
                 onMouseEnter={() =>  setWomenDropdownVisible(true)}
-                onMouseLeave={() => setWomenDropdownVisible(false)}
+                // onMouseLeave={() => setWomenDropdownVisible(false)}
               >
                 <Text style={styles.text}>Women</Text>
               </Pressable>
@@ -110,11 +110,11 @@ const Header = (props) => {
         )}
 
         <View style={styles.rightSubContainer}>
-          <View style={styles.paddingContainer}>
+          {/* <View style={styles.paddingContainer}>
             <TouchableOpacity>
               <FontAwesome name="search" size={24} color="black" />
             </TouchableOpacity>
-          </View>
+          </View> */}
           <View style={styles.paddingContainer}>
             <TouchableOpacity onPress={() => navigation.navigate("WishList")}>
               <AntDesign name="hearto" size={24} color="black" />

@@ -98,7 +98,7 @@ export default class Dashboard extends Component {
                       fontWeight: '300',
                       lineHeight: 26,
                       marginTop: 50
-                    }}>This is a pre-release beta version of our fashion design platform. We're still refining the experience, so expect exciting updates soon! Your feedback is invaluable—let us know how we can improve. </Text>
+                    }}>This is a pre-release beta version of our fashion design platform. The site currently contains demo data, so some features may or may not work as expected. We're still refining the experience, so expect exciting updates soon! </Text>
                     <Text style={{
                       fontFamily: "Roboto",
                       fontSize: 18,

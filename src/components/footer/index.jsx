@@ -13,7 +13,7 @@ import Feather from '@expo/vector-icons/Feather';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from "@expo/vector-icons/Entypo";
-import { isMobile } from "../../utils";
+import { isMobile, validateEmail } from "../../utils";
 import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
 
@@ -50,7 +50,21 @@ class Footer extends React.Component {
     };
 
     handleSubscribe = () => {
-        this.setState({ isLoading: !this.state.isLoading })
+        this.setState({ isLoading: true })
+        if(validateEmail(this.state.text)){
+        Toast.show({
+            type: 'success',
+            text1: 'Thank You for Join us',
+            visibilityTime: 5000
+          });
+        }else{
+            Toast.show({
+                type: 'error',
+                text1: 'Please enter valid email',
+                visibilityTime: 5000
+              });
+        }
+          this.setState({ text: "", isLoading: false })
     }
 
     openFAQ = () => {
