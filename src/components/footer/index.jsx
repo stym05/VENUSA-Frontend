@@ -140,7 +140,7 @@ class Footer extends React.Component {
                             <Text style={styles.text2}>COMPANY</Text>
                             <View style={styles.subTextContainer}>
                                 <View style={styles.row}>
-                                    <Text style={styles.iconText} onPress={this.openContactUs}>Contact Us</Text>
+                                    <Text style={styles.iconText} onPress={this.openContactUs}>FeedBack or Complain</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Text style={styles.iconText} onPress={this.openTermsAndConditions}>Terms & Conditions</Text>

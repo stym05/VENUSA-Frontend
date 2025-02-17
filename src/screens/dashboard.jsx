@@ -80,36 +80,37 @@ export default class Dashboard extends Component {
             <Modal isVisible={isModalVisible}>
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={styles(theme).modalContainer} >
-                  <View style={{ display: 'flex', flexDirection: isMobile() ? "column" : 'row' }}>
-                    <View style={{ height: isMobile() ? 400 : Dimensions.get("window").height * 0.6, width: isMobile() ? "100%" : '50%' }}>
-                      {isMobile() && <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                        <Entypo name="cross" size={24} color="black" onPress={()=> {
-                          this.setState({isModalVisible: !isModalVisible})
-                        }}/>
-                      </View>}
-                      <Image
-                        contentFit="fill"
-                        source={require("../../assets/gifs/loading.gif")}
-                        style={{
-                          height: "100%",
-                        }}
-                      />
-                    </View>
-                    <View style={{ width: isMobile() ? "100%" : "50%" }}>
-                      {!isMobile() && <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
-                        <Entypo name="cross" size={24} color="black" onPress={()=> {
-                          this.setState({isModalVisible: !isModalVisible})
-                        }}/>
-                      </View>}
-                      <View style={{ width: '100%', justifyContent: 'center', alignItems: 'center', marginTop: 50 }}>
-                        <Text style={{
-                          fontFamily: "Roboto",
-                          fontSize: 32,
-                          fontWeight: '600',
-                          lineHeight: 42
-                        }}>Under Maintenance</Text>
-                      </View>
-                    </View>
+                  <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                    <Entypo name="cross" size={24} color="black" onPress={() => {
+                      this.setState({ isModalVisible: !isModalVisible })
+                    }} />
+                  </View>
+                  <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{
+                      fontFamily: "Roboto",
+                      fontSize: 32,
+                      fontWeight: '600',
+                      lineHeight: 32
+                    }}>Welcome to Venusa</Text>
+                    <Text style={{
+                      fontFamily: "Roboto",
+                      fontSize: 18,
+                      fontWeight: '300',
+                      lineHeight: 26,
+                      marginTop: 50
+                    }}>This is a pre-release beta version of our fashion design platform. We're still refining the experience, so expect exciting updates soon! Your feedback is invaluable—let us know how we can improve. </Text>
+                    <Text style={{
+                      fontFamily: "Roboto",
+                      fontSize: 18,
+                      fontWeight: '300',
+                      lineHeight: 26,
+                      marginTop: 25
+                    }}>Get ready for an exclusive sneak peek!</Text>
+                    <TouchableOpacity style={styles(theme).button} onPress={() => {
+                      this.setState({ isModalVisible: !isModalVisible })
+                    }}>
+                      <Text style={styles(theme).buttonText}>Let’s Explore</Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>
@@ -247,9 +248,24 @@ const styles = (theme) => StyleSheet.create({
     bottom: 0,
     right: 0,
   },
+  button: {
+    marginTop: 50,
+    backgroundColor: '#1A1A1A',
+    width: '40%',
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    textAlign: 'center'
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontFamily: "Roboto"
+  },
   modalContainer: {
-    width: isMobile() ? "95%" :  Dimensions.get("window").width * 0.6,
+    width: isMobile() ? "95%" : Dimensions.get("window").width * 0.6,
     height: Dimensions.get("window").height * 0.6,
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    padding: 25
   }
 });

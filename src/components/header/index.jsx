@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Pressable,
   Platform,
+  Image,
 } from "react-native";
 import OfferStrip from "../offerStrip/index.jsx";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -21,6 +22,7 @@ const Header = (props) => {
   // State for Men & Women dropdown visibility
   const [menDropdownVisible, setMenDropdownVisible] = useState(false);
   const [womenDropdownVisible, setWomenDropdownVisible] = useState(false);
+  const [showSearchBar, setShowSearchBar] = useState(false);
 
   // Dropdown items
   const renderDropdown = (category) => (
@@ -38,21 +40,22 @@ const Header = (props) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || showSearchBar ? 250 : null }]}>
       <OfferStrip />
       <View style={styles.subContainer}>
         <View style={styles.leftSubContainer}>
-          {/* {isMobile() && (
+          {isMobile() && (
             <View style={styles.paddingContainer}>
-              <TouchableOpacity>
+              {/* <TouchableOpacity>
                 <MaterialCommunityIcons
                   name="reorder-horizontal"
                   size={24}
                   color="black"
                 />
-              </TouchableOpacity>
+              </TouchableOpacity> */}
+              <Image source={require("../../../assets/images/Venusa_logo.jpg")} style={{width: 50, height: 50}} />
             </View>
-          )} */}
+          )}
 
           {/* MEN Dropdown */}
           {!isMobile() && (
@@ -73,7 +76,7 @@ const Header = (props) => {
             <View style={styles.paddingContainer}>
               <Pressable
                 onPress={() => setWomenDropdownVisible(!womenDropdownVisible)}
-                onMouseEnter={() => setWomenDropdownVisible(true)}
+                onMouseEnter={() =>  setWomenDropdownVisible(true)}
                 onMouseLeave={() => setWomenDropdownVisible(false)}
               >
                 <Text style={styles.text}>Women</Text>
@@ -82,13 +85,13 @@ const Header = (props) => {
             </View>
           )}
 
-          {!isMobile() && (
+          {/* {!isMobile() && (
             <View style={styles.paddingContainer}>
               <TouchableOpacity>
                 <Text style={styles.text}>Sale</Text>
               </TouchableOpacity>
             </View>
-          )}
+          )} */}
         </View>
 
         {!isMobile() && (
@@ -178,14 +181,15 @@ const styles = StyleSheet.create({
     top: 30,
     left: 0,
     zIndex: 9999,
+    width: 250,
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 8,
-    elevation: 5, // Shadow for Android
-    shadowColor: "#000", // Shadow for iOS
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    // borderRadius: 8,
+    // elevation: 5, // Shadow for Android
+    // shadowColor: "#000", // Shadow for iOS
+    // shadowOffset: { width: 0, height: 2 },
+    // shadowOpacity: 0.2,
+    // shadowRadius: 4,
   },
   dropdownItem: {
     padding: 10,
