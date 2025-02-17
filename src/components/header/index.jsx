@@ -53,7 +53,7 @@ const Header = (props) => {
                   color="black"
                 />
               </TouchableOpacity> */}
-              <Image source={require("../../../assets/images/Venusa_logo.jpg")} style={{width: 50, height: 50}} />
+              <Image source={require("../../../assets/images/Venusa_logo1.jpg")} style={{width: 50, height: 50}} />
             </View>
           )}
 
