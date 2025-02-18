@@ -16,9 +16,9 @@ import { getSubCategorieById } from '../apis';
 class ShopCategories extends Component {
     constructor(props) {
         super(props);
-        let categorie = "men"
+        let categorie = "Mens"
         if(this.props.route && this.props.route.params){
-            categorie = this.props.route.params.categorie || "men"
+            categorie = this.props.route.params.categorie || "Mens"
             console.log("categorie selected is =", categorie)
         }
         this.state = {
