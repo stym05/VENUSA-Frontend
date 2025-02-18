@@ -249,7 +249,7 @@ const styles = (theme) => StyleSheet.create({
     right: 0,
   },
   button: {
-    marginTop: 50,
+    marginTop: isMobile() ? 10 : 50,
     backgroundColor: '#1A1A1A',
     width: '40%',
     padding: 15,
