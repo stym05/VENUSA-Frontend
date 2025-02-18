@@ -133,7 +133,7 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "http://139.59.44.49:8000/uploads/video-1739793660582.mp4" }}
+                source={{ uri: "https://webservices.venusa.co.in/uploads/video-1739793660582.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 // Callback when remote video is buffering                                      
