@@ -7,7 +7,8 @@ import {
     Dimensions,
     Text,
     FlatList,
-    TouchableOpacity
+    TouchableOpacity,
+    ActivityIndicator
 } from 'react-native';
 import { ScrollView } from 'react-native-web';
 import Footer from '../components/footer';
@@ -61,9 +62,12 @@ class ShopCategories extends Component {
     render() {
         const {
             subCategories,
-            categorie
+            categorie,
+            isloading
         } = this.state
-        return (
+        return isloading ? (<View style={{flex: 1}}>
+            <ActivityIndicator size={"large"} color={"#000"} />
+        </View>) : (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.subContainer}>
