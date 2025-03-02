@@ -29,21 +29,21 @@ class Cart extends React.Component {
                 size: "s", // Selected size (e.g., "M", "L", "XL")
                 quantity: 1, // Number of items for this size
                 price: 400 // Price per unit (store in case price changes later)
-            },{
+            }, {
                 product: null, // References Product
                 productName: "Georgie Petite Trim Insert Top",
                 image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
                 size: "s", // Selected size (e.g., "M", "L", "XL")
                 quantity: 1, // Number of items for this size
                 price: 400 // Price per unit (store in case price changes later)
-            },{
+            }, {
                 product: null, // References Product
                 productName: "Georgie Petite Trim Insert Top",
                 image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
                 size: "s", // Selected size (e.g., "M", "L", "XL")
                 quantity: 1, // Number of items for this size
                 price: 400 // Price per unit (store in case price changes later)
-            },{
+            }, {
                 product: null, // References Product
                 productName: "Georgie Petite Trim Insert Top",
                 image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
@@ -64,17 +64,17 @@ class Cart extends React.Component {
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.subContainer}>
-                        <View style={{ width: isMobile() ? "80%" :  '50%' }}>
+                        <View style={{ width: isMobile() ? "80%" : '50%' }}>
                             <Text style={styles.header}>Your Cart</Text>
                             <View style={{ padding: 20 }}>
                                 {cartProducts.map((item) => {
-                                    return (<View style={{ display: 'flex', flexDirection: 'row', marginBottom: 25}}>
+                                    return (<View style={{ display: 'flex', flexDirection: 'row', marginBottom: 25 }}>
                                         <TouchableOpacity>
                                             <Image source={{ uri: item.image }} style={styles.image} />
                                         </TouchableOpacity>
-                                        <View style={{width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginVertical: 20}}>
-                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                                                <View style={{marginLeft: 20}}>
+                                        <View style={{ width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginVertical: 20 }}>
+                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ marginLeft: 20 }}>
                                                     <Text style={styles.text}>{item.productName}</Text>
                                                     <Text style={styles.text2}>size: {item.size}</Text>
                                                 </View>
@@ -82,8 +82,8 @@ class Cart extends React.Component {
                                                     <FontAwesome name="trash-o" size={24} color="black" />
                                                 </TouchableOpacity>
                                             </View>
-                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                                                <View style={{marginLeft: 20}}>
+                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ marginLeft: 20 }}>
                                                     <Text style={styles.text}>₹{"35000.00"}</Text>
                                                 </View>
                                             </View>
@@ -98,18 +98,19 @@ class Cart extends React.Component {
                                     <Text style={styles.text}>SubTotal {"("}{totalItemCount}{")"}</Text>
                                     <Text style={styles.text}>₹{totalAmount}</Text>
                                 </View>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
-                                    <TouchableOpacity style={styles.button}>
+                                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                    <TouchableOpacity style={styles.button} onPress={() =>
+                                        this.props.navigation.navigate('CheckoutScreen')}>
                                         <Text style={styles.buttonText}>Continue to CheckOut</Text>
                                     </TouchableOpacity>
-                                    <Text style={{textAlign: 'center'}}>Shipping, taxes, and discount codes calculated at checkout.</Text>
+                                    <Text style={{ textAlign: 'center' }}>Shipping, taxes, and discount codes calculated at checkout.</Text>
                                 </View>
                             </View>
                         </View>
                     </View>
-                    <Footer navigation={this.props.navigation}/>
+                    <Footer navigation={this.props.navigation} />
                 </ScrollView>
-            </SafeAreaView>
+            </SafeAreaView >
         )
     }
 }
@@ -140,8 +141,8 @@ const styles = StyleSheet.create({
     },
     payContainer: {
         backgroundColor: "#808080",
-        display: 'flex', 
-        flexDirection: 'column', 
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         opacity: 10,
         padding: 25,
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: isMobile() ? 100 : 250,
-        height: isMobile() ? 100 :250,
+        height: isMobile() ? 100 : 250,
         resizeMode: "cover",
     },
     text: {

@@ -24,6 +24,7 @@ import ReturnPolicy from "./screens/returnPolicy";
 import ContactUs from "./screens/ContactUs";
 import AboutUs from "./screens/AboutUs";
 import DeliveryPolicy from "./screens/DeliveryPolicy";
+import CheckoutScreen from "./screens/CheckOutScreen";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -52,7 +53,8 @@ const linking = {
                     Policy: "/Policy",
                     ReturnPolicy: "/ReturnPolicy",
                     ContactUs: "/ContactUs",
-                    AboutUs: "/AboutUs"
+                    AboutUs: "/AboutUs",
+                    CheckoutScreen: "/CheckoutScreen"
                 },
             },
         },
@@ -183,6 +185,11 @@ const Routes = () => {
                     <Stack.Screen
                         name="DeliveryPolicy"
                         component={DeliveryPolicy}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="CheckoutScreen"
+                        component={CheckoutScreen}
                         options={{ headerShown: false }}
                     />
                 </Stack.Navigator>
