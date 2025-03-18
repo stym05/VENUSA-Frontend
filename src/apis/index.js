@@ -1,39 +1,113 @@
-import { get } from "./apiConfig"
-import { URL } from "./urls"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { URL } from "./urls";
 
+const DOMAIN = "http://localhost:8000/"
 
-export const getAllCategories = () => {
+const setAuthorizationHeader = async () => {
+    const jwt = await AsyncStorage.getItem("token");
+    return {
+      Authorization: `Bearer ${jwt}`,
+      "Content-Type": "application/json",
+    };
+};
+
+export const getAllCategories = async () => {
     try {
-        const result = get(URL.getAllCategories);
-        return result;
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.getAllCategories, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
     } catch (err) {
         console.log("error in getAllCategories", err);
+        return err;
     }
-}
+};
 
-export const getSubCategorieById = (id) => {
+export const getSubCategorieById = async (id) => {
     try {
-        const result = get(URL.getSubCategorieById+`/${id}`)
-        return result;
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.getSubCategorieById + `/${id}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
     } catch (err) {
         console.log("error in getSubCategorieById", err);
+        return err;
     }
-}
+};
 
-export const getProductBySubCategory = (id) => {
+export const getProductBySubCategory = async (id) => {
     try {
-        const result = get(URL.getProductBySubCategory+`/${id}`)
-        return result;
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.getProductBySubCategory + `/${id}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
     } catch (err) {
         console.log("error in getProductBySubCategory", err);
+        return err;
     }
-}
+};
 
-export const getProductById = (id) => {
+export const getProductById = async (id) => {
     try {
-        const result = get(URL.getProductById+`/${id}`)
-        return result;
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.getProductById + `/${id}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
     } catch (err) {
-        console.log("error in getProductBySubCategory", err);
+        console.log("error in getProductById", err);
+        return err;
     }
-}
+};
+
+export const createSubsciber = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.CREATE_SUBSCRIBER, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in createSubsciber", err);
+        return err;
+    }
+};
+
+export const getOTP = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.GENRATE_OTP, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getOTP", err);
+        return err;
+    }
+};
+
+export const validateOTP = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN+URL.VALIDATE_OTP, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in validateOTP", err);
+        return err;
+    }
+};

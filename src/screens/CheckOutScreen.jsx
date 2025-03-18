@@ -81,9 +81,9 @@ const CheckoutScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
+            {/*<View style={styles.header}>
                 <Text style={styles.headerText}>20% Offer for the First time user. Shop Women and Men</Text>
-            </View>
+            </View>*/}
 
             <ScrollView style={styles.scrollView}>
                 <View style={styles.checkoutContainer}>

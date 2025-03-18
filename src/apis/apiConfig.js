@@ -1,6 +1,8 @@
 import { Platform } from "react-native";
 
-const apiMainURL = "https://webservices.venusa.co.in/"; // Replace with your API base URL.
+// const apiMainURL = "https://webservices.venusa.co.in/"; // Replace with your API base URL.
+
+const apiMainURL = "http://localhost:8000/";
 
 const setAuthorizationHeader = (url) => {
   return {
@@ -36,16 +38,19 @@ const fetchWrapper = async (method, url, data = null, isFormData = false) => {
   } else if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
-
-  return fetch(URL, {
+  try {
+  const response = await fetch(URL, {
     method,
     headers: {
       ...headers,
     },
     body: data ? (isFormData ? data : JSON.stringify(data)) : null,
-  })
-    .then(handleResponse)
-    .catch(handleError);
+    })
+    return response;
+  } catch (err) {
+    console.log("error", err);
+    return err;
+  }
 };
 
 // HTTP Methods

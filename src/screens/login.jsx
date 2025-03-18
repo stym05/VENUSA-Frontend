@@ -14,6 +14,8 @@ import Store from '../store';
 import Checkbox from 'expo-checkbox';
 import { isMobile } from '../utils';
 import Footer from '../components/footer';
+import { getOTP, validateOTP } from '../apis';
+import Toast from 'react-native-toast-message';
 
 export default class Login extends Component {
   constructor(props) {
@@ -26,7 +28,9 @@ export default class Login extends Component {
       mobileNumber: "",
       otp: "",
       isChecked: false,
-      isLoading: false
+      isLoading: false,
+      showOTP: false,
+      userId: ""
     }
   }
 
@@ -42,8 +46,48 @@ export default class Login extends Component {
     this.setState({ isChecked: value })
   }
 
-  handleLogin = () => {
-    this.setState({ isLoading: !this.state.isLoading })
+  handleLogin = async () => {
+    if(!this.state.showOTP) {
+      // for OTP genration
+      this.setState({ isLoading: true })
+      const payload = {
+        userName: this.state.mobileNumber
+      }
+      const response = await getOTP(payload)
+      if(response.success) {
+        this.setState({ isLoading: false, userId: response.userId, showOTP: true });
+        Toast.show({
+          type: "success",
+          text1: "OTP Sent Successfully"
+        })
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "something went wrong"
+        })
+      }
+      this.setState({isLoading: false})
+    }else{ 
+      this.setState({ isLoading: true })
+      const payload = {
+        userId: this.state.userId,
+        otp: this.state.otp
+      }
+      const response = await validateOTP(payload);
+      if(response.success) {
+        this.setState({ isLoading: false, showOTP: true });
+        Toast.show({
+          type: "success",
+          text1: "hii, welcome to venusa"
+        })
+        this.props.navigation.navigate(this.state.from ? this.state.from : "Dashboard")
+      }else{
+        Toast.show({
+          type: "error",
+          text1: "something went wrong"
+        })
+      }
+    }
   }
 
   render() {
@@ -64,7 +108,7 @@ export default class Login extends Component {
                   onChangeText={this.handleTextChange}
                 />
               </View>
-              {<View style={styles(theme).inputContainer}>
+              {this.state.showOTP && <View style={styles(theme).inputContainer}>
                 <Text style={styles(theme).text}>Enter OTP*</Text>
                 <TextInput
                   style={styles(theme).input}
@@ -85,7 +129,7 @@ export default class Login extends Component {
             </View>
             <View style={styles(theme).buttonContainer}>
               <TouchableOpacity style={styles(theme).button} onPress={this.handleLogin}>
-                {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles(theme).buttonText}>LOGIN</Text>)}
+                {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles(theme).buttonText}>{this.state.showOTP ? "LOGIN" : "Send OTP"}</Text>)}
               </TouchableOpacity>
             </View>
           </View>

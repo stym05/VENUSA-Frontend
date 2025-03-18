@@ -16,6 +16,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 import { isMobile, validateEmail } from "../../utils";
 import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
+import { createSubsciber } from "../../apis";
 
 class Footer extends React.Component {
 
@@ -49,14 +50,31 @@ class Footer extends React.Component {
           });
     };
 
-    handleSubscribe = () => {
+    handleSubscribe = async () => {
         this.setState({ isLoading: true })
+        try {
         if(validateEmail(this.state.text)){
-        Toast.show({
-            type: 'success',
-            text1: 'Thank You for Join us',
-            visibilityTime: 5000
-          });
+            const payload = {
+                email: this.state.text
+            }
+            const response = await createSubsciber(payload);
+            console.log("response is ", response);
+            if(response.success) {
+                console.log("erre")
+                Toast.show({
+                    type: 'success',
+                    text1: 'Thank You for Join us',
+                    visibilityTime: 5000
+                });
+            }else{
+                console.log("err35652526e")
+                Toast.show({
+                    type: 'error',
+                    text1: response.message,
+                    visibilityTime: 5000
+                });
+            }
+            this.setState({ text: "", isLoading: false })
         }else{
             Toast.show({
                 type: 'error',
@@ -64,7 +82,16 @@ class Footer extends React.Component {
                 visibilityTime: 5000
               });
         }
-          this.setState({ text: "", isLoading: false })
+        } catch (err) {
+            console.log("err35652526e")
+                Toast.show({
+                    type: 'error',
+                    text1: "something went wrong",
+                    visibilityTime: 5000
+                });
+                this.setState({ text: "", isLoading: false })
+        }
+         
     }
 
     openFAQ = () => {
