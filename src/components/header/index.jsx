@@ -9,7 +9,6 @@ import {
   Image,
 } from "react-native";
 import OfferStrip from "../offerStrip/index.jsx";
-import FontAwesome from "@expo/vector-icons/FontAwesome";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";

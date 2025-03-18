@@ -16,6 +16,8 @@ import { isMobile } from '../utils';
 import Footer from '../components/footer';
 import { getOTP, validateOTP } from '../apis';
 import Toast from 'react-native-toast-message';
+import { AUTH, AUTH_TOKEN, USER_DATA } from '../store/actions/types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Login extends Component {
   constructor(props) {
@@ -47,41 +49,50 @@ export default class Login extends Component {
   }
 
   handleLogin = async () => {
-    if(!this.state.showOTP) {
+    if (!this.state.showOTP) {
       // for OTP genration
       this.setState({ isLoading: true })
       const payload = {
         userName: this.state.mobileNumber
       }
       const response = await getOTP(payload)
-      if(response.success) {
+      if (response.success) {
         this.setState({ isLoading: false, userId: response.userId, showOTP: true });
         Toast.show({
           type: "success",
           text1: "OTP Sent Successfully"
         })
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "something went wrong"
         })
       }
-      this.setState({isLoading: false})
-    }else{ 
+      this.setState({ isLoading: false })
+    } else {
       this.setState({ isLoading: true })
       const payload = {
         userId: this.state.userId,
         otp: this.state.otp
       }
       const response = await validateOTP(payload);
-      if(response.success) {
+      if (response.success) {
         this.setState({ isLoading: false, showOTP: true });
         Toast.show({
           type: "success",
           text1: "hii, welcome to venusa"
         })
+        const jwt = response.authToken;
+
+        // Store JWT token in AsyncStorage
+        await AsyncStorage.setItem("jwt", jwt);
+        console.log("Users Data is ", response)
+        // Dispatch actions to Redux
+        Store.dispatch({ type: AUTH, payload: true });
+        Store.dispatch({ type: USER_DATA, payload: response.user });
+        Store.dispatch({ type: AUTH_TOKEN, payload: jwt });
         this.props.navigation.navigate(this.state.from ? this.state.from : "Dashboard")
-      }else{
+      } else {
         Toast.show({
           type: "error",
           text1: "something went wrong"
@@ -133,7 +144,7 @@ export default class Login extends Component {
               </TouchableOpacity>
             </View>
           </View>
-          <Footer navigation={this.props.navigation}/>
+          <Footer navigation={this.props.navigation} />
         </ScrollView>
       </SafeAreaView>
     )

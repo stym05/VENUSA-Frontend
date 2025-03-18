@@ -42,7 +42,7 @@ export default class Dashboard extends Component {
     try {
       this.setState({ isLoading: true });
       const allCategoriesData = await getAllCategories();
-      console.log("data we got is ", allCategoriesData);
+      console.log("data we got is ", Store.getState().user);
       if (allCategoriesData && allCategoriesData.success) {
         const data = allCategoriesData.categories;
         let categorie = {};
