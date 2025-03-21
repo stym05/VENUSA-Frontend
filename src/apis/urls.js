@@ -5,6 +5,8 @@ export const URL = {
     getProductBySubCategory: "api/products/subcategory",
     getProductById: "api/products",
     CREATE_SUBSCRIBER: "api/subscriber/create",
-    GENRATE_OTP: "api/login/loginUser",
-    VALIDATE_OTP: "api/login/validateOTPforUsers"
+    GENRATE_OTP: "api/login/loginCustomer",
+    VALIDATE_OTP: "api/login/validateOTPforCustomers",
+    GET_CART_ITEMS: "api/cart",
+    GET_WISHLIST: "api/wishlist",
 }

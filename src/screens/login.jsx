@@ -53,7 +53,7 @@ export default class Login extends Component {
       // for OTP genration
       this.setState({ isLoading: true })
       const payload = {
-        userName: this.state.mobileNumber
+        phone_number: this.state.mobileNumber
       }
       const response = await getOTP(payload)
       if (response.success) {
@@ -89,9 +89,9 @@ export default class Login extends Component {
         console.log("Users Data is ", response)
         // Dispatch actions to Redux
         Store.dispatch({ type: AUTH, payload: true });
-        Store.dispatch({ type: USER_DATA, payload: response.user });
+        Store.dispatch({ type: USER_DATA, payload: response.customer });
         Store.dispatch({ type: AUTH_TOKEN, payload: jwt });
-        this.props.navigation.navigate(this.state.from ? this.state.from : "Dashboard")
+        this.props.navigation.replace(this.state.from ? this.state.from : "Dashboard")
       } else {
         Toast.show({
           type: "error",

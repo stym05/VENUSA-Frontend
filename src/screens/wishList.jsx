@@ -7,11 +7,14 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    Dimensions
+    Dimensions,
 } from 'react-native';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { isMobile } from '../utils/index';
 import Footer from '../components/footer/index';
+import Store from "../store";
+import { getWishList } from "../apis";
+import Modal from "react-native-modal";
 
 const { width } = Dimensions.get("window");
 
@@ -22,59 +25,93 @@ class WishList extends React.Component {
             loading: false,
             totalItemCount: 0.0,
             totalAmount: 0.0,
-            cartProducts: [{
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            },{
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            },{
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            },{
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            }]
+            cartProducts: [],
+            isModalVisible: true
         }
+    }
+
+    async componentDidMount() {
+        try {
+            this.setState({ isLoading: true })
+            const {
+                isAuthenticated
+            } = this.state;
+            if (isAuthenticated) {
+                const userId = Store.getState().user.userData._id
+                const response = await getWishList(userId);
+                if (response.success) {
+                    this.setState({ cartProducts: response.data, isLoading: false })
+                } else {
+                    this.setState({ cartProducts: [], isLoading: false })
+                }
+            } else {
+                this.setState({ isAuthenticated: false })
+            }
+
+        } catch (err) {
+            console.log("something went wrong")
+        }
+    }
+
+    componentWillUnmount() {
+        const { isModalVisible } = this.state;
+        this.setState({ isModalVisible: !isModalVisible })
     }
 
     render() {
         const {
             totalItemCount,
             totalAmount,
-            cartProducts
+            cartProducts,
+            isModalVisible
         } = this.state;
         return (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.subContainer}>
-                        <View style={{ width: isMobile() ? "80%" :  '50%' }}>
+                        <Modal isVisible={isModalVisible}>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <View style={styles.modalContainer} >
+                                    <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                                        {/* <Entypo name="cross" size={24} color="black" onPress={() => {
+                                                                this.setState({ isModalVisible: !isModalVisible })
+                                                            }} /> */}
+                                    </View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{
+                                            fontFamily: "Roboto",
+                                            fontSize: 32,
+                                            fontWeight: '600',
+                                            lineHeight: 32
+                                        }}>Oops your not login</Text>
+                                        <Text style={{
+                                            fontFamily: "Roboto",
+                                            fontSize: 18,
+                                            fontWeight: '300',
+                                            lineHeight: 26,
+                                            marginTop: 50
+                                        }}>Login to get your cart items</Text>
+                                        <TouchableOpacity style={styles.button} onPress={() => {
+                                            this.setState({ isModalVisible: !isModalVisible })
+                                            this.props.navigation.replace("Login")
+                                        }}>
+                                            <Text style={styles.buttonText}>Login</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
+                        <View style={{ width: isMobile() ? "80%" : '50%' }}>
                             <Text style={styles.header}>Your WishList</Text>
                             <View style={{ padding: 20 }}>
                                 {cartProducts.map((item) => {
-                                    return (<View style={{ display: 'flex', flexDirection: 'row', marginBottom: 25}}>
+                                    return (<View style={{ display: 'flex', flexDirection: 'row', marginBottom: 25 }}>
                                         <TouchableOpacity>
                                             <Image source={{ uri: item.image }} style={styles.image} />
                                         </TouchableOpacity>
-                                        <View style={{width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginVertical: 20}}>
-                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                                                <View style={{marginLeft: 20}}>
+                                        <View style={{ width: '60%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginVertical: 20 }}>
+                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ marginLeft: 20 }}>
                                                     <Text style={styles.text}>{item.productName}</Text>
                                                     <Text style={styles.text2}>size: {item.size}</Text>
                                                 </View>
@@ -82,8 +119,8 @@ class WishList extends React.Component {
                                                     <FontAwesome name="trash-o" size={24} color="black" />
                                                 </TouchableOpacity>
                                             </View>
-                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between'}}>
-                                                <View style={{marginLeft: 20}}>
+                                            <View style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                                                <View style={{ marginLeft: 20 }}>
                                                     <Text style={styles.text}>₹{"35000.00"}</Text>
                                                 </View>
                                             </View>
@@ -98,11 +135,11 @@ class WishList extends React.Component {
                                     <Text style={styles.text}>SubTotal {"("}{totalItemCount}{")"}</Text>
                                     <Text style={styles.text}>₹{totalAmount}</Text>
                                 </View>
-                                <View style={{justifyContent: 'center', alignItems: 'center'}}>
+                                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
                                     <TouchableOpacity style={styles.button}>
                                         <Text style={styles.buttonText}>Continue to CheckOut</Text>
                                     </TouchableOpacity>
-                                    <Text style={{textAlign: 'center'}}>Shipping, taxes, and discount codes calculated at checkout.</Text>
+                                    <Text style={{ textAlign: 'center' }}>Shipping, taxes, and discount codes calculated at checkout.</Text>
                                 </View>
                             </View>
                         </View>
@@ -140,8 +177,8 @@ const styles = StyleSheet.create({
     },
     payContainer: {
         backgroundColor: "#808080",
-        display: 'flex', 
-        flexDirection: 'column', 
+        display: 'flex',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         opacity: 10,
         padding: 25,
@@ -152,7 +189,7 @@ const styles = StyleSheet.create({
     },
     image: {
         width: isMobile() ? 100 : 250,
-        height: isMobile() ? 100 :250,
+        height: isMobile() ? 100 : 250,
         resizeMode: "cover",
     },
     text: {
@@ -180,6 +217,12 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontFamily: "Roboto"
     },
+    modalContainer: {
+        width: isMobile() ? "95%" : Dimensions.get("window").width * 0.6,
+        height: isMobile() ? null : Dimensions.get("window").height * 0.5,
+        backgroundColor: '#fff',
+        padding: 25
+    }
 })
 
 export default WishList;

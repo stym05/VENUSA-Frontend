@@ -12,60 +12,112 @@ import {
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { isMobile } from '../utils/index';
 import Footer from '../components/footer/index';
+import Store from "../store";
+import { getCartItem } from "../apis";
+import Modal from "react-native-modal";
+import Entypo from '@expo/vector-icons/Entypo';
 
 const { width } = Dimensions.get("window");
 
 class Cart extends React.Component {
     constructor(props) {
         super(props);
+        let isAuthenticated = Store.getState().user.isAuthenticated || false
         this.state = {
             loading: false,
             totalItemCount: 0.0,
             totalAmount: 0.0,
-            cartProducts: [{
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            }, {
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            }, {
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            }, {
-                product: null, // References Product
-                productName: "Georgie Petite Trim Insert Top",
-                image: "https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&q=80&w=400",
-                size: "s", // Selected size (e.g., "M", "L", "XL")
-                quantity: 1, // Number of items for this size
-                price: 400 // Price per unit (store in case price changes later)
-            }]
+            isAuthenticated,
+            cartProducts: [],
+            isModalVisible: true
         }
     }
+
+    async componentDidMount() {
+        try {
+            this.setState({ isLoading: true })
+            const {
+                isAuthenticated
+            } = this.state;
+            if (isAuthenticated) {
+                const userId = Store.getState().user.userData._id
+                const response = await getCartItem(userId);
+                if (response.success) {
+                    this.setState({ cartProducts: response.data, isLoading: false })
+                } else {
+                    this.setState({ cartProducts: [], isLoading: false })
+                }
+            } else {
+                this.setState({ isAuthenticated: false })
+            }
+
+        } catch (err) {
+            console.log("something went wrong")
+        }
+    }
+
+    componentWillUnmount() {
+        const  { isModalVisible } = this.state;
+        this.setState({ isModalVisible: !isModalVisible })
+    }
+
 
     render() {
         const {
             totalItemCount,
             totalAmount,
-            cartProducts
+            cartProducts,
+            isModalVisible
         } = this.state;
         return (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.subContainer}>
+                        <Modal isVisible={isModalVisible}>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <View style={styles.modalContainer} >
+                                    <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
+                                        {/* <Entypo name="cross" size={24} color="black" onPress={() => {
+                                            this.setState({ isModalVisible: !isModalVisible })
+                                        }} /> */}
+                                    </View>
+                                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                                        <Text style={{
+                                            fontFamily: "Roboto",
+                                            fontSize: 32,
+                                            fontWeight: '600',
+                                            lineHeight: 32
+                                        }}>Oops your not login</Text>
+                                        <Text style={{
+                                            fontFamily: "Roboto",
+                                            fontSize: 18,
+                                            fontWeight: '300',
+                                            lineHeight: 26,
+                                            marginTop: 50
+                                        }}>Login to get your cart items</Text>
+                                        <TouchableOpacity style={styles.button} onPress={() => {
+                                            this.setState({ isModalVisible: !isModalVisible })
+                                            this.props.navigation.replace("Login")
+                                        }}>
+                                            <Text style={styles.buttonText}>Login</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                </View>
+                            </View>
+                        </Modal>
                         <View style={{ width: isMobile() ? "80%" : '50%' }}>
                             <Text style={styles.header}>Your Cart</Text>
+                            {cartProducts.length < 1 && (
+                                <View>
+                                    <Text style={{
+                                        fontFamily: "Roboto",
+                                        fontWeight: "100",
+                                        fontSize: 18,
+                                        lineHeight: 38,
+                                        padding: 20
+                                    }}>0 Products</Text>
+                                </View>
+                            )}
                             <View style={{ padding: 20 }}>
                                 {cartProducts.map((item) => {
                                     return (<View style={{ display: 'flex', flexDirection: 'row', marginBottom: 25 }}>
@@ -181,6 +233,12 @@ const styles = StyleSheet.create({
         fontWeight: "600",
         fontFamily: "Roboto"
     },
+    modalContainer: {
+        width: isMobile() ? "95%" : Dimensions.get("window").width * 0.6,
+        height: isMobile() ? null : Dimensions.get("window").height * 0.5,
+        backgroundColor: '#fff',
+        padding: 25
+    }
 })
 
 export default Cart;
