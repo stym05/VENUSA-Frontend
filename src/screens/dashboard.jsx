@@ -49,7 +49,7 @@ export default class Dashboard extends Component {
         data.forEach((item) => {
           categorie[item.name] = {
             id: item._id,
-            categoryImage: item.categoryImage,
+            categoryImage: item.image,
           }
         })
         console.log("data we filtered", categorie);
