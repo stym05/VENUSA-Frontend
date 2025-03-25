@@ -9,7 +9,7 @@ import {
     ActivityIndicator
 } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { getAllCategories } from "../../apis";
+import { DOMAIN, getAllCategories } from "../../apis";
 
 
 class Item extends React.Component {
@@ -24,11 +24,12 @@ class Item extends React.Component {
             loading: false,
             isSelected: false,
             isSale: true,
-            imageUrl: item.images[0],
+            imageUrl: item.images[0]?.includes("http") ? item.images[0] : DOMAIN + item.images[0],
             name: item.name || "name",
             price: item.price || 0.0,
             id: item._id
         }
+        console.log(this.state.imageUrl)
     }
 
     handlePress = (prodId) => {

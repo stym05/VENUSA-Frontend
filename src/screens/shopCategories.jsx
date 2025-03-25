@@ -12,14 +12,14 @@ import {
 } from 'react-native';
 import { ScrollView } from 'react-native-web';
 import Footer from '../components/footer';
-import { getSubCategorieById } from '../apis';
+import { DOMAIN, getSubCategorieById } from '../apis';
 
 class ShopCategories extends Component {
     constructor(props) {
         super(props);
-        let categorie = "men"
+        let categorie = "mens"
         if(this.props.route && this.props.route.params){
-            categorie = this.props.route.params.categorie || "men"
+            categorie = this.props.route.params.categorie || "mens"
             console.log("categorie selected is =", categorie)
         }
         this.state = {
@@ -91,6 +91,7 @@ class ShopCategories extends Component {
                                     keyExtractor={(item, index) => index.toString()}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity onPress={() => this.navigateToProducts(item._id, item.name)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
+                                        {/* {console.log("images for item ", item.image.includes("http") ? item.image : DOMAIN + item.image)} */}
                                             <Image
                                                 source={{ uri: item.image }}
                                                 style={styles.img}

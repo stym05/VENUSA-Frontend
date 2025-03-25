@@ -11,7 +11,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Footer from "../../components/footer";
-import { getProductById } from "../../apis";
+import { DOMAIN, getProductById } from "../../apis";
 
 const { width } = Dimensions.get("window");
 
@@ -43,11 +43,19 @@ class ItemDescription extends React.Component {
             const response = await getProductById(productId);
             console.log(response)
             if (response && response.success) {
+                console.log("images", response)
                 let size = response.product.stock.filter((item) => {
                     return item.quantity > 0
                 })
+                console.log("images", size)
+                const imgs = response.product.images;
+                console.log("images", imgs)
+                const images = imgs.map((item)=> {
+                    return item?.includes("http") ? item : DOMAIN + item;
+                })
+                console.log("images", images)
                 this.setState({
-                    images: response.product.images,
+                    images,
                     colors: response.product.colors,
                     name: response.product.name,
                     price: response.product.price,
