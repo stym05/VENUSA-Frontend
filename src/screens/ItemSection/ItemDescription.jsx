@@ -39,6 +39,7 @@ class ItemDescription extends React.Component {
         try {
             this.setState({ isloading: true });
             const { productId } = this.state;
+            console.log("Product id we get is = ", productId);
             const response = await getProductById(productId);
             console.log(response)
             if (response && response.success) {

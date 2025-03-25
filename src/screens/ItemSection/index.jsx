@@ -41,6 +41,7 @@ class ItemSection extends React.Component {
                 productId
             } = this.state;
             this.setState({ isloading: true })
+            console.log("product id ", productId)
             const response = await getProductBySubCategory(productId);
             if (response && response.success) {
                 const { products } = response;

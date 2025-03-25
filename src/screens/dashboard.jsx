@@ -170,13 +170,13 @@ export default class Dashboard extends Component {
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie["Mens"]
+                    categorie: categorie["men"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
                     <Text style={{ fontSize: isMobile() ? 18 : 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie["Womens"]
+                    categorie: categorie["women"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
                     <Text style={{ fontSize: isMobile() ? 18 : 24, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
