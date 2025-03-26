@@ -171,3 +171,18 @@ export const removeFromWishList = async (data) => {
         return err;
     }
 }
+
+export const addToCart = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.ADD_TO_CART, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in addToCart", err);
+        return err;
+    }
+}

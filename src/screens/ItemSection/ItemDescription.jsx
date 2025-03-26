@@ -11,7 +11,9 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Footer from "../../components/footer";
-import { DOMAIN, getProductById } from "../../apis";
+import { addToCart, DOMAIN, getProductById } from "../../apis";
+import Store from "../../store";
+import Toast from "react-native-toast-message";
 
 const { width } = Dimensions.get("window");
 
@@ -31,6 +33,8 @@ class ItemDescription extends React.Component {
             name: "",
             price: 0,
             description: "",
+            size: "S",
+            color: "",
             sizeAvailable: []
         };
     }
@@ -75,9 +79,38 @@ class ItemDescription extends React.Component {
         this.setState({ activeIndex });
     };
 
-    handleSubscribe = () => {
-        // cart k logic yha likhna hai
-        
+    handleAddToCart = async () => {
+        try {
+            const { productId, size, color } = this.state;
+            const userId = Store.getState().user.userData._id
+            const payload = {
+                userId: userId,
+                productId,
+                size,
+                color
+            }
+            const response = await addToCart(payload);
+            if(response.success) {
+                Toast.show({
+                    text1: "Product added to cart",
+                    type: "success",
+                    visibilityTime: 5000
+                })
+            }else{
+                Toast.show({
+                    text1: "something went wrong. please try again later",
+                    type: "error",
+                    visibilityTime: 5000
+                })
+            }
+        }catch(err) {
+            console.log("Error to adding cart is ", err);
+            Toast.show({
+                text1: "something went wrong. please try again later",
+                type: "error",
+                visibilityTime: 5000
+            })
+        }
     }
 
     render() {
@@ -214,7 +247,7 @@ class ItemDescription extends React.Component {
                                 </View>
                             </View>
                             <View>
-                                <TouchableOpacity style={styles.button} onPress={this.handleSubscribe}>
+                                <TouchableOpacity style={styles.button} onPress={this.handleAddToCart}>
                                     {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles.buttonText}>Add to cart</Text>)}
                                 </TouchableOpacity>
                             </View>

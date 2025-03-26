@@ -40,7 +40,8 @@ class Cart extends Component {
                 const userId = Store.getState().user.userData._id;
                 const response = await getCartItem(userId);
                 if (response.success) {
-                    this.setState({ cartProducts: response.data, loading: false });
+                    console.log("cart data is ", response.cart);
+                    this.setState({ cartProducts: response?.cart?.products, loading: false });
                 } else {
                     this.setState({ cartProducts: [], loading: false });
                 }
@@ -95,19 +96,20 @@ class Cart extends Component {
                                 {cartProducts.map((item, index) => (
                                     <View key={index} style={styles.cartItem}>
                                         <TouchableOpacity>
-                                            <Image source={{ uri: item.image }} style={styles.image} />
+                                            <Image source={{ uri: item.product.images[0] }} style={styles.image} />
                                         </TouchableOpacity>
                                         <View style={styles.cartItemDetails}>
                                             <View style={styles.cartItemHeader}>
                                                 <View style={styles.cartItemInfo}>
-                                                    <Text style={styles.text}>{item.productName}</Text>
+                                                    <Text style={styles.text}>{item.product.name}</Text>
                                                     <Text style={styles.text2}>Size: {item.size}</Text>
+                                                    <Text style={styles.text2}>Color: {item.color}</Text>
                                                 </View>
                                                 <TouchableOpacity onPress={() => this.handleTrashItem(item)}>
                                                     <FontAwesome name="trash-o" size={24} color="black" />
                                                 </TouchableOpacity>
                                             </View>
-                                            <Text style={styles.text}>₹{item.price || "35000.00"}</Text>
+                                            <Text style={styles.text}>₹{item.product.price}</Text>
                                         </View>
                                     </View>
                                 ))}

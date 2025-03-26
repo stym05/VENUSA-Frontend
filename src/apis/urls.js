@@ -10,5 +10,6 @@ export const URL = {
     GET_CART_ITEMS: "api/cart",
     GET_WISHLIST: "api/wishlist",
     ADD_TO_WISHLIST: "api/wishlist/add",
-    REMOVE_FROM_WISHLIST: "api/wishlist/remove"
+    REMOVE_FROM_WISHLIST: "api/wishlist/remove",
+    ADD_TO_CART: "api/cart/add"
 }

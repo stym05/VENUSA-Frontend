@@ -54,7 +54,7 @@ class ItemSection extends React.Component {
     };
 
     render() {
-        const { loading, productarray, productCount, currentPage, itemsPerPage } = this.state;
+        const { loading, productarray, productCount, currentPage, itemsPerPage, productName } = this.state;
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginatedProducts = productarray.slice(startIndex, startIndex + itemsPerPage);
 
@@ -78,7 +78,7 @@ class ItemSection extends React.Component {
                         <View style={styles.itemList}>
                             <View style={{ marginHorizontal: 20 }}>
                                 <View style={[styles.row, { justifyContent: 'space-between' }]}>
-                                    <Text style={styles.text}><Text style={styles.text2}>Category/</Text>Tops</Text>
+                                    <Text style={styles.text}><Text style={styles.text2}>Category/</Text>{productName}</Text>
                                     <Text style={styles.text2}>Products ({productCount})</Text>
                                 </View>
                                 
