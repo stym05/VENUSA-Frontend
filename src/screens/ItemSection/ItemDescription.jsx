@@ -75,6 +75,11 @@ class ItemDescription extends React.Component {
         this.setState({ activeIndex });
     };
 
+    handleSubscribe = () => {
+        // cart k logic yha likhna hai
+        
+    }
+
     render() {
         const {
             isLoading,

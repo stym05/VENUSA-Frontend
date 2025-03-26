@@ -9,4 +9,6 @@ export const URL = {
     VALIDATE_OTP: "api/login/validateOTPforCustomers",
     GET_CART_ITEMS: "api/cart",
     GET_WISHLIST: "api/wishlist",
+    ADD_TO_WISHLIST: "api/wishlist/add",
+    REMOVE_FROM_WISHLIST: "api/wishlist/remove"
 }

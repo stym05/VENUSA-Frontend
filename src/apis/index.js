@@ -141,3 +141,33 @@ export const getWishList = async (userId) => {
         return err;
     }
 }
+
+export const AddToWishList = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.ADD_TO_WISHLIST, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in addToWishlist", err);
+        return err;
+    }
+};
+
+export const removeFromWishList = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.REMOVE_FROM_WISHLIST, {
+            method: "DELETE",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in removeFromWishList", err);
+        return err;
+    }
+}

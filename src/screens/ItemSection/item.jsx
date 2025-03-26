@@ -9,22 +9,23 @@ import {
     ActivityIndicator
 } from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { DOMAIN, getAllCategories } from "../../apis";
+import { AddToWishList, DOMAIN, getAllCategories, removeFromWishList } from "../../apis";
+import Store from "../../store";
+import Toast from "react-native-toast-message";
 
 
 class Item extends React.Component {
     constructor(props) {
         super(props);
         let item = {}
-        console.log("this props is =", this.props)
-        if(this.props.item && this.props.item.item) {
-            item = this.props.item.item
+        if (this.props.item) {
+            item = this.props.item
         }
         this.state = {
             loading: false,
             isSelected: false,
             isSale: true,
-            imageUrl: item.images[0]?.includes("http") ? item.images[0] : DOMAIN + item.images[0],
+            imageUrl: item.images[0],
             name: item.name || "name",
             price: item.price || 0.0,
             id: item._id
@@ -39,9 +40,66 @@ class Item extends React.Component {
         });
     }
 
-    toggleSelected = () => {
-        console.log("selected ko toggle kro");
-        this.setState({ isSelected: !this.state.isSelected })
+    toggleSelected = async (prodId) => {
+        const {
+            isSelected
+        } = this.state;
+        const userId = Store.getState().user.userData._id;
+        const payload = {
+            userId,
+            productId: prodId
+        }
+        console.log("hello world", payload);
+        if (!isSelected) {
+            const response = await AddToWishList(payload);
+            if (response.status) {
+                if (response.code == 100) {
+                    Toast.show({
+                        text1: "Product added to wishlist",
+                        type: "success",
+                        visibilityTime: 5000
+                    })
+                } else {
+                    Toast.show({
+                        text1: "Product already added to wishlist",
+                        type: "success",
+                        visibilityTime: 5000
+                    })
+                }
+                
+                this.setState({ isSelected: true })
+            } else {
+                Toast.show({
+                    text1: "something went wrong please try again later",
+                    type: "error",
+                    visibilityTime: 5000
+                })
+            }
+        } else {
+            const response = await removeFromWishList(payload);
+            if (response.status) {
+                if (response.code == 100) {
+                    Toast.show({
+                        text1: "Product removed from wishlist",
+                        type: "success",
+                        visibilityTime: 5000
+                    })
+                } else {
+                    Toast.show({
+                        text1: "Product already removed from wishlist",
+                        type: "success",
+                        visibilityTime: 5000
+                    })
+                }
+                this.setState({ isSelected: false })
+            } else {
+                Toast.show({
+                    text1: "something went wrong please try again later",
+                    type: "error",
+                    visibilityTime: 5000
+                })
+            }
+        }
     }
 
     render() {
@@ -73,7 +131,7 @@ class Item extends React.Component {
                         </View>
                     )}
                     <View style={styles.heart}>
-                        {isSelected ? <AntDesign name="heart" size={24} color="red" onPress={this.toggleSelected} /> : <AntDesign onPress={this.toggleSelected} name="hearto" size={24} color="black" />}
+                        {isSelected ? <AntDesign name="heart" size={24} color="red" onPress={() => this.toggleSelected(id)} /> : <AntDesign onPress={() => this.toggleSelected(id)} name="hearto" size={24} color="black" />}
                     </View>
                 </ImageBackground>
                 <TouchableOpacity style={styles.upperDetails} onPress={() => this.handlePress(id)}>
