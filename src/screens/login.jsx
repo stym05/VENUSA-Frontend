@@ -116,7 +116,13 @@ export default class Login extends Component {
                   placeholder="+91-00000 0000"
                   placeholderTextColor={"#808080"}
                   value={mobileNumber}
-                  onChangeText={this.handleTextChange}
+                  keyboardType="numeric"
+                  onChangeText={(value) => {
+                    const cleanedValue = value.replace(/[^0-9]/g, '');
+                    if (cleanedValue.length <= 10) {
+                      this.handleTextChange(cleanedValue);
+                    }
+                  }}
                 />
               </View>
               {this.state.showOTP && <View style={styles(theme).inputContainer}>
