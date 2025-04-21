@@ -47,51 +47,51 @@ class Footer extends React.Component {
             type: 'success',
             text1: 'Text Copied to Clipboard',
             visibilityTime: 5000
-          });
+        });
     };
 
     handleSubscribe = async () => {
         this.setState({ isLoading: true })
         try {
-        if(validateEmail(this.state.text)){
-            const payload = {
-                email: this.state.text
-            }
-            const response = await createSubsciber(payload);
-            console.log("response is ", response);
-            if(response.success) {
-                console.log("erre")
-                Toast.show({
-                    type: 'success',
-                    text1: 'Thank You for Join us',
-                    visibilityTime: 5000
-                });
-            }else{
-                console.log("err35652526e")
+            if (validateEmail(this.state.text)) {
+                const payload = {
+                    email: this.state.text
+                }
+                const response = await createSubsciber(payload);
+                console.log("response is ", response);
+                if (response.success) {
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Thank You for Join us',
+                        visibilityTime: 5000
+                    });
+                } else {
+                    console.log("err35652526e")
+                    Toast.show({
+                        type: 'error',
+                        text1: response.message,
+                        visibilityTime: 5000
+                    });
+                    this.setState({ isLoading: false })
+                }
+                this.setState({ text: "", isLoading: false })
+            } else {
                 Toast.show({
                     type: 'error',
-                    text1: response.message,
+                    text1: 'Please enter valid email',
                     visibilityTime: 5000
                 });
+                this.setState({ isLoading: false })
             }
-            this.setState({ text: "", isLoading: false })
-        }else{
-            Toast.show({
-                type: 'error',
-                text1: 'Please enter valid email',
-                visibilityTime: 5000
-              });
-        }
         } catch (err) {
             console.log("err35652526e")
-                Toast.show({
-                    type: 'error',
-                    text1: "something went wrong",
-                    visibilityTime: 5000
-                });
-                this.setState({ text: "", isLoading: false })
+            Toast.show({
+                type: 'error',
+                text1: "something went wrong",
+                visibilityTime: 5000
+            });
+            this.setState({ text: "", isLoading: false })
         }
-         
     }
 
     openFAQ = () => {
@@ -115,9 +115,9 @@ class Footer extends React.Component {
     }
 
     handleMail = () => {
-        if(Platform.OS == "web") {
+        if (Platform.OS == "web") {
             global.open("mailto:admin@venusa.co.in");
-        }else{
+        } else {
             Linking.openURL("mailto:admin@venusa.co.in")
         }
     }
@@ -209,13 +209,13 @@ class Footer extends React.Component {
                             <View >
                                 <Entypo name="instagram" size={24} color="black" />
                             </View>
-                            <View style={{marginHorizontal: 10}}>
+                            <View style={{ marginHorizontal: 10 }}>
                                 <FontAwesome5 name="whatsapp" size={24} color="black" />
                             </View>
                         </View>
                     </View>
                 </View>
-                <Text style={{marginTop: 50}}>2025 Venusa. All Rights Reserved.</Text>
+                <Text style={{ marginTop: 50 }}>2025 Venusa. All Rights Reserved.</Text>
             </View>
         )
     }
