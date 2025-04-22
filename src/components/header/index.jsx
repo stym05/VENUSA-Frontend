@@ -66,11 +66,7 @@ const Header = (props) => {
         <Text style={styles.dropdownItem}>{category === "men" ? "T-Shirts" : "Tops"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-<<<<<<< HEAD
-        <Text style={styles.dropdownItem}>{category == "men" ? "Pants" : "Dresses"}</Text>
-=======
         <Text style={styles.dropdownItem}>{category === "men" ? "Pants" : "Dresses"}</Text>
->>>>>>> cc3217dd35dcb0dea32176ed44cc83637755ca0e
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
         <Text style={styles.dropdownItem}>{category === "men" ? "Jogger" : "bottom"}</Text>
