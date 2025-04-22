@@ -12,6 +12,7 @@ import {
     Dimensions,
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
+import { Picker } from '@react-native-picker/picker';
 
 const windowWidth = Dimensions.get('window').width;
 
@@ -37,6 +38,7 @@ const CheckoutScreen = () => {
     const [promoCode, setPromoCode] = useState('');
     const [quantity1, setQuantity1] = useState(1);
     const [quantity2, setQuantity2] = useState(1);
+    const [cardType, setCardType] = useState('');
 
     const cartItems = [
         {
@@ -76,6 +78,26 @@ const CheckoutScreen = () => {
             setQuantity1(quantity1 - 1);
         } else if (id === 2 && quantity2 > 1) {
             setQuantity2(quantity2 - 1);
+        }
+    };
+
+    const getCardType = (cardNumber) => {
+        const firstDigit = cardNumber.charAt(0);
+        const firstTwoDigits = cardNumber.slice(0, 2);
+        const firstThreeDigits = cardNumber.slice(0, 3);
+
+        if (firstDigit === '4' && (cardNumber.length === 13 || cardNumber.length === 16)) {
+            setCardType('Visa');
+            return 'Visa';
+        } else if (['51', '52', '53', '54', '55'].includes(firstTwoDigits) && cardNumber.length === 16) {
+            setCardType('MasterCard');
+            return 'MasterCard';
+        } else if (['60', '65', '81'].includes(firstTwoDigits) && cardNumber.length === 16) {
+            setCardType('RuPay');
+            return 'RuPay';
+        } else {
+            setCardType('Unknown');
+            return 'Unknown';
         }
     };
 
@@ -126,13 +148,19 @@ const CheckoutScreen = () => {
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Shipping Address</Text>
                             <View style={styles.inputWithIcon}>
-                                <TextInput
+                                <Picker
+                                    selectedValue={country}
                                     style={styles.input}
-                                    placeholder="Country/Region"
-                                    value={country}
-                                    onChangeText={setCountry}
-                                />
-                                <Text style={styles.inputIcon}>×</Text>
+                                    onValueChange={(itemValue) => setCountry(itemValue)}
+                                >
+                                    <Picker.Item label="Select Country/Region" value="" />
+                                    <Picker.Item label="India" value="India" />
+                                    <Picker.Item label="United States" value="United States" />
+                                    <Picker.Item label="United Kingdom" value="United Kingdom" />
+                                    <Picker.Item label="Canada" value="Canada" />
+                                    <Picker.Item label="Australia" value="Australia" />
+                                    {/* Add more countries as needed */}
+                                </Picker>
                             </View>
 
                             <View style={styles.nameInputsContainer}>
@@ -233,9 +261,15 @@ const CheckoutScreen = () => {
                                     <View style={styles.creditCardInputs}>
                                         <TextInput
                                             style={styles.input}
-                                            placeholder="Card Number"
+                                            placeholder={`Card Number (${cardType})`}
                                             value={cardNumber}
-                                            onChangeText={setCardNumber}
+                                            onChangeText={(text) => {
+                                                const formattedText = text.replace(/[^0-9]/g, '').slice(0, 16);
+                                                setCardNumber(formattedText);
+
+                                                // Identify card type
+                                                getCardType(formattedText);
+                                            }}
                                             keyboardType="number-pad"
                                         />
 
@@ -244,13 +278,21 @@ const CheckoutScreen = () => {
                                                 style={[styles.input, styles.halfInput]}
                                                 placeholder="Expiry Date (MM/YY)"
                                                 value={expiryDate}
-                                                onChangeText={setExpiryDate}
+                                                onChangeText={(text) => {
+                                                    // Allow only numbers and limit length to 5 (MM/YY)
+                                                    const formattedText = text.replace(/[^0-9]/g, '').slice(0, 5);
+                                                    setExpiryDate(formattedText);
+                                                }}
                                             />
                                             <TextInput
                                                 style={[styles.input, styles.halfInput]}
                                                 placeholder="Security Code"
                                                 value={securityCode}
-                                                onChangeText={setSecurityCode}
+                                                onChangeText={(text) => {
+                                                    // Allow only numbers and limit length to 3
+                                                    const formattedText = text.replace(/[^0-9]/g, '').slice(0, 3);
+                                                    setSecurityCode(formattedText);
+                                                }}
                                                 keyboardType="number-pad"
                                             />
                                         </View>

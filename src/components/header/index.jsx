@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -17,23 +17,63 @@ import { useNavigation } from '@react-navigation/native';
 
 const Header = (props) => {
   const navigation = useNavigation();
-  
+
   // State for Men & Women dropdown visibility
   const [menDropdownVisible, setMenDropdownVisible] = useState(false);
   const [womenDropdownVisible, setWomenDropdownVisible] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
 
+  // Used to handle hover states correctly
+  const [isHoveringMenLink, setIsHoveringMenLink] = useState(false);
+  const [isHoveringMenDropdown, setIsHoveringMenDropdown] = useState(false);
+  const [isHoveringWomenLink, setIsHoveringWomenLink] = useState(false);
+  const [isHoveringWomenDropdown, setIsHoveringWomenDropdown] = useState(false);
+
+  // Effect to manage men dropdown visibility
+  useEffect(() => {
+    if (isHoveringMenLink || isHoveringMenDropdown) {
+      setMenDropdownVisible(true);
+      setWomenDropdownVisible(false);
+    } else {
+      const timer = setTimeout(() => {
+        setMenDropdownVisible(false);
+      }, 50); // Small delay to prevent flickering
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringMenLink, isHoveringMenDropdown]);
+
+  // Effect to manage women dropdown visibility
+  useEffect(() => {
+    if (isHoveringWomenLink || isHoveringWomenDropdown) {
+      setWomenDropdownVisible(true);
+      setMenDropdownVisible(false);
+    } else {
+      const timer = setTimeout(() => {
+        setWomenDropdownVisible(false);
+      }, 50); // Small delay to prevent flickering
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringWomenLink, isHoveringWomenDropdown]);
+
   // Dropdown items
   const renderDropdown = (category) => (
-    <View style={styles.dropdown}>
+    <View
+      style={[styles.dropdown, category === "men" ? styles.menDropdown : styles.womenDropdown]}
+      onMouseEnter={() => category === "men" ? setIsHoveringMenDropdown(true) : setIsHoveringWomenDropdown(true)}
+      onMouseLeave={() => category === "men" ? setIsHoveringMenDropdown(false) : setIsHoveringWomenDropdown(false)}
+    >
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>{category == "men" ? "T-Shirts" : "Tops"}</Text>
+        <Text style={styles.dropdownItem}>{category === "men" ? "T-Shirts" : "Tops"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
+<<<<<<< HEAD
         <Text style={styles.dropdownItem}>{category == "men" ? "Pants" : "Dresses"}</Text>
+=======
+        <Text style={styles.dropdownItem}>{category === "men" ? "Pants" : "Dresses"}</Text>
+>>>>>>> cc3217dd35dcb0dea32176ed44cc83637755ca0e
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>{category == "men" ? "Jogger" : "bottom"}</Text>
+        <Text style={styles.dropdownItem}>{category === "men" ? "Jogger" : "bottom"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -45,14 +85,7 @@ const Header = (props) => {
         <View style={styles.leftSubContainer}>
           {isMobile() && (
             <View style={styles.paddingContainer}>
-              {/* <TouchableOpacity>
-                <MaterialCommunityIcons
-                  name="reorder-horizontal"
-                  size={24}
-                  color="black"
-                />
-              </TouchableOpacity> */}
-              <Image source={require("../../../assets/images/Venusa_logo1.jpg")} style={{width: 50, height: 50}} />
+              <Image source={require("../../../assets/images/Venusa_logo1.jpg")} style={{ width: 50, height: 50 }} />
             </View>
           )}
 
@@ -60,9 +93,12 @@ const Header = (props) => {
           {!isMobile() && (
             <View style={styles.paddingContainer}>
               <Pressable
-                onPress={() => setMenDropdownVisible(!menDropdownVisible)} // Click for Mobile
-                onMouseEnter={() => setMenDropdownVisible(true)}  // Hover for Web
-                // onMouseLeave={() => setMenDropdownVisible(false)}
+                onPress={() => {
+                  setMenDropdownVisible(!menDropdownVisible);
+                  setWomenDropdownVisible(false);
+                }}
+                onMouseEnter={() => setIsHoveringMenLink(true)}
+                onMouseLeave={() => setIsHoveringMenLink(false)}
               >
                 <Text style={styles.text}>Men</Text>
               </Pressable>
@@ -74,23 +110,18 @@ const Header = (props) => {
           {!isMobile() && (
             <View style={styles.paddingContainer}>
               <Pressable
-                onPress={() => setWomenDropdownVisible(!womenDropdownVisible)}
-                onMouseEnter={() =>  setWomenDropdownVisible(true)}
-                // onMouseLeave={() => setWomenDropdownVisible(false)}
+                onPress={() => {
+                  setWomenDropdownVisible(!womenDropdownVisible);
+                  setMenDropdownVisible(false);
+                }}
+                onMouseEnter={() => setIsHoveringWomenLink(true)}
+                onMouseLeave={() => setIsHoveringWomenLink(false)}
               >
                 <Text style={styles.text}>Women</Text>
               </Pressable>
               {womenDropdownVisible && renderDropdown("women")}
             </View>
           )}
-
-          {/* {!isMobile() && (
-            <View style={styles.paddingContainer}>
-              <TouchableOpacity>
-                <Text style={styles.text}>Sale</Text>
-              </TouchableOpacity>
-            </View>
-          )} */}
         </View>
 
         {!isMobile() && (
@@ -109,11 +140,6 @@ const Header = (props) => {
         )}
 
         <View style={styles.rightSubContainer}>
-          {/* <View style={styles.paddingContainer}>
-            <TouchableOpacity>
-              <FontAwesome name="search" size={24} color="black" />
-            </TouchableOpacity>
-          </View> */}
           <View style={styles.paddingContainer}>
             <TouchableOpacity onPress={() => navigation.navigate("WishList")}>
               <AntDesign name="hearto" size={24} color="black" />
@@ -177,18 +203,20 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: 30,
+    top: 20,
     left: 0,
     zIndex: 9999,
     width: 250,
     backgroundColor: "white",
     padding: 10,
-    // borderRadius: 8,
-    // elevation: 5, // Shadow for Android
-    // shadowColor: "#000", // Shadow for iOS
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 4,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+  menDropdown: {
+    // Add any specific styles for men dropdown if needed
+  },
+  womenDropdown: {
+    // Add any specific styles for women dropdown if needed
   },
   dropdownItem: {
     padding: 10,
