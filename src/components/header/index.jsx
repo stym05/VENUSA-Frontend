@@ -30,7 +30,7 @@ const Header = (props) => {
         <Text style={styles.dropdownItem}>{category == "men" ? "T-Shirts" : "Tops"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>{category == "men" ? "Pents" : "Dresses"}</Text>
+        <Text style={styles.dropdownItem}>{category == "men" ? "Pants" : "Dresses"}</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
         <Text style={styles.dropdownItem}>{category == "men" ? "Jogger" : "bottom"}</Text>
@@ -99,8 +99,8 @@ const Header = (props) => {
               navigation.navigate("App", { screen: "Dashboard" });
             }}
             style={{
-              fontFamily: "Roboto",
-              fontWeight: "600",
+              fontFamily: "lexend Zetta",
+              fontWeight: "500",
               fontSize: 24,
             }}
           >
