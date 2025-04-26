@@ -17,6 +17,7 @@ import { isMobile, validateEmail } from "../../utils";
 import * as Clipboard from 'expo-clipboard';
 import Toast from 'react-native-toast-message';
 import { createSubsciber } from "../../apis";
+import { Dimensions } from "react-native";
 
 class Footer extends React.Component {
 
@@ -24,7 +25,7 @@ class Footer extends React.Component {
         super(props);
         this.state = {
             text: "",
-            isLoading: false
+            isLoading: false,
         }
     }
 
@@ -126,14 +127,16 @@ class Footer extends React.Component {
         const { text, isLoading } = this.state;
         return (
             <View style={styles.container}>
-                <Text style={styles.text1}>Join us in living, better. Every day.</Text>
-                <TextInput
-                    style={styles.input}
-                    placeholder="Enter your email address"
-                    placeholderTextColor={"#808080"}
-                    value={text}
-                    onChangeText={this.handleTextChange}
-                />
+                <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={styles.text1}>Join us in living, better. Every day.</Text>
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Enter your email address"
+                        placeholderTextColor={"#808080"}
+                        value={text}
+                        onChangeText={this.handleTextChange}
+                    />
+                </View>
                 <View style={styles.middleContainer}>
                     <Text style={styles.text2}>By signing up, you agree to our{" "}
                         <Text style={styles.underlinedText} onPress={this.openPrivacyPolicy}>Privacy Policy</Text>
@@ -156,7 +159,7 @@ class Footer extends React.Component {
                                 </View>
                                 <View style={styles.row}>
                                     <Feather name="phone" size={16} color="black" />
-                                    <Text style={styles.iconText} onPress={this.copyToClipboard}>+91-7838356424</Text>
+                                    <Text style={styles.iconText} onPress={this.copyToClipboard}>+91 7982050422</Text>
                                 </View>
                                 <View style={styles.row}>
                                     <Text style={styles.iconText} onPress={this.openAboutUs}>About Us</Text>
@@ -202,18 +205,21 @@ class Footer extends React.Component {
                                 </View>
                             </View>
                         </View>
-                    </View>
-                    <View>
-                        <Text style={styles.text2}>Follow Us</Text>
-                        <View style={styles.row}>
-                            <View >
-                                <Entypo name="instagram" size={24} color="black" />
-                            </View>
-                            <View style={{ marginHorizontal: 10 }}>
-                                <FontAwesome5 name="whatsapp" size={24} color="black" />
+                        <View style={styles.minContainer}>
+                            <Text style={styles.text2}>Follow Us</Text>
+                            <View style={styles.subTextContainer}>
+                                <View style={styles.row}>
+                                    <View style={{marginRight: 15}}>
+                                        <Entypo name="instagram" size={24} color="black" />
+                                    </View>
+                                    <View style={{ marginHorizontal: 10 }}>
+                                        <FontAwesome5 name="whatsapp" size={24} color="black" />
+                                    </View>
+                                </View>
                             </View>
                         </View>
                     </View>
+
                 </View>
                 <Text style={{ marginTop: 50 }}>2025 Venusa. All Rights Reserved.</Text>
             </View>
@@ -224,7 +230,9 @@ class Footer extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
         backgroundColor: "#F8F3F0",
+        width: "100%",
         alignItems: 'center',
         justifyContent: 'center',
         padding: 40
@@ -278,18 +286,18 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto"
     },
     lowerContainer: {
-        width: isMobile() ? "100%" : "80%",
+        width: isMobile() ? "100%" : "100%",
         marginTop: isMobile() ? 50 : 100,
         display: 'flex',
         flexDirection: isMobile() ? 'column' : 'row',
     },
     subLowerContainer: {
-        width: isMobile() ? "100%" : "80%",
+        width: isMobile() ? "100%" : "100%",
         display: 'flex',
         flexDirection: isMobile() ? 'column' : 'row',
     },
     minContainer: {
-        width: isMobile() ? "100%" : "25%",
+        width: isMobile() ? "100%" : "20%",
         marginTop: isMobile() ? 10 : 0
     },
     row: {
@@ -297,11 +305,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 5,
+        marginTop: 20,
         textAlign: 'center'
     },
     subTextContainer: {
-        paddingVertical: 5,
+        paddingVertical: 10,
         justifyContent: 'flex-start',
         alignItems: 'flex-start'
     },
