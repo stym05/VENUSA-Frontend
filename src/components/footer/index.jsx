@@ -108,7 +108,7 @@ class Footer extends React.Component {
     }
 
     openReturnPolicy = () => {
-        this.props.navigation.navigate("ReturnPolicy");
+        this.props.navigation.navigate("OrderHistory");
     }
 
     openDeliveryPolicy = () => {
@@ -209,7 +209,7 @@ class Footer extends React.Component {
                             <Text style={styles.text2}>Follow Us</Text>
                             <View style={styles.subTextContainer}>
                                 <View style={styles.row}>
-                                    <View style={{marginRight: 15}}>
+                                    <View style={{ marginRight: 15 }}>
                                         <Entypo name="instagram" size={24} color="black" />
                                     </View>
                                     <View style={{ marginHorizontal: 10 }}>

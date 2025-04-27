@@ -25,6 +25,8 @@ import ContactUs from "./screens/ContactUs";
 import AboutUs from "./screens/AboutUs";
 import DeliveryPolicy from "./screens/DeliveryPolicy";
 import CheckoutScreen from "./screens/CheckOutScreen";
+import OrderHistory from "./screens/OrderScreen";
+import OrderDetails from "./screens/OrderDetails";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -54,7 +56,10 @@ const linking = {
                     ReturnPolicy: "/ReturnPolicy",
                     ContactUs: "/ContactUs",
                     AboutUs: "/AboutUs",
-                    CheckoutScreen: "/CheckoutScreen"
+                    CheckoutScreen: "/CheckoutScreen",
+                    OrderHistory: "/OrderHistory",
+                    OrderDetails: "/OrderHistory/OrderDetails"
+
                 },
             },
         },
@@ -192,6 +197,17 @@ const Routes = () => {
                         component={CheckoutScreen}
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name="OrderHistory"
+                        component={OrderHistory}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="OrderDetails"
+                        component={OrderDetails}
+                        options={{ headerShown: false }}
+                    />
+
                 </Stack.Navigator>
             </NavigationContainer>
         </SafeAreaView>
