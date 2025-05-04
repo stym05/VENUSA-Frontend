@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -13,10 +13,15 @@ import {
 } from 'react-native';
 import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
+import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
+import { createAddress, getUserAddress } from '../apis';
+import { useSelector } from 'react-redux';
+
+
 
 const windowWidth = Dimensions.get('window').width;
 
-const CheckoutScreen = () => {
+const CheckoutScreen = (props) => {
     const [email, setEmail] = useState('');
     const [emailNews, setEmailNews] = useState(false);
     const [country, setCountry] = useState('');
@@ -26,19 +31,117 @@ const CheckoutScreen = () => {
     const [address, setAddress] = useState('');
     const [apartment, setApartment] = useState('');
     const [postalCode, setPostalCode] = useState('');
+    const [userId, setUserId] = useState('');
     const [city, setCity] = useState('');
+    const [state, setState] =  useState('');
     const [phone, setPhone] = useState('');
+    const [alternate_mobile_number, set_alternate_mobile_number] = useState("");
     const [saveInfo, setSaveInfo] = useState(false);
-    const [paymentMethod, setPaymentMethod] = useState('creditCard');
-    const [cardNumber, setCardNumber] = useState('');
-    const [expiryDate, setExpiryDate] = useState('');
-    const [securityCode, setSecurityCode] = useState('');
-    const [nameOnCard, setNameOnCard] = useState('');
-    const [useShippingAddress, setUseShippingAddress] = useState(true);
+    // const [paymentMethod, setPaymentMethod] = useState('creditCard');
+    // const [cardNumber, setCardNumber] = useState('');
+    // const [expiryDate, setExpiryDate] = useState('');
+    // const [securityCode, setSecurityCode] = useState('');
+    // const [nameOnCard, setNameOnCard] = useState('');
+    // const [useShippingAddress, setUseShippingAddress] = useState(true);
     const [promoCode, setPromoCode] = useState('');
     const [quantity1, setQuantity1] = useState(1);
     const [quantity2, setQuantity2] = useState(1);
-    const [cardType, setCardType] = useState('');
+    // const [cardType, setCardType] = useState('');
+    const { error, isLoading, Razorpay } = useRazorpay();
+    const userData = useSelector((state) => state.user);
+
+
+    useEffect(async () => {
+        try {
+            console.log("user", userData);
+            const { _id, email } = userData.userData;
+            console.log("user", _id);
+            setUserId(_id);
+            const addressResponce = await getUserAddress(_id)
+            console.log(addressResponce);
+            if (addressResponce.success) {
+                const { addresses } = addressResponce;
+                // if(addresses.length != 0) {
+                const add = addresses[0];
+
+                setEmail(email);
+                setAddress(add?.street_address)
+                setCity(add?.city)
+                setState(add?.state);
+                setPostalCode(add?.postal_code);
+                setPhone(add?.mobile_number);
+                set_alternate_mobile_number(add?.alternate_mobile_number);
+                // }
+            }
+        } catch (err) {
+            console.log(err)
+        }
+    }, [])
+
+
+
+    const confirmAddress = async () => {
+        try {
+            const payload  = {
+                customer: userId,
+                street_address: address,
+                city,
+                state,
+                postal_code: postalCode,
+                country: "india",
+                is_default: true,
+                mobile_number: phone,
+                alternate_mobile_number 
+            }
+
+            const response = await createAddress(payload);
+            if(response.success){
+                genrateOrder();
+            }
+
+        } catch (error) {
+            console.error("Error during payment:", error);
+        }
+    }
+
+
+    const genrateOrder = async () => {
+        try {
+            const response = await createOrder();
+        } catch (error) {
+
+        }
+    }
+
+    const handlePayment = async () => {
+        try {
+            const options = {
+                key: "rzp_test_EqSp950wLrSSjT",
+                amount: 50000, // Amount in paise
+                currency: "INR",
+                name: "Test Company",
+                description: "Test Transaction",
+                // order_id: "order_9A33XWu170gUtm", // Generate order_id on server
+                handler: (response) => {
+                    console.log(response);
+                    alert("Payment Successful!");
+                },
+                prefill: {
+                    name: "John Doe",
+                    email: "john.doe@example.com",
+                    contact: "9999999999",
+                },
+                theme: {
+                    color: "#F37254",
+                },
+            };
+
+            const razorpayInstance = new Razorpay(options);
+            razorpayInstance.open();
+        } catch (error) {
+            console.error("Error during payment:", error);
+        }
+    };
 
     const cartItems = [
         {
@@ -147,7 +250,7 @@ const CheckoutScreen = () => {
 
                         <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Shipping Address</Text>
-                            <View style={styles.inputWithIcon}>
+                            {/* <View style={styles.inputWithIcon}>
                                 <Picker
                                     selectedValue={country}
                                     style={styles.input}
@@ -159,9 +262,8 @@ const CheckoutScreen = () => {
                                     <Picker.Item label="United Kingdom" value="United Kingdom" />
                                     <Picker.Item label="Canada" value="Canada" />
                                     <Picker.Item label="Australia" value="Australia" />
-                                    {/* Add more countries as needed */}
                                 </Picker>
-                            </View>
+                            </View> */}
 
                             <View style={styles.nameInputsContainer}>
                                 <TextInput
@@ -178,12 +280,12 @@ const CheckoutScreen = () => {
                                 />
                             </View>
 
-                            <TextInput
+                            {/* <TextInput
                                 style={styles.input}
                                 placeholder="Company(Optional)"
                                 value={company}
                                 onChangeText={setCompany}
-                            />
+                            /> */}
 
                             <View style={styles.inputWithIcon}>
                                 <TextInput
@@ -220,9 +322,20 @@ const CheckoutScreen = () => {
                             <View style={styles.inputWithIcon}>
                                 <TextInput
                                     style={styles.input}
-                                    placeholder="Phone"
+                                    placeholder="Phone Number"
                                     value={phone}
                                     onChangeText={setPhone}
+                                    keyboardType="phone-pad"
+                                />
+                                <Text style={styles.inputIcon}>📱</Text>
+                            </View>
+
+                            <View style={styles.inputWithIcon}>
+                                <TextInput
+                                    style={styles.input}
+                                    placeholder="Alternative Phone Number"
+                                    value={alternate_mobile_number}
+                                    onChangeText={set_alternate_mobile_number}
                                     keyboardType="phone-pad"
                                 />
                                 <Text style={styles.inputIcon}>📱</Text>
@@ -237,7 +350,8 @@ const CheckoutScreen = () => {
                             />
                         </View>
 
-                        <View style={styles.section}>
+
+                        {/* <View style={styles.section}>
                             <Text style={styles.sectionTitle}>Payment</Text>
 
                             <View style={styles.paymentContainer}>
@@ -336,7 +450,7 @@ const CheckoutScreen = () => {
                                     <Text style={styles.paymentText}>Cash On Delivery (COD)</Text>
                                 </View>
                             </View>
-                        </View>
+                        </View> */}
                     </View>
 
                     <View style={styles.rightColumn}>
@@ -421,7 +535,7 @@ const CheckoutScreen = () => {
                                 </View>
                             </View>
 
-                            <TouchableOpacity style={styles.placeOrderButton}>
+                            <TouchableOpacity style={styles.placeOrderButton} onPress={handlePayment}>
                                 <Text style={styles.placeOrderButtonText}>Place Order</Text>
                             </TouchableOpacity>
                         </View>

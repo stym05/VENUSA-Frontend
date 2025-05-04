@@ -11,7 +11,9 @@ export default function App() {
 
   const [fontsLoaded] = useFonts({
     'Roboto': require('./assets/fonts/Roboto-Regular.ttf'),
-    'Didot': require('./assets/fonts/GFSDidot-Regular.ttf')
+    'Didot': require('./assets/fonts/GFSDidot-Regular.ttf'),
+    "Jura": require("./assets/fonts/Jura-Regular.ttf"),
+    "LexendZetta": require("./assets/fonts/LexendZetta-Regular.ttf")
   });
 
   if (!fontsLoaded) {

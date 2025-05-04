@@ -77,7 +77,7 @@ export default class Dashboard extends Component {
       <SafeAreaView style={styles(theme).container}>
         <ScrollView>
           <View style={styles(theme).subContainer}>
-            <Modal isVisible={isModalVisible}>
+            {/* <Modal isVisible={isModalVisible}>
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
                 <View style={styles(theme).modalContainer} >
                   <View style={{ width: '100%', justifyContent: 'flex-end', alignItems: 'flex-end' }}>
@@ -114,8 +114,8 @@ export default class Dashboard extends Component {
                   </View>
                 </View>
               </View>
-            </Modal>
-            <View style={{ height: isMobile() ? 400 : 800, backgroundColor: "#fff", marginBottom: isMobile() ? 15 : 50 }}>
+            </Modal> */}
+            <View style={{ height: isMobile() ? 400 : 500, backgroundColor: "black", marginBottom: isMobile() ? 15 : 15 }}>
               {/* <TouchableOpacity
                 onPress={() => console.log("Button Pressed")}
                 style={{
@@ -133,7 +133,7 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "https://webservices.venusa.co.in/uploads/video-1739793660582.mp4" }}
+                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/home_video.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 // Callback when remote video is buffering                                      
@@ -147,51 +147,60 @@ export default class Dashboard extends Component {
             </View>
             <View style={{ marginVertical: 20, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{
-                fontFamily: "Roboto",
+                fontFamily: "Jura",
                 fontSize: 28,
                 fontWeight: '600',
                 lineHeight: 38
               }}>Love at first sight</Text>
             </View>
             <View style={styles(theme).imageContainer}>
-              <View style={{ height: isMobile() ? 400 : '100%', width: isMobile() ? "100%" : '50%' }}>
+              <View style={{ height: isMobile() ? 400 : '100%', width: isMobile() ? "100%" : '50%', backgroundColor: "gray" }}>
                 <Image
-                  contentFit="fill"
-                  source={require("../../assets/images/one.jpg")}
+                  contentFit="contain"
+                  source={require("../../assets/temp.jpg")}
                   style={{
                     height: "100%",
                   }}
                 />
               </View>
               <View style={{ backgroundColor: '#B42124', width: isMobile() ? "100%" : '50%', padding: 50, justifyContent: 'center' }}>
-                <Text style={{ fontSize: isMobile() ? 25 : 50, color: "#F8F3F0" }}>End Of Monsoon Sales</Text>
+                <Text style={{ fontSize: isMobile() ? 20 : 36, color: "#F8F3F0" }}>End Of Monsoon Sales</Text>
                 <View style={{ marginTop: 30 }}>
-                  <Text style={{ fontSize: isMobile() ? 25 : 50, color: '#F8F3F0' }}>Up to 35% Off</Text>
+                  <Text style={{ fontSize: isMobile() ? 20 : 36, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
                     categorie: categorie["mens"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
-                    <Text style={{ fontSize: isMobile() ? 18 : 24, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
+                    <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
                     categorie: categorie["womens"]
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
-                    <Text style={{ fontSize: isMobile() ? 18 : 24, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
+                    <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
                 </View>
               </View>
             </View>
             <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
               <Text style={{
-                fontFamily: "Roboto",
+                fontFamily: "Jura",
                 fontSize: 28,
                 fontWeight: '600',
                 lineHeight: 38
               }}>Bestsellers</Text>
             </View>
             <View style={styles(theme).imageContainer}>
+              <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
+                <Image
+                  contentFit="fill"
+                  source={require("../../assets/images/two.jpg")}
+                  style={{
+                    height: "100%",
+                  }}
+                />
+              </View>
               <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
                   contentFit="fill"
@@ -231,7 +240,7 @@ const styles = (theme) => StyleSheet.create({
   imageContainer: {
     display: 'flex',
     flexDirection: isMobile() ? "column" : 'row',
-    minHeight: isMobile() ? 400 : 800,
+    minHeight: isMobile() ? 400 : 500,
   },
   circularStrip: {
     padding: 50,

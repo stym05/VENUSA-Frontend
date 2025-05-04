@@ -75,7 +75,7 @@ class ShopCategories extends Component {
                             source={{ uri: categorie.categoryImage }}
                             style={{
                                 width: Dimensions.get("window").width * 0.8,
-                                height: Dimensions.get("window").height * 0.8,
+                                height: Dimensions.get("window").height * 0.5,
                                 marginTop: 10
                             }}
                         />
@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
         marginTop: 25
     },
     img: {
-        width: 250,
-        height: 350,
+        width: 200,
+        height: 250,
         marginTop: 10
     },
     text: {

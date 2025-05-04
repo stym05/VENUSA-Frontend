@@ -121,33 +121,35 @@ const Header = (props) => {
         </View>
 
         {!isMobile() && (
-          <Text
-            onPress={() => {
-              navigation.navigate("App", { screen: "Dashboard" });
-            }}
-            style={{
-              fontFamily: "lexend Zetta",
-              fontWeight: "500",
-              fontSize: 24,
-            }}
-          >
-            VENUSA
-          </Text>
+          <View style={{width: "33%", justifyContent: 'center', alignItems: 'center'}}>
+            <Text
+              onPress={() => {
+                navigation.navigate("App", { screen: "Dashboard" });
+              }}
+              style={{
+                fontFamily: "LexendZetta",
+                fontWeight: "500",
+                fontSize: 24,
+              }}
+            >
+              VENUSA
+            </Text>
+          </View>
         )}
 
         <View style={styles.rightSubContainer}>
-          <View style={styles.paddingContainer}>
+          <View style={[styles.paddingContainer, {width: '15%'}]}>
             <TouchableOpacity onPress={() => navigation.navigate("WishList")}>
               <AntDesign name="hearto" size={24} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={styles.paddingContainer}>
+          <View style={[styles.paddingContainer, {width: '15%'}]}>
             <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
               <Feather name="shopping-bag" size={24} color="black" />
             </TouchableOpacity>
           </View>
           {!isMobile() && (
-            <View style={styles.paddingContainer}>
+            <View style={[styles.paddingContainer, {width: '15%'}]}>
               <TouchableOpacity onPress={() => navigation.navigate("App", { screen: "Login" })}>
                 <AntDesign name="user" size={24} color="black" />
               </TouchableOpacity>
@@ -171,24 +173,24 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 15,
   },
   leftSubContainer: {
-    width: "50%",
+    width: "33%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: isMobile() ? "flex-start" : "center",
-    alignItems: isMobile() ? "flex-start" : "center",
+    justifyContent: isMobile() ? "flex-start" : "flex-start",
+    alignItems: isMobile() ? "flex-start" : "flex-start",
   },
   rightSubContainer: {
-    width: "50%",
+    width: "33%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: isMobile() ? "flex-end" : "center",
-    alignItems: isMobile() ? "flex-end" : "center",
+    justifyContent: isMobile() ? "flex-end" : "flex-end",
+    alignItems: isMobile() ? "flex-end" : "flex-end",
   },
   paddingContainer: {
-    width: isMobile() ? "30%" : "10%",
+    width: isMobile() ? "30%" : "20%",
     justifyContent: "center",
     alignItems: "center",
     textAlign: "center",
@@ -196,6 +198,8 @@ const styles = StyleSheet.create({
   },
   text: {
     fontWeight: "bold",
+    fontFamily: "Jura",
+    fontSize: 16
   },
   dropdown: {
     position: "absolute",

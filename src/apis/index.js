@@ -2,7 +2,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { URL } from "./urls";
 import Store from "../store";
 
-export const DOMAIN = "https://webservices.venusa.co.in/"
+export const DOMAIN = "https://webservices.venusa.co.in/";
+
+// export const LOCAL_DOMAIN = "http://localhost:8000";
+
+
 
 const setAuthorizationHeader = async () => {
     const jwt = Store.getState().user.authToken;
@@ -11,6 +15,50 @@ const setAuthorizationHeader = async () => {
         "Content-Type": "application/json",
     };
 };
+
+export const getUserAddress = async (id) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.GET_CUSTOMER_ADDRESS + "/" + id, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getAllCategories", err);
+        return err;
+    }
+}
+
+
+export const createAddress = async () => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.CREATE_ADDRESS, {
+            method: "POST",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getAllCategories", err);
+        return err;
+    }
+}
+
+
+export const createOrder = async () => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.createOrder, {
+            method: "POST",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getAllCategories", err);
+        return err;
+    }
+}
 
 export const getAllCategories = async () => {
     try {
@@ -82,6 +130,22 @@ export const createSubsciber = async (data) => {
         return err;
     }
 };
+
+
+export const createPreOrder = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.CREATE_PRE_ORDER, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in createSubsciber", err);
+        return err;
+    }
+}
 
 export const getOTP = async (data) => {
     try {

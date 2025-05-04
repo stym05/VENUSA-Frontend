@@ -11,7 +11,7 @@ import {
     TouchableOpacity,
 } from "react-native";
 import Footer from "../../components/footer";
-import { addToCart, DOMAIN, getProductById } from "../../apis";
+import { addToCart, createPreOrder, DOMAIN, getProductById } from "../../apis";
 import Store from "../../store";
 import Toast from "react-native-toast-message";
 
@@ -66,7 +66,6 @@ class ItemDescription extends React.Component {
                     description: response.product.description,
                     sizeAvailable: size
                 })
-                console.log("error is on", this.state.images)
             }
             this.setState({ isloading: false })
         } catch (err) {
@@ -89,7 +88,7 @@ class ItemDescription extends React.Component {
                 size,
                 color
             }
-            const response = await addToCart(payload);
+            const response = await createPreOrder(payload);
             if(response.success) {
                 Toast.show({
                     text1: "Product added to cart",
@@ -174,7 +173,7 @@ class ItemDescription extends React.Component {
                                     color: '#000'
                                 }}>{this.state.name}</Text>
                             </View>
-                            <View style={styles.paddedItem}>
+                            {/* <View style={styles.paddedItem}>
                                 <Text style={{
                                     fontFamily: 'Roboto',
                                     fontSize: 20,
@@ -182,7 +181,7 @@ class ItemDescription extends React.Component {
                                     lineHeight: 24,
                                     color: '#000'
                                 }}>{"₹"}{this.state.price}</Text>
-                            </View>
+                            </View> */}
                             <View style={styles.paddedItem}>
                                 <Text style={{
                                     fontFamily: 'Roboto',
@@ -248,7 +247,7 @@ class ItemDescription extends React.Component {
                             </View>
                             <View>
                                 <TouchableOpacity style={styles.button} onPress={this.handleAddToCart}>
-                                    {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles.buttonText}>Add to cart</Text>)}
+                                    {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles.buttonText}>Pre Order</Text>)}
                                 </TouchableOpacity>
                             </View>
                         </View>

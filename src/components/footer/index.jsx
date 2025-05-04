@@ -221,7 +221,7 @@ class Footer extends React.Component {
                     </View>
 
                 </View>
-                <Text style={{ marginTop: 50 }}>2025 Venusa. All Rights Reserved.</Text>
+                <Text style={{ marginTop: 25 }}>2025 Venusa. All Rights Reserved.</Text>
             </View>
         )
     }
@@ -230,7 +230,6 @@ class Footer extends React.Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: "#F8F3F0",
         width: "100%",
         alignItems: 'center',
@@ -252,27 +251,27 @@ const styles = StyleSheet.create({
         fontFamily: "Roboto",
         width: 350,
         marginBottom: 20,
-        marginTop: 30
+        marginTop: 20
     },
     middleContainer: {
         width: 350,
-        marginTop: 10
+        marginTop: 5
     },
     text2: {
         color: "gray",
         fontFamily: "Roboto",
         lineHeight: 20,
-        fontSize: 16
+        fontSize: 12
     },
     underlinedText: {
-        fontSize: 16,
+        fontSize: 12,
         textDecorationLine: 'underline',
         cursor: 'pointer',
         fontFamily: "Roboto",
         color: '#000'
     },
     button: {
-        marginTop: 50,
+        marginTop: 25,
         backgroundColor: '#1A1A1A',
         width: '100%',
         padding: 15,
@@ -287,7 +286,7 @@ const styles = StyleSheet.create({
     },
     lowerContainer: {
         width: isMobile() ? "100%" : "100%",
-        marginTop: isMobile() ? 50 : 100,
+        marginTop: isMobile() ? 50 : 50,
         display: 'flex',
         flexDirection: isMobile() ? 'column' : 'row',
     },
@@ -305,11 +304,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         display: 'flex',
         flexDirection: 'row',
-        marginTop: 20,
+        marginTop: 10,
         textAlign: 'center'
     },
     subTextContainer: {
-        paddingVertical: 10,
+        paddingVertical: 5,
         justifyContent: 'flex-start',
         alignItems: 'flex-start'
     },
