@@ -54,6 +54,7 @@ class Footer extends React.Component {
     handleSubscribe = async () => {
         this.setState({ isLoading: true })
         try {
+            console.log(validateEmail(this.state.text))
             if (validateEmail(this.state.text)) {
                 const payload = {
                     email: this.state.text

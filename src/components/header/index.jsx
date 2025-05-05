@@ -68,14 +68,14 @@ const Header = (props) => {
       <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
         <Text style={styles.dropdownItem}>{category === "men" ? "Pants" : "Dresses"}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
+      {/* <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
         <Text style={styles.dropdownItem}>{category === "men" ? "Jogger" : "bottom"}</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 
   return (
-    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || showSearchBar ? 250 : null }]}>
+    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || showSearchBar ? 200 : null }]}>
       <OfferStrip />
       <View style={styles.subContainer}>
         <View style={styles.leftSubContainer}>
@@ -207,10 +207,8 @@ const styles = StyleSheet.create({
     left: 0,
     zIndex: 9999,
     width: 250,
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     padding: 10,
-    borderWidth: 1,
-    borderColor: "#eee",
   },
   menDropdown: {
     // Add any specific styles for men dropdown if needed

@@ -115,7 +115,7 @@ export default class Dashboard extends Component {
                 </View>
               </View>
             </Modal> */}
-            <View style={{ height: isMobile() ? 400 : 500, backgroundColor: "black", marginBottom: isMobile() ? 15 : 15 }}>
+            <View style={{ height: isMobile() ? 400 : 700, backgroundColor: "black", marginBottom: isMobile() ? 15 : 15 }}>
               {/* <TouchableOpacity
                 onPress={() => console.log("Button Pressed")}
                 style={{
@@ -133,9 +133,10 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/home_video.mp4" }}
+                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/C0021_1.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
+                resizeMode='cover'
                 // Callback when remote video is buffering                                      
                 onBuffer={this.onBuffer}
                 muted={"muted"}
@@ -154,17 +155,18 @@ export default class Dashboard extends Component {
               }}>Love at first sight</Text>
             </View>
             <View style={styles(theme).imageContainer}>
-              <View style={{ height: isMobile() ? 400 : '100%', width: isMobile() ? "100%" : '50%', backgroundColor: "gray" }}>
+              <View style={{ height: isMobile() ? 400 : '100%', width: isMobile() ? "100%" : '50%', backgroundColor: "black" }}>
                 <Image
-                  contentFit="contain"
-                  source={require("../../assets/temp.jpg")}
+                  contentFit="cover"
+                  // source={require("../../assets/temp.jpg")}
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/title_pic_P.jpg"}
                   style={{
                     height: "100%",
                   }}
                 />
               </View>
-              <View style={{ backgroundColor: '#B42124', width: isMobile() ? "100%" : '50%', padding: 50, justifyContent: 'center' }}>
-                <Text style={{ fontSize: isMobile() ? 20 : 36, color: "#F8F3F0" }}>End Of Monsoon Sales</Text>
+              <View style={{ backgroundColor: '#800020', width: isMobile() ? "100%" : '50%', padding: 50, justifyContent: 'center' }}>
+                <Text style={{ fontSize: isMobile() ? 20 : 36, color: "#F8F3F0" }}>Let the Style Journey Begin</Text>
                 <View style={{ marginTop: 30 }}>
                   <Text style={{ fontSize: isMobile() ? 20 : 36, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
@@ -194,8 +196,8 @@ export default class Dashboard extends Component {
             <View style={styles(theme).imageContainer}>
               <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
-                  contentFit="fill"
-                  source={require("../../assets/images/two.jpg")}
+                  contentFit="cover"
+                  source={'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg'}
                   style={{
                     height: "100%",
                   }}
@@ -203,8 +205,8 @@ export default class Dashboard extends Component {
               </View>
               <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
-                  contentFit="fill"
-                  source={require("../../assets/images/two.jpg")}
+                  contentFit="cover"
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
                   style={{
                     height: "100%",
                   }}
@@ -212,8 +214,8 @@ export default class Dashboard extends Component {
               </View>
               {!isMobile() && <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
-                  contentFit="fill"
-                  source={require("../../assets/images/prod1/1.jpg")}
+                  contentFit="contain"
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
                   style={{
                     height: "100%",
                   }}
@@ -255,6 +257,7 @@ const styles = (theme) => StyleSheet.create({
     top: 0,
     left: 0,
     bottom: 0,
+    
     right: 0,
   },
   button: {
