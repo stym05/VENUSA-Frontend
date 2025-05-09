@@ -133,7 +133,7 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/C0021_1.mp4" }}
+                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/C0021_3.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 resizeMode='cover'
@@ -194,16 +194,25 @@ export default class Dashboard extends Component {
               }}>Bestsellers</Text>
             </View>
             <View style={styles(theme).imageContainer}>
-              <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <Image
                   contentFit="contain"
                   source={'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg'}
                   style={{
-                    height: "100%",
+                    height: 600,
                   }}
                 />
               </View>
-              <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <Image
+                  contentFit="contain"
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
+                  style={{
+                    height: 600,
+                  }}
+                />
+              </View>
+              {/* {!isMobile() && <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
                   contentFit="contain"
                   source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
@@ -211,16 +220,7 @@ export default class Dashboard extends Component {
                     height: "100%",
                   }}
                 />
-              </View>
-              {!isMobile() && <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
-                <Image
-                  contentFit="contain"
-                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
-                  style={{
-                    height: "100%",
-                  }}
-                />
-              </View>}
+              </View>} */}
             </View>
           </View>
           <Footer navigation={this.props.navigation} />
