@@ -168,7 +168,7 @@ export default class Dashboard extends Component {
               <View style={{ backgroundColor: '#800020', width: isMobile() ? "100%" : '50%', padding: 50, justifyContent: 'center' }}>
                 <Text style={{ fontSize: isMobile() ? 20 : 36, color: "#F8F3F0" }}>Let the Style Journey Begin</Text>
                 <View style={{ marginTop: 30 }}>
-                  <Text style={{ fontSize: isMobile() ? 20 : 36, color: '#F8F3F0' }}>Up to 35% Off</Text>
+                  <Text style={{ fontSize: isMobile() ? 24 : 40, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
@@ -196,7 +196,7 @@ export default class Dashboard extends Component {
             <View style={styles(theme).imageContainer}>
               <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
-                  contentFit="cover"
+                  contentFit="contain"
                   source={'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg'}
                   style={{
                     height: "100%",
@@ -205,7 +205,7 @@ export default class Dashboard extends Component {
               </View>
               <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
                 <Image
-                  contentFit="cover"
+                  contentFit="contain"
                   source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
                   style={{
                     height: "100%",
