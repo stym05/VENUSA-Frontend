@@ -14,7 +14,7 @@ const OfferStrip = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.boldText}>20% Offer{" "}</Text>
-            <Text style={styles.text}>for the first time user. Show{" "}
+            <Text style={styles.text}>for the first time user. Shop{" "}
                 <Text style={styles.boldText} onPress={navigateToScreen}>Women{" "}</Text>
                  and{" "}
                 <Text style={styles.boldText} onPress={navigateToScreen}>Men</Text>

@@ -65,15 +65,24 @@ class ItemSection extends React.Component {
                         {/* Sidebar Filters */}
                         <View style={styles.filterSection}>
                             <Text style={styles.headerText}>Offers</Text>
-                            <Text style={styles.filterText}>Member Exclusive Prices</Text>
-                            <Text style={styles.filterText}>Sweatshirts starting ₹799</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.filterText}>Member Exclusive Prices</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity>
+                                <Text style={styles.filterText}>Sweatshirts starting ₹799</Text>
+                            </TouchableOpacity>
                             <Text style={styles.headerText}>New In</Text>
-                            <Text style={styles.filterText}>Women's Clothing | New Arrivals</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.filterText}>Women's Clothing | New Arrivals</Text>
+                            </TouchableOpacity>
                             <Text style={styles.headerText}>Collection</Text>
-                            <Text style={styles.filterText}>Top</Text>
-                            <Text style={styles.filterText}>Pants</Text>
+                            <TouchableOpacity>
+                                <Text style={styles.filterText}>Top</Text>
+                                <Text style={styles.filterText}>Pants</Text>
+                            </TouchableOpacity>
+
                         </View>
-                        
+
                         {/* Products Section */}
                         <View style={styles.itemList}>
                             <View style={{ marginHorizontal: 20 }}>
@@ -81,24 +90,55 @@ class ItemSection extends React.Component {
                                     <Text style={styles.text}><Text style={styles.text2}>Category/</Text>{productName}</Text>
                                     <Text style={styles.text2}>Products ({productCount})</Text>
                                 </View>
-                                
+
                                 {/* Sorting and Filters */}
                                 <View style={[styles.row, styles.filters]}>
-                                    {['Sort By', 'Color', 'Size', 'Product Type'].map((label, index) => (
-                                        <Picker
-                                            key={index}
-                                            selectedValue={this.state[`selected${label.replace(' ', '')}`]}
-                                            onValueChange={(value) => this.setState({ [`selected${label.replace(' ', '')}`]: value })}
-                                            style={styles.picker}
-                                        >
-                                            <Picker.Item label={label} value={label.toLowerCase()} />
-                                            <Picker.Item label="Option 1" value="option1" />
-                                            <Picker.Item label="Option 2" value="option2" />
-                                        </Picker>
-                                    ))}
+                                    {['Sort By', 'Size'].map((label, index) => {
+                                        if (label === 'Sort By') {
+                                            return (
+                                                <Picker
+                                                    key={index}
+                                                    selectedValue={this.state[`selected${label.replace(' ', '')}`]}
+                                                    onValueChange={(value) => this.setState({ [`selected${label.replace(' ', '')}`]: value })}
+                                                    style={styles.picker}
+                                                >
+                                                    <Picker.Item label="Sort By" value="sortBy" />
+                                                    <Picker.Item label="Pricing Lowest to Highest" value="priceLowToHigh" />
+                                                    <Picker.Item label="Pricing Highest to Lowest" value="priceHighToLow" />
+                                                </Picker>
+                                            );
+                                        } else if (label === 'Size') {
+                                            return (
+                                                <Picker
+                                                    key={index}
+                                                    selectedValue={this.state[`selected${label}`]}
+                                                    onValueChange={(value) => this.setState({ [`selected${label}`]: value })}
+                                                    style={styles.picker}
+                                                >
+                                                    <Picker.Item label="Select Size" value="size" />
+                                                    {['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'].map(size => (
+                                                        <Picker.Item key={size} label={size} value={size.toLowerCase()} />
+                                                    ))}
+                                                </Picker>
+                                            );
+                                        } else {
+                                            return (
+                                                <Picker
+                                                    key={index}
+                                                    selectedValue={this.state[`selected${label.replace(' ', '')}`]}
+                                                    onValueChange={(value) => this.setState({ [`selected${label.replace(' ', '')}`]: value })}
+                                                    style={styles.picker}
+                                                >
+                                                    <Picker.Item label={label} value={label.toLowerCase()} />
+                                                    <Picker.Item label="Option 1" value="option1" />
+                                                    <Picker.Item label="Option 2" value="option2" />
+                                                </Picker>
+                                            );
+                                        }
+                                    })}
                                 </View>
                             </View>
-                            
+
                             {/* Product Grid */}
                             <FlatList
                                 data={paginatedProducts}

@@ -54,7 +54,7 @@ class ItemDescription extends React.Component {
                 console.log("images", size)
                 const imgs = response.product.images;
                 console.log("images", imgs)
-                const images = imgs.map((item)=> {
+                const images = imgs.map((item) => {
                     return item?.includes("http") ? item : DOMAIN + item;
                 })
                 console.log("images", images)
@@ -89,20 +89,20 @@ class ItemDescription extends React.Component {
                 color
             }
             const response = await createPreOrder(payload);
-            if(response.success) {
+            if (response.success) {
                 Toast.show({
                     text1: "Product added to cart",
                     type: "success",
                     visibilityTime: 5000
                 })
-            }else{
+            } else {
                 Toast.show({
                     text1: "something went wrong. please try again later",
                     type: "error",
                     visibilityTime: 5000
                 })
             }
-        }catch(err) {
+        } catch (err) {
             console.log("Error to adding cart is ", err);
             Toast.show({
                 text1: "something went wrong. please try again later",
@@ -162,7 +162,7 @@ class ItemDescription extends React.Component {
                                     fontWeight: '400',
                                     lineHeight: 20,
                                     color: '#808080'
-                                }}>{"Women /Category / Blouses & Tops"}</Text>
+                                }}>{this.props.route.params.ItemDescription}</Text>
                             </View>
                             <View style={styles.paddedItem}>
                                 <Text style={{
