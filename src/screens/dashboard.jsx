@@ -17,7 +17,7 @@ import Octicons from '@expo/vector-icons/Octicons';
 import MovingTextStrip from '../components/MovingTextStrip/index.jsx';
 import Video, { VideoRef } from 'react-native-video';
 import { isMobile } from '../utils/index.js';
-import { Image } from 'expo-image';
+import { Image, ImageBackground } from 'expo-image';
 import { getAllCategories } from '../apis/index.js';
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
@@ -212,15 +212,141 @@ export default class Dashboard extends Component {
                   }}
                 />
               </View>
-              {/* {!isMobile() && <View style={{ height: '100%', width: isMobile() ? "100%" : '50%' }}>
-                <Image
+            </View>
+            <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+              <Text style={{
+                fontFamily: "Jura",
+                fontSize: 28,
+                fontWeight: '600',
+                lineHeight: 38
+              }}>New Arrivals</Text>
+            </View>
+            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
                   contentFit="contain"
-                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
                   style={{
-                    height: "100%",
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
                   }}
-                />
-              </View>} */}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+            </View>
+            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+            </View>
+            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+
+              </View>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: '#ddd',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
             </View>
           </View>
           <Footer navigation={this.props.navigation} />
@@ -257,7 +383,7 @@ const styles = (theme) => StyleSheet.create({
     top: 0,
     left: 0,
     bottom: 0,
-    
+
     right: 0,
   },
   button: {
