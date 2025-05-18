@@ -233,12 +233,12 @@ export default class Dashboard extends Component {
                   }}
                 >
                   <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
+                    backgroundColor: 'white',
                     padding: 20,
                     borderRadius: 10,
                     marginBottom: 50
                   }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
                   </TouchableOpacity>
                 </ImageBackground>
               </View>
@@ -253,54 +253,12 @@ export default class Dashboard extends Component {
                   }}
                 >
                   <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
+                    backgroundColor: 'white',
                     padding: 20,
                     borderRadius: 10,
                     marginBottom: 50
                   }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-            </View>
-            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
                   </TouchableOpacity>
                 </ImageBackground>
               </View>
@@ -322,7 +280,49 @@ export default class Dashboard extends Component {
                     borderRadius: 10,
                     marginBottom: 50
                   }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: 'white',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
+                  </TouchableOpacity>
+                </ImageBackground>
+              </View>
+            </View>
+            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
+              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
+                <ImageBackground
+                  contentFit="contain"
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  style={{
+                    height: 600,
+                    justifyContent: 'flex-end', // Vertically center
+                    alignItems: 'center', // Horizontally center
+                  }}
+                >
+                  <TouchableOpacity style={{
+                    backgroundColor: 'white',
+                    padding: 20,
+                    borderRadius: 10,
+                    marginBottom: 50
+                  }}>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
                   </TouchableOpacity>
                 </ImageBackground>
 
@@ -338,12 +338,12 @@ export default class Dashboard extends Component {
                   }}
                 >
                   <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
+                    backgroundColor: 'white',
                     padding: 20,
                     borderRadius: 10,
                     marginBottom: 50
                   }}>
-                    <Text style={{ fontSize: 18, fontWeight: '800', color: "#000" }}>Buy Now</Text>
+                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
                   </TouchableOpacity>
                 </ImageBackground>
               </View>

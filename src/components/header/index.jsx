@@ -14,6 +14,8 @@ import Feather from "@expo/vector-icons/Feather";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { isMobile } from "../../utils/index.js";
 import { useNavigation } from '@react-navigation/native';
+import Store from "../../store/index.js";
+import { getAllCategories } from '../../apis/index.js';
 
 const Header = (props) => {
   const navigation = useNavigation();
@@ -22,12 +24,44 @@ const Header = (props) => {
   const [menDropdownVisible, setMenDropdownVisible] = useState(false);
   const [womenDropdownVisible, setWomenDropdownVisible] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
+  const [categories, setCategories] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
 
   // Used to handle hover states correctly
   const [isHoveringMenLink, setIsHoveringMenLink] = useState(false);
   const [isHoveringMenDropdown, setIsHoveringMenDropdown] = useState(false);
   const [isHoveringWomenLink, setIsHoveringWomenLink] = useState(false);
   const [isHoveringWomenDropdown, setIsHoveringWomenDropdown] = useState(false);
+
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoading(true);
+        const allCategoriesData = await getAllCategories();
+
+        if (allCategoriesData && allCategoriesData.success) {
+          const data = allCategoriesData.categories;
+          let categoriesObj = {};
+
+          data.forEach((item) => {
+            categoriesObj[item.name] = {
+              id: item._id,
+              categoryImage: item.image,
+            }
+          });
+
+          setCategories(categoriesObj);
+        }
+      } catch (err) {
+        console.log("Error fetching categories:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Effect to manage men dropdown visibility
   useEffect(() => {
@@ -55,6 +89,33 @@ const Header = (props) => {
     }
   }, [isHoveringWomenLink, isHoveringWomenDropdown]);
 
+  // Handle navigation to shop categories
+  const navigateToCategory = (categoryType) => {
+    // Determine which category to use based on categoryType
+    const categoryKey = categoryType === "men" ? "mens" : "womens";
+    const category = categories[categoryKey];
+
+    console.log("Navigating to:", categoryKey, category);
+
+    if (category) {
+      // Force navigation with key to ensure screen refreshes
+      navigation.navigate("ShopCategories", {
+        categorie: category,
+        key: Date.now() // Add a unique key to force refresh
+      });
+    } else {
+      // Fallback if category not loaded yet
+      navigation.navigate("ShopCategories", {
+        category: categoryKey,
+        key: Date.now() // Add a unique key to force refresh
+      });
+    }
+
+    // Close dropdowns
+    setMenDropdownVisible(false);
+    setWomenDropdownVisible(false);
+  };
+
   // Dropdown items
   const renderDropdown = (category) => (
     <View
@@ -62,15 +123,12 @@ const Header = (props) => {
       onMouseEnter={() => category === "men" ? setIsHoveringMenDropdown(true) : setIsHoveringWomenDropdown(true)}
       onMouseLeave={() => category === "men" ? setIsHoveringMenDropdown(false) : setIsHoveringWomenDropdown(false)}
     >
-      <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
+      <TouchableOpacity onPress={() => navigateToCategory(category)}>
         <Text style={styles.dropdownItem}>{category === "men" ? "T-Shirts" : "Tops"}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
+      <TouchableOpacity onPress={() => navigateToCategory(category)}>
         <Text style={styles.dropdownItem}>{category === "men" ? "Pants" : "Dresses"}</Text>
       </TouchableOpacity>
-      {/* <TouchableOpacity onPress={() => navigation.navigate("ShopCategories", { category })}>
-        <Text style={styles.dropdownItem}>{category === "men" ? "Jogger" : "bottom"}</Text>
-      </TouchableOpacity> */}
     </View>
   );
 
@@ -89,10 +147,7 @@ const Header = (props) => {
           {!isMobile() && (
             <View style={styles.paddingContainer}>
               <Pressable
-                onPress={() => {
-                  setMenDropdownVisible(!menDropdownVisible);
-                  setWomenDropdownVisible(false);
-                }}
+                onPress={() => navigateToCategory("men")}
                 onMouseEnter={() => setIsHoveringMenLink(true)}
                 onMouseLeave={() => setIsHoveringMenLink(false)}
               >
@@ -106,10 +161,7 @@ const Header = (props) => {
           {!isMobile() && (
             <View style={styles.paddingContainer}>
               <Pressable
-                onPress={() => {
-                  setWomenDropdownVisible(!womenDropdownVisible);
-                  setMenDropdownVisible(false);
-                }}
+                onPress={() => navigateToCategory("women")}
                 onMouseEnter={() => setIsHoveringWomenLink(true)}
                 onMouseLeave={() => setIsHoveringWomenLink(false)}
               >
@@ -121,7 +173,7 @@ const Header = (props) => {
         </View>
 
         {!isMobile() && (
-          <View style={{width: "33%", justifyContent: 'center', alignItems: 'center'}}>
+          <View style={{ width: "33%", justifyContent: 'center', alignItems: 'center' }}>
             <Text
               onPress={() => {
                 navigation.navigate("App", { screen: "Dashboard" });
@@ -138,18 +190,18 @@ const Header = (props) => {
         )}
 
         <View style={styles.rightSubContainer}>
-          <View style={[styles.paddingContainer, {width: '15%'}]}>
+          <View style={[styles.paddingContainer, { width: '15%' }]}>
             <TouchableOpacity onPress={() => navigation.navigate("WishList")}>
               <AntDesign name="hearto" size={24} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={[styles.paddingContainer, {width: '15%'}]}>
+          <View style={[styles.paddingContainer, { width: '15%' }]}>
             <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
               <Feather name="shopping-bag" size={24} color="black" />
             </TouchableOpacity>
           </View>
           {!isMobile() && (
-            <View style={[styles.paddingContainer, {width: '15%'}]}>
+            <View style={[styles.paddingContainer, { width: '15%' }]}>
               <TouchableOpacity onPress={() => navigation.navigate("App", { screen: "Login" })}>
                 <AntDesign name="user" size={24} color="black" />
               </TouchableOpacity>
