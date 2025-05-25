@@ -18,7 +18,7 @@ class ShopCategories extends Component {
     constructor(props) {
         super(props);
         let categorie = "mens"
-        if(this.props.route && this.props.route.params){
+        if (this.props.route && this.props.route.params) {
             categorie = this.props.route.params.categorie || "mens"
             console.log("categorie selected is =", categorie)
         }
@@ -36,14 +36,14 @@ class ShopCategories extends Component {
             } = this.state;
             this.setState({ isloading: true })
             const response = await getSubCategorieById(categorie.id);
-            if(response && response.success) {
+            if (response && response.success) {
                 const { subCategories } = response;
                 this.setState({ subCategories, isloading: false })
             }
         } catch (err) {
             console.log("error in shopCategories is = ", err)
         }
-        this.setState({isloading:  false})
+        this.setState({ isloading: false })
     }
 
     handleScroll = (event) => {
@@ -65,17 +65,35 @@ class ShopCategories extends Component {
             categorie,
             isloading
         } = this.state
-        return isloading ? (<View style={{flex: 1}}>
+        return isloading ? (<View style={{ flex: 1 }}>
             <ActivityIndicator size={"large"} color={"#000"} />
         </View>) : (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.subContainer}>
+                        {console.log(categorie, "------------------categorie")}
+                        <View style={styles.headerContainer}>
+                            <TouchableOpacity onPress={() => console.log("All collections clicked")}>
+                                <Text style={styles.headerText}>All collections</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log("New Arrivals clicked")}>
+                                <Text style={styles.headerText}>New Arrivals</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log("Trending clicked")}>
+                                <Text style={styles.headerText}>Trending</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log("Best Sellers clicked")}>
+                                <Text style={styles.headerText}>Best Sellers</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => console.log("Sale clicked")}>
+                                <Text style={[styles.headerText, { color: '#b42124' }]}>Sale</Text>
+                            </TouchableOpacity>
+                        </View>
                         <Image
-                            source={{ uri: categorie.categoryImage }}
+                            source={categorie.category === "mens" ? require('./Mens BG.png') : require('./Womens BG.png')}
                             style={{
-                                width: Dimensions.get("window").width * 0.8,
-                                height: Dimensions.get("window").height * 0.5,
+                                width: Dimensions.get("window").width * 1.0,
+                                height: Dimensions.get("window").height * 1.1,
                                 marginTop: 10
                             }}
                         />
@@ -91,7 +109,7 @@ class ShopCategories extends Component {
                                     keyExtractor={(item, index) => index.toString()}
                                     renderItem={({ item }) => (
                                         <TouchableOpacity onPress={() => this.navigateToProducts(item._id, item.name)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
-                                        {/* {console.log("images for item ", item.image.includes("http") ? item.image : DOMAIN + item.image)} */}
+                                            {/* {console.log("images for item ", item.image.includes("http") ? item.image : DOMAIN + item.image)} */}
                                             <Image
                                                 source={{ uri: item.image }}
                                                 style={styles.img}
@@ -103,6 +121,27 @@ class ShopCategories extends Component {
                         </View>
                         <View style={styles.shoppingContainer} >
                             <Text style={styles.heading}>New Arivals</Text>
+                            <View style={{ marginTop: 25 }}>
+                                <FlatList
+                                    data={subCategories}
+                                    horizontal
+                                    pagingEnabled
+                                    onScroll={this.handleScroll}
+                                    showsHorizontalScrollIndicator={false}
+                                    keyExtractor={(item, index) => index.toString()}
+                                    renderItem={({ item }) => (
+                                        <TouchableOpacity onPress={() => this.navigateToProducts(item._id)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
+                                            <Image
+                                                source={{ uri: item.image }}
+                                                style={styles.img}
+                                            />
+                                            <Text style={styles.text}>{item.name}</Text>
+                                        </TouchableOpacity>)}
+                                />
+                            </View>
+                        </View>
+                        <View style={styles.shoppingContainer} >
+                            <Text style={styles.heading}>Trending</Text>
                             <View style={{ marginTop: 25 }}>
                                 <FlatList
                                     data={subCategories}
@@ -161,7 +200,22 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         fontSize: 16,
         lineHeight: 20
+    },
+    headerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: Dimensions.get("window").width * 0.8,
+        marginTop: 20
+    },
+    headerText: {
+        fontFamily: "Roboto",
+        fontWeight: "400",
+        fontSize: 16,
+        lineHeight: 20,
+        padding: 15,
     }
+    // b42124
 })
 
 export default ShopCategories;

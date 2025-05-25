@@ -23,6 +23,7 @@ const Header = (props) => {
   // State for Men & Women dropdown visibility
   const [menDropdownVisible, setMenDropdownVisible] = useState(false);
   const [womenDropdownVisible, setWomenDropdownVisible] = useState(false);
+  const [saleDropdownVisible, setSaleDropdownVisible] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [categories, setCategories] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,8 @@ const Header = (props) => {
   const [isHoveringMenDropdown, setIsHoveringMenDropdown] = useState(false);
   const [isHoveringWomenLink, setIsHoveringWomenLink] = useState(false);
   const [isHoveringWomenDropdown, setIsHoveringWomenDropdown] = useState(false);
+  const [isHoveringSaleLink, setIsHoveringSaleLink] = useState(false);
+  const [isHoveringSaleDropdown, setIsHoveringSaleDropdown] = useState(false);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -48,6 +51,7 @@ const Header = (props) => {
             categoriesObj[item.name] = {
               id: item._id,
               categoryImage: item.image,
+              category: item.name,
             }
           });
 
@@ -68,6 +72,7 @@ const Header = (props) => {
     if (isHoveringMenLink || isHoveringMenDropdown) {
       setMenDropdownVisible(true);
       setWomenDropdownVisible(false);
+      setSaleDropdownVisible(false);
     } else {
       const timer = setTimeout(() => {
         setMenDropdownVisible(false);
@@ -81,6 +86,7 @@ const Header = (props) => {
     if (isHoveringWomenLink || isHoveringWomenDropdown) {
       setWomenDropdownVisible(true);
       setMenDropdownVisible(false);
+      setSaleDropdownVisible(false);
     } else {
       const timer = setTimeout(() => {
         setWomenDropdownVisible(false);
@@ -89,18 +95,32 @@ const Header = (props) => {
     }
   }, [isHoveringWomenLink, isHoveringWomenDropdown]);
 
+  // Effect to manage sale dropdown visibility
+  useEffect(() => {
+    if (isHoveringSaleLink || isHoveringSaleDropdown) {
+      setSaleDropdownVisible(true);
+      setMenDropdownVisible(false);
+      setWomenDropdownVisible(false);
+    } else {
+      const timer = setTimeout(() => {
+        setSaleDropdownVisible(false);
+      }, 50); // Small delay to prevent flickering
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringSaleLink, isHoveringSaleDropdown]);
+
   // Handle navigation to shop categories
   const navigateToCategory = (categoryType) => {
     // Determine which category to use based on categoryType
-    const categoryKey = categoryType === "men" ? "mens" : "womens";
+    const categoryKey = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
     const category = categories[categoryKey];
 
     console.log("Navigating to:", categoryKey, category);
 
-    if (category) {
+    if (category || categoryType === "sale") {
       // Force navigation with key to ensure screen refreshes
       navigation.navigate("ShopCategories", {
-        categorie: category,
+        categorie: category || { category: "sale" },
         key: Date.now() // Add a unique key to force refresh
       });
     } else {
@@ -114,26 +134,48 @@ const Header = (props) => {
     // Close dropdowns
     setMenDropdownVisible(false);
     setWomenDropdownVisible(false);
+    setSaleDropdownVisible(false);
   };
 
   // Dropdown items
   const renderDropdown = (category) => (
     <View
-      style={[styles.dropdown, category === "men" ? styles.menDropdown : styles.womenDropdown]}
-      onMouseEnter={() => category === "men" ? setIsHoveringMenDropdown(true) : setIsHoveringWomenDropdown(true)}
-      onMouseLeave={() => category === "men" ? setIsHoveringMenDropdown(false) : setIsHoveringWomenDropdown(false)}
+      style={[
+        styles.dropdown,
+        category === "men" ? styles.menDropdown :
+          category === "women" ? styles.womenDropdown :
+            styles.saleDropdown
+      ]}
+      onMouseEnter={() => {
+        if (category === "men") setIsHoveringMenDropdown(true);
+        else if (category === "women") setIsHoveringWomenDropdown(true);
+        else setIsHoveringSaleDropdown(true);
+      }}
+      onMouseLeave={() => {
+        if (category === "men") setIsHoveringMenDropdown(false);
+        else if (category === "women") setIsHoveringWomenDropdown(false);
+        else setIsHoveringSaleDropdown(false);
+      }}
     >
       <TouchableOpacity onPress={() => navigateToCategory(category)}>
-        <Text style={styles.dropdownItem}>{category === "men" ? "T-Shirts" : "Tops"}</Text>
+        <Text style={styles.dropdownItem}>
+          {category === "men" ? "T-Shirts" :
+            category === "women" ? "Tops" :
+              "Men's Sale"}
+        </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => navigateToCategory(category)}>
-        <Text style={styles.dropdownItem}>{category === "men" ? "Pants" : "Dresses"}</Text>
+        <Text style={styles.dropdownItem}>
+          {category === "men" ? "Pants" :
+            category === "women" ? "Dresses" :
+              "Women's Sale"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
 
   return (
-    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || showSearchBar ? 200 : null }]}>
+    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || saleDropdownVisible || showSearchBar ? 200 : null }]}>
       <OfferStrip />
       <View style={styles.subContainer}>
         <View style={styles.leftSubContainer}>
@@ -170,6 +212,21 @@ const Header = (props) => {
               {womenDropdownVisible && renderDropdown("women")}
             </View>
           )}
+
+          {/* SALE Dropdown */}
+          {!isMobile() && (
+            <View style={styles.paddingContainer}>
+              <Pressable
+                onPress={() => navigateToCategory("sale")}
+                onMouseEnter={() => setIsHoveringSaleLink(true)}
+                onMouseLeave={() => setIsHoveringSaleLink(false)}
+              >
+                <Text style={[styles.text, styles.saleText]}>Sale</Text>
+              </Pressable>
+              {saleDropdownVisible && renderDropdown("sale")}
+            </View>
+          )}
+
         </View>
 
         {!isMobile() && (
@@ -268,10 +325,16 @@ const styles = StyleSheet.create({
   womenDropdown: {
     // Add any specific styles for women dropdown if needed
   },
+  saleDropdown: {
+    // Add any specific styles for sale dropdown if needed
+  },
   dropdownItem: {
     padding: 10,
     fontSize: 16,
     color: "#000",
+  },
+  saleText: {
+    color: "#b42124",
   },
 });
 
