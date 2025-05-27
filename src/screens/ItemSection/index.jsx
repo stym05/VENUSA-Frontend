@@ -7,7 +7,8 @@ import {
     ScrollView,
     StyleSheet,
     TouchableOpacity,
-    Image
+    Image,
+    ActivityIndicator
 } from 'react-native';
 import Item from "./item";
 import { isMobile } from "../../utils";
@@ -43,14 +44,21 @@ class ItemSection extends React.Component {
             const { productId } = this.state;
             this.setState({ loading: true });
             const response = await getProductBySubCategory(productId);
+            console.log("-----------------getProductBySubCategory-----------", response)
             if (response && response.success) {
                 const { products } = response;
-                this.setState({ productarray: products, productCount: products.length, loading: false });
+                this.setState({
+                    productarray: products,
+                    productCount: products.length,
+                    loading: false
+                });
+            } else {
+                this.setState({ loading: false });
             }
         } catch (err) {
             console.log("Error fetching products: ", err);
+            this.setState({ loading: false });
         }
-        this.setState({ loading: false });
     };
 
     renderFilterDropdown = (label, options) => {
@@ -82,23 +90,63 @@ class ItemSection extends React.Component {
         </View>
     );
 
+    renderProductCard = (product, index) => {
+        const ProductCard = () => {
+            // Adjust these property names based on your actual API response structure
+            const productId = product.id || product._id || product.productId;
+            const productName = product.name || product.title || product.productName;
+            const productPrice = product.price || product.cost || product.amount;
+            const productImages = product.images || [product.image || product.imageUrl || product.thumbnail || 'https://via.placeholder.com/200x250'];
+
+            // State to manage the current image index
+            const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
+
+            // Effect to change the image every 3 seconds
+            React.useEffect(() => {
+                const interval = setInterval(() => {
+                    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % productImages.length);
+                }, 3000); // Change image every 3 seconds
+
+                return () => clearInterval(interval); // Cleanup on unmount
+            }, [productImages.length]);
+
+            return (
+                <View key={productId || index} style={styles.productCard}>
+                    <View style={styles.productImageContainer}>
+                        <Image
+                            source={{ uri: productImages[currentImageIndex] }} // Display the current image
+                            style={styles.productImage}
+                            resizeMode="cover"
+                        />
+                        <TouchableOpacity style={styles.wishlistButton}>
+                            <Text style={styles.wishlistIcon}>♡</Text>
+                        </TouchableOpacity>
+                        {index % 3 === 0 && (
+                            <View style={styles.saleBadge}>
+                                <Text style={styles.saleBadgeText}>Sale</Text>
+                            </View>
+                        )}
+                    </View>
+                    <View style={styles.productInfo}>
+                        <Text style={styles.productName}>{productName}</Text>
+                        <Text style={styles.productPrice}>
+                            {typeof productPrice === 'number' ? `₹${productPrice.toFixed(2)}` : productPrice}
+                        </Text>
+                    </View>
+                </View>
+            );
+        };
+
+        return <ProductCard />;
+    };
+
     render() {
         const { loading, productarray, productCount, currentPage, itemsPerPage, productName } = this.state;
+
+        // Calculate pagination
         const startIndex = (currentPage - 1) * itemsPerPage;
         const paginatedProducts = productarray.slice(startIndex, startIndex + itemsPerPage);
-
-        // Mock data for display - replace with your actual data
-        const mockProducts = [
-            { id: '1', name: 'Willa Wrap Top', price: '₹3,400.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '2', name: 'Georgie Trim Insert Top', price: '₹1,400.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '3', name: 'Emma Trimmed Blouse', price: '₹3,000.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '4', name: 'Parker Printed Top', price: '₹5,400.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '5', name: 'Yolanda Yoke Blouse', price: '₹1,899.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '6', name: 'Kath Puff Sleeve Top', price: '₹2,400.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '7', name: 'Simona Sleeve Blouse', price: '₹5,400.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '8', name: 'Cassidy Lace Blouse', price: '₹1,800.00', image: 'https://via.placeholder.com/200x250' },
-            { id: '9', name: 'Pippi Rosette Halter Top', price: '₹3,300.00', image: 'https://via.placeholder.com/200x250' },
-        ];
+        const totalPages = Math.ceil(productCount / itemsPerPage);
 
         return (
             <SafeAreaView style={styles.container}>
@@ -131,9 +179,9 @@ class ItemSection extends React.Component {
                             <View style={styles.categoryHeader}>
                                 <View style={styles.breadcrumb}>
                                     <Text style={styles.categoryText}>
-                                        <Text style={styles.breadcrumbText}>Category/</Text>{productName || 'Tops'}
+                                        <Text style={styles.breadcrumbText}>Category/</Text>{productName || 'Products'}
                                     </Text>
-                                    <Text style={styles.productCount}>Products ({productCount || mockProducts.length})</Text>
+                                    <Text style={styles.productCount}>Products ({productCount})</Text>
                                 </View>
 
                                 {/* Filter options */}
@@ -149,63 +197,72 @@ class ItemSection extends React.Component {
                                 </View>
                             </View>
 
-                            {/* Product Grid */}
-                            <View style={styles.productGrid}>
-                                {mockProducts.map((product) => (
-                                    <View key={product.id} style={styles.productCard}>
-                                        <View style={styles.productImageContainer}>
-                                            <Image
-                                                source={{ uri: product.image }}
-                                                style={styles.productImage}
-                                                resizeMode="cover"
-                                            />
-                                            <TouchableOpacity style={styles.wishlistButton}>
-                                                <Text style={styles.wishlistIcon}>♡</Text>
-                                            </TouchableOpacity>
-                                            {product.id % 3 === 0 && (
-                                                <View style={styles.saleBadge}>
-                                                    <Text style={styles.saleBadgeText}>Sale</Text>
-                                                </View>
-                                            )}
-                                        </View>
-                                        <View style={styles.productInfo}>
-                                            <Text style={styles.productName}>{product.name}</Text>
-                                            <Text style={styles.productPrice}>{product.price}</Text>
-                                        </View>
+                            {/* Loading State */}
+                            {loading ? (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color="#000" />
+                                    <Text style={styles.loadingText}>Loading products...</Text>
+                                </View>
+                            ) : (
+                                <>
+                                    {/* Product Grid */}
+                                    <View style={styles.productGrid}>
+                                        {paginatedProducts.length > 0 ? (
+                                            paginatedProducts.map((product, index) =>
+                                                this.renderProductCard(product, index)
+                                            )
+                                        ) : (
+                                            <View style={styles.noProductsContainer}>
+                                                <Text style={styles.noProductsText}>No products found</Text>
+                                            </View>
+                                        )}
                                     </View>
-                                ))}
-                            </View>
 
-                            {/* Pagination */}
-                            <View style={styles.paginationContainer}>
-                                <TouchableOpacity style={styles.paginationArrow}>
-                                    <Text style={styles.paginationArrowText}>←</Text>
-                                </TouchableOpacity>
+                                    {/* Pagination - Only show if there are products and multiple pages */}
+                                    {productCount > itemsPerPage && (
+                                        <View style={styles.paginationContainer}>
+                                            <TouchableOpacity
+                                                style={[styles.paginationArrow, currentPage === 1 && styles.disabledArrow]}
+                                                onPress={() => currentPage > 1 && this.setState({ currentPage: currentPage - 1 })}
+                                                disabled={currentPage === 1}
+                                            >
+                                                <Text style={[styles.paginationArrowText, currentPage === 1 && styles.disabledText]}>←</Text>
+                                            </TouchableOpacity>
 
-                                {[1, 2, 3, 4, 5].map(num => (
-                                    <TouchableOpacity
-                                        key={num}
-                                        style={[
-                                            styles.paginationButton,
-                                            num === 1 && styles.activePaginationButton
-                                        ]}
-                                        onPress={() => this.setState({ currentPage: num })}
-                                    >
-                                        <Text
-                                            style={[
-                                                styles.paginationButtonText,
-                                                num === 1 && styles.activePaginationText
-                                            ]}
-                                        >
-                                            {num}
-                                        </Text>
-                                    </TouchableOpacity>
-                                ))}
+                                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                                const pageNumber = i + 1;
+                                                return (
+                                                    <TouchableOpacity
+                                                        key={pageNumber}
+                                                        style={[
+                                                            styles.paginationButton,
+                                                            currentPage === pageNumber && styles.activePaginationButton
+                                                        ]}
+                                                        onPress={() => this.setState({ currentPage: pageNumber })}
+                                                    >
+                                                        <Text
+                                                            style={[
+                                                                styles.paginationButtonText,
+                                                                currentPage === pageNumber && styles.activePaginationText
+                                                            ]}
+                                                        >
+                                                            {pageNumber}
+                                                        </Text>
+                                                    </TouchableOpacity>
+                                                );
+                                            })}
 
-                                <TouchableOpacity style={styles.paginationArrow}>
-                                    <Text style={styles.paginationArrowText}>→</Text>
-                                </TouchableOpacity>
-                            </View>
+                                            <TouchableOpacity
+                                                style={[styles.paginationArrow, currentPage === totalPages && styles.disabledArrow]}
+                                                onPress={() => currentPage < totalPages && this.setState({ currentPage: currentPage + 1 })}
+                                                disabled={currentPage === totalPages}
+                                            >
+                                                <Text style={[styles.paginationArrowText, currentPage === totalPages && styles.disabledText]}>→</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    )}
+                                </>
+                            )}
                         </View>
                     </View>
                     <Footer navigation={this.props.navigation} />
@@ -313,6 +370,27 @@ const styles = StyleSheet.create({
     filtersButtonText: {
         fontSize: 14,
     },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 50,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#666',
+    },
+    noProductsContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingVertical: 50,
+    },
+    noProductsText: {
+        fontSize: 16,
+        color: '#666',
+    },
     productGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -408,6 +486,12 @@ const styles = StyleSheet.create({
     paginationArrowText: {
         fontSize: 16,
         color: '#666',
+    },
+    disabledArrow: {
+        opacity: 0.3,
+    },
+    disabledText: {
+        color: '#ccc',
     }
 });
 

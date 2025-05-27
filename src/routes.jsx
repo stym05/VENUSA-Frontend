@@ -27,6 +27,7 @@ import DeliveryPolicy from "./screens/DeliveryPolicy";
 import CheckoutScreen from "./screens/CheckOutScreen";
 import OrderHistory from "./screens/OrderScreen";
 import OrderDetails from "./screens/OrderDetails";
+import TrendingScrollBanner from "./screens/trendingScroller";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -58,7 +59,9 @@ const linking = {
                     AboutUs: "/AboutUs",
                     CheckoutScreen: "/CheckoutScreen",
                     OrderHistory: "/OrderHistory",
-                    OrderDetails: "/OrderHistory/OrderDetails"
+                    OrderDetails: "/OrderHistory/OrderDetails",
+                    TrendingScrollBanner: "/TrendingScrollBanner/",
+
 
                 },
             },
@@ -125,6 +128,11 @@ const Routes = () => {
                     <Stack.Screen
                         name="ShopCategories"
                         component={ShopCategories}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="TrendingScrollBanner"
+                        component={TrendingScrollBanner}
                         options={{ headerShown: false }}
                     />
                     <Stack.Screen

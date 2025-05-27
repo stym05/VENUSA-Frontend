@@ -21,6 +21,7 @@ import { Image, ImageBackground } from 'expo-image';
 import { getAllCategories } from '../apis/index.js';
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
+import TrendingScrollBanner from './trendingScroller.jsx';
 
 export default class Dashboard extends Component {
 
@@ -221,6 +222,11 @@ export default class Dashboard extends Component {
                 lineHeight: 38
               }}>New Arrivals</Text>
             </View>
+            <TrendingScrollBanner
+              text="FREE SHIPPING ON ALL ORDERS"
+              backgroundColor="#4CAF50"
+              textColor="#ffffff"
+            />
             <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
