@@ -181,7 +181,7 @@ const Header = (props) => {
         <View style={styles.leftSubContainer}>
           {isMobile() && (
             <View style={styles.paddingContainer}>
-              <Image source={require("../../../assets/images/Venusa_logo1.jpg")} style={{ width: 50, height: 50 }} />
+              <Image source={require("../../../assets/images/Venusa_logo1.jpg")} style={{ width: 50, height: 50, alignSelf: 'flex-start' }} />
             </View>
           )}
 
@@ -246,13 +246,16 @@ const Header = (props) => {
           </View>
         )}
 
-        <View style={styles.rightSubContainer}>
-          <View style={[styles.paddingContainer, { width: '15%' }]}>
+        <View style={[styles.rightSubContainer, {
+          width: isMobile() ? "100%" : "33%",
+          paddingRight: isMobile() ? 120 : 0
+        }]}>
+          <View style={[styles.paddingContainer, { width: isMobile() ? "auto" : "15%", marginRight: isMobile() ? 30 : 10 }]}>
             <TouchableOpacity onPress={() => navigation.navigate("WishList")}>
               <AntDesign name="hearto" size={24} color="black" />
             </TouchableOpacity>
           </View>
-          <View style={[styles.paddingContainer, { width: '15%' }]}>
+          <View style={[styles.paddingContainer, { width: isMobile() ? "auto" : "15%" }]}>
             <TouchableOpacity onPress={() => navigation.navigate("Cart")}>
               <Feather name="shopping-bag" size={24} color="black" />
             </TouchableOpacity>
@@ -280,7 +283,8 @@ const styles = StyleSheet.create({
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
+    // justifyContent: "center",
+    justifyContent: isMobile() ? "flex-start" : "center",
     alignItems: "center",
     padding: 15,
   },
@@ -295,8 +299,8 @@ const styles = StyleSheet.create({
     width: "33%",
     display: "flex",
     flexDirection: "row",
-    justifyContent: isMobile() ? "flex-end" : "flex-end",
-    alignItems: isMobile() ? "flex-end" : "flex-end",
+    justifyContent: "flex-end",
+    alignItems: "center",
   },
   paddingContainer: {
     width: isMobile() ? "30%" : "20%",
