@@ -14,6 +14,8 @@ import { ScrollView } from 'react-native-web';
 import Footer from '../components/footer';
 import { DOMAIN, getSubCategorieById } from '../apis';
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 class ShopCategories extends Component {
     constructor(props) {
         super(props);
@@ -25,7 +27,8 @@ class ShopCategories extends Component {
         this.state = {
             isloading: false,
             categorie,
-            subCategories: []
+            subCategories: [],
+            screenData: Dimensions.get('window')
         }
     }
 
@@ -44,12 +47,64 @@ class ShopCategories extends Component {
             console.log("error in shopCategories is = ", err)
         }
         this.setState({ isloading: false })
+
+        // Listen for orientation changes
+        this.dimensionsSubscription = Dimensions.addEventListener('change', this.handleOrientationChange);
+    }
+
+    componentWillUnmount() {
+        if (this.dimensionsSubscription) {
+            this.dimensionsSubscription?.remove();
+        }
+    }
+
+    handleOrientationChange = ({ window }) => {
+        this.setState({ screenData: window });
     }
 
     handleScroll = (event) => {
-        const activeIndex = Math.round(event.nativeEvent.contentOffset.x / (width * 0.45));
+        const { screenData } = this.state;
+        const itemWidth = this.getItemWidth();
+        const activeIndex = Math.round(event.nativeEvent.contentOffset.x / itemWidth);
         this.setState({ activeIndex });
     };
+
+    getItemWidth = () => {
+        const { screenData } = this.state;
+        const isTablet = screenData.width >= 768;
+        const isLandscape = screenData.width > screenData.height;
+
+        if (isTablet) {
+            return isLandscape ? screenData.width * 0.25 : screenData.width * 0.4;
+        }
+        return screenData.width * 0.45;
+    }
+
+    getImageDimensions = () => {
+        const { screenData } = this.state;
+        const isTablet = screenData.width >= 768;
+        const isSmallScreen = screenData.width < 360;
+
+        if (isTablet) {
+            return { width: 220, height: 280 };
+        } else if (isSmallScreen) {
+            return { width: 140, height: 180 };
+        }
+        return { width: 180, height: 230 };
+    }
+
+    getHeaderFontSize = () => {
+        const { screenData } = this.state;
+        const isTablet = screenData.width >= 768;
+        const isSmallScreen = screenData.width < 360;
+
+        if (isTablet) {
+            return 38;
+        } else if (isSmallScreen) {
+            return 26;
+        }
+        return 32;
+    }
 
     navigateToProducts = (id, name) => {
         console.log("hello world")
@@ -59,163 +114,212 @@ class ShopCategories extends Component {
         })
     }
 
+    renderCategoryItem = ({ item }) => {
+        const imageDimensions = this.getImageDimensions();
+        const itemWidth = this.getItemWidth();
+
+        return (
+            <TouchableOpacity
+                onPress={() => this.navigateToProducts(item._id, item.name)}
+                style={[styles.categoryItem, { width: itemWidth }]}
+            >
+                <Image
+                    source={{ uri: item.image }}
+                    style={[styles.img, imageDimensions]}
+                    resizeMode="cover"
+                />
+                <Text style={styles.text} numberOfLines={2}>{item.name}</Text>
+            </TouchableOpacity>
+        );
+    }
+
+    renderHeaderButtons = () => {
+        const { screenData } = this.state;
+        const isSmallScreen = screenData.width < 360;
+        const fontSize = isSmallScreen ? 12 : 16;
+        const padding = isSmallScreen ? 8 : 15;
+
+        const buttons = [
+            { text: "All collections", action: () => console.log("All collections clicked") },
+            { text: "New Arrivals", action: () => console.log("New Arrivals clicked") },
+            { text: "Trending", action: () => console.log("Trending clicked") },
+            { text: "Best Sellers", action: () => console.log("Best Sellers clicked") },
+            { text: "Sale", action: () => console.log("Sale clicked"), color: '#b42124' }
+        ];
+
+        return (
+            <View style={styles.headerContainer}>
+                <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.headerScrollContent}
+                >
+                    {buttons.map((button, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            onPress={button.action}
+                            style={[styles.headerButton, { paddingHorizontal: padding }]}
+                        >
+                            <Text style={[
+                                styles.headerText,
+                                { fontSize, color: button.color || '#000' }
+                            ]}>
+                                {button.text}
+                            </Text>
+                        </TouchableOpacity>
+                    ))}
+                </ScrollView>
+            </View>
+        );
+    }
+
+    renderSection = (title, data) => {
+        const { screenData } = this.state;
+        const headerFontSize = this.getHeaderFontSize();
+
+        return (
+            <View style={[styles.shoppingContainer, { width: screenData.width * 0.9 }]}>
+                <Text style={[styles.heading, { fontSize: headerFontSize }]}>{title}</Text>
+                <View style={styles.flatListContainer}>
+                    <FlatList
+                        data={data}
+                        horizontal
+                        pagingEnabled={false}
+                        onScroll={this.handleScroll}
+                        showsHorizontalScrollIndicator={false}
+                        keyExtractor={(item, index) => `${title}-${index}`}
+                        renderItem={this.renderCategoryItem}
+                        contentContainerStyle={styles.flatListContent}
+                    />
+                </View>
+            </View>
+        );
+    }
+
     render() {
         const {
             subCategories,
             categorie,
-            isloading
-        } = this.state
-        return isloading ? (<View style={{ flex: 1 }}>
-            <ActivityIndicator size={"large"} color={"#000"} />
-        </View>) : (
+            isloading,
+            screenData
+        } = this.state;
+
+        if (isloading) {
+            return (
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#000" />
+                </View>
+            );
+        }
+
+        const backgroundImageStyle = {
+            width: screenData.width,
+            height: Math.min(screenData.height * 0.8, 600), // Cap the height
+            marginTop: 10
+        };
+
+        return (
             <SafeAreaView style={styles.container}>
-                <ScrollView>
+                <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.subContainer}>
                         {console.log(categorie, "------------------categorie")}
-                        <View style={styles.headerContainer}>
-                            <TouchableOpacity onPress={() => console.log("All collections clicked")}>
-                                <Text style={styles.headerText}>All collections</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log("New Arrivals clicked")}>
-                                <Text style={styles.headerText}>New Arrivals</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log("Trending clicked")}>
-                                <Text style={styles.headerText}>Trending</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log("Best Sellers clicked")}>
-                                <Text style={styles.headerText}>Best Sellers</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity onPress={() => console.log("Sale clicked")}>
-                                <Text style={[styles.headerText, { color: '#b42124' }]}>Sale</Text>
-                            </TouchableOpacity>
-                        </View>
+
+                        {this.renderHeaderButtons()}
+
                         <Image
-                            source={categorie.category === "mens" ? require('./Mens BG.png') : require('./Womens BG.png')}
-                            style={{
-                                width: Dimensions.get("window").width * 1.0,
-                                height: Dimensions.get("window").height * 1.1,
-                                marginTop: 10
-                            }}
+                            source={categorie.category === "mens" ?
+                                require('./Mens BG.png') :
+                                require('./Womens BG.png')
+                            }
+                            style={backgroundImageStyle}
+                            resizeMode="cover"
                         />
-                        <View style={styles.shoppingContainer} >
-                            <Text style={styles.heading}>Shop by Categories</Text>
-                            <View style={{ marginTop: 25 }}>
-                                <FlatList
-                                    data={subCategories}
-                                    horizontal
-                                    pagingEnabled
-                                    onScroll={this.handleScroll}
-                                    showsHorizontalScrollIndicator={false}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item }) => (
-                                        <TouchableOpacity onPress={() => this.navigateToProducts(item._id, item.name)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
-                                            {/* {console.log("images for item ", item.image.includes("http") ? item.image : DOMAIN + item.image)} */}
-                                            <Image
-                                                source={{ uri: item.image }}
-                                                style={styles.img}
-                                            />
-                                            <Text style={styles.text}>{item.name}</Text>
-                                        </TouchableOpacity>)}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.shoppingContainer} >
-                            <Text style={styles.heading}>New Arivals</Text>
-                            <View style={{ marginTop: 25 }}>
-                                <FlatList
-                                    data={subCategories}
-                                    horizontal
-                                    pagingEnabled
-                                    onScroll={this.handleScroll}
-                                    showsHorizontalScrollIndicator={false}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item }) => (
-                                        <TouchableOpacity onPress={() => this.navigateToProducts(item._id)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
-                                            <Image
-                                                source={{ uri: item.image }}
-                                                style={styles.img}
-                                            />
-                                            <Text style={styles.text}>{item.name}</Text>
-                                        </TouchableOpacity>)}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.shoppingContainer} >
-                            <Text style={styles.heading}>Trending</Text>
-                            <View style={{ marginTop: 25 }}>
-                                <FlatList
-                                    data={subCategories}
-                                    horizontal
-                                    pagingEnabled
-                                    onScroll={this.handleScroll}
-                                    showsHorizontalScrollIndicator={false}
-                                    keyExtractor={(item, index) => index.toString()}
-                                    renderItem={({ item }) => (
-                                        <TouchableOpacity onPress={() => this.navigateToProducts(item._id)} style={{ justifyContent: 'center', alignItems: 'center', marginRight: 20 }}>
-                                            <Image
-                                                source={{ uri: item.image }}
-                                                style={styles.img}
-                                            />
-                                            <Text style={styles.text}>{item.name}</Text>
-                                        </TouchableOpacity>)}
-                                />
-                            </View>
-                        </View>
+
+                        {this.renderSection("Shop by Categories", subCategories)}
+                        {this.renderSection("New Arrivals", subCategories)}
+                        {this.renderSection("Trending", subCategories)}
                     </View>
                     <Footer navigation={this.props.navigation} />
                 </ScrollView>
             </SafeAreaView>
-        )
+        );
     }
 }
-
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff"
     },
+    scrollContent: {
+        flexGrow: 1,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
     subContainer: {
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: 50
+        paddingBottom: 50
     },
     heading: {
         fontFamily: "Didot",
         fontWeight: "400",
-        fontSize: 32,
-        lineHeight: 40
+        lineHeight: 40,
+        textAlign: 'center'
     },
     shoppingContainer: {
-        width: Dimensions.get("window").width * 0.8,
+        marginTop: 25,
+        paddingHorizontal: 10
+    },
+    flatListContainer: {
         marginTop: 25
     },
+    flatListContent: {
+        paddingHorizontal: 10
+    },
+    categoryItem: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 15,
+        paddingHorizontal: 5
+    },
     img: {
-        width: 200,
-        height: 250,
-        marginTop: 10
+        marginTop: 10,
+        borderRadius: 8
     },
     text: {
         fontFamily: "Roboto",
         fontWeight: "400",
         fontSize: 16,
-        lineHeight: 20
+        lineHeight: 20,
+        textAlign: 'center',
+        marginTop: 8,
+        paddingHorizontal: 5
     },
     headerContainer: {
+        width: '100%',
+        marginTop: 20,
+        paddingHorizontal: 10
+    },
+    headerScrollContent: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
-        width: Dimensions.get("window").width * 0.8,
-        marginTop: 20
+        justifyContent: 'center',
+        minWidth: '100%'
+    },
+    headerButton: {
+        paddingVertical: 10,
+        marginHorizontal: 2
     },
     headerText: {
         fontFamily: "Roboto",
         fontWeight: "400",
-        fontSize: 16,
         lineHeight: 20,
-        padding: 15,
+        textAlign: 'center'
     }
-    // b42124
-})
+});
 
 export default ShopCategories;
