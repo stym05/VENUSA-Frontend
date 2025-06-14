@@ -111,7 +111,17 @@ class ItemSection extends React.Component {
             }, [productImages.length]);
 
             return (
-                <View key={productId || index} style={styles.productCard}>
+                <TouchableOpacity
+                    key={productId || index}
+                    style={styles.productCard}
+                    onPress={() => {
+                        // Navigate to product details
+                        this.props.navigation.navigate('ItemDescription', {
+                            productId: productId,
+                            productName: productName
+                        });
+                    }}
+                >
                     <View style={styles.productImageContainer}>
                         <Image
                             source={{ uri: productImages[currentImageIndex] }} // Display the current image
@@ -133,7 +143,7 @@ class ItemSection extends React.Component {
                             {typeof productPrice === 'number' ? `₹${productPrice.toFixed(2)}` : productPrice}
                         </Text>
                     </View>
-                </View>
+                </TouchableOpacity>
             );
         };
 

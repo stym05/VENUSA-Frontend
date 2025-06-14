@@ -88,7 +88,7 @@ class ItemDescription extends React.Component {
                 size,
                 color
             }
-            const response = await createPreOrder(payload);
+            const response = await addToCart(payload);
             if (response.success) {
                 Toast.show({
                     text1: "Product added to cart",
@@ -222,13 +222,13 @@ class ItemDescription extends React.Component {
                             <View style={[styles.paddedItem]}>
                                 <Text style={{
                                     fontFamily: 'Roboto',
-                                    fontSize: 20,
+                                    fontSize: 14,
                                     fontWeight: '400',
                                     lineHeight: 24,
-                                    color: '#000',
+                                    color: '#333333',
                                     marginBottom: 10
-                                }}>Sizes</Text>
-                                <View style={{ display: 'flex', flexDirection: 'row' }}>
+                                }}>Select Size</Text>
+                                <View style={{ display: 'flex', flexDirection: 'row', fontWeight: 400, fontSize: 14, }}>
                                     {sizeAvailable.map((item, index) => (
                                         <TouchableOpacity
                                             key={index}
@@ -243,6 +243,9 @@ class ItemDescription extends React.Component {
                                             }}>{item.size}</Text>
                                         </TouchableOpacity>
                                     ))}
+                                </View>
+                                <View>
+                                    <Text style={{ fontFamily: "Roboto", textDecorationLine: "underline" }}>Size Guide</Text>
                                 </View>
                             </View>
                             <View>
