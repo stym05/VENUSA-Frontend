@@ -53,7 +53,7 @@ export default class Login extends Component {
       // for OTP genration
       this.setState({ isLoading: true })
       const payload = {
-        phone_number: this.state.mobileNumber
+        userName: this.state.mobileNumber
       }
       const response = await getOTP(payload)
       if (response.success) {
