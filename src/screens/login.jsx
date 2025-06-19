@@ -53,7 +53,7 @@ export default class Login extends Component {
       // for OTP genration
       this.setState({ isLoading: true })
       const payload = {
-        phone_number: this.state.mobileNumber
+        userName: this.state.mobileNumber
       }
       const response = await getOTP(payload)
       if (response.success) {
@@ -91,7 +91,8 @@ export default class Login extends Component {
         Store.dispatch({ type: AUTH, payload: true });
         Store.dispatch({ type: USER_DATA, payload: response.customer });
         Store.dispatch({ type: AUTH_TOKEN, payload: jwt });
-        this.props.navigation.replace(this.state.from ? this.state.from : "Dashboard")
+        console.log("this.state.from", this.state.from, this.props.navigation)
+        this.props.navigation.navigate(this.state.from ? this.state.from : "Dashboard")
       } else {
         Toast.show({
           type: "error",

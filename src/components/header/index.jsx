@@ -24,6 +24,7 @@ const Header = (props) => {
   const [menDropdownVisible, setMenDropdownVisible] = useState(false);
   const [womenDropdownVisible, setWomenDropdownVisible] = useState(false);
   const [saleDropdownVisible, setSaleDropdownVisible] = useState(false);
+  const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [categories, setCategories] = useState({});
   const [isLoading, setIsLoading] = useState(false);
@@ -35,6 +36,8 @@ const Header = (props) => {
   const [isHoveringWomenDropdown, setIsHoveringWomenDropdown] = useState(false);
   const [isHoveringSaleLink, setIsHoveringSaleLink] = useState(false);
   const [isHoveringSaleDropdown, setIsHoveringSaleDropdown] = useState(false);
+  const [isHoveringProfileLink, setIsHoveringProfileLink] = useState(false);
+  const [isHoveringProfileDropdown, setIsHoveringProfileDropdown] = useState(false);
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -73,6 +76,7 @@ const Header = (props) => {
       setMenDropdownVisible(true);
       setWomenDropdownVisible(false);
       setSaleDropdownVisible(false);
+      setProfileDropdownVisible(false);
     } else {
       const timer = setTimeout(() => {
         setMenDropdownVisible(false);
@@ -87,6 +91,7 @@ const Header = (props) => {
       setWomenDropdownVisible(true);
       setMenDropdownVisible(false);
       setSaleDropdownVisible(false);
+      setProfileDropdownVisible(false);
     } else {
       const timer = setTimeout(() => {
         setWomenDropdownVisible(false);
@@ -101,6 +106,7 @@ const Header = (props) => {
       setSaleDropdownVisible(true);
       setMenDropdownVisible(false);
       setWomenDropdownVisible(false);
+      setProfileDropdownVisible(false);
     } else {
       const timer = setTimeout(() => {
         setSaleDropdownVisible(false);
@@ -108,6 +114,21 @@ const Header = (props) => {
       return () => clearTimeout(timer);
     }
   }, [isHoveringSaleLink, isHoveringSaleDropdown]);
+
+  // Effect to manage profile dropdown visibility
+  useEffect(() => {
+    if (isHoveringProfileLink || isHoveringProfileDropdown) {
+      setProfileDropdownVisible(true);
+      setMenDropdownVisible(false);
+      setWomenDropdownVisible(false);
+      setSaleDropdownVisible(false);
+    } else {
+      const timer = setTimeout(() => {
+        setProfileDropdownVisible(false);
+      }, 50); // Small delay to prevent flickering
+      return () => clearTimeout(timer);
+    }
+  }, [isHoveringProfileLink, isHoveringProfileDropdown]);
 
   // Handle navigation to shop categories
   const navigateToCategory = (categoryType) => {
@@ -135,6 +156,41 @@ const Header = (props) => {
     setMenDropdownVisible(false);
     setWomenDropdownVisible(false);
     setSaleDropdownVisible(false);
+    setProfileDropdownVisible(false);
+  };
+
+  // Handle profile navigation
+  const navigateToProfile = (section) => {
+    // Close dropdown first
+    setProfileDropdownVisible(false);
+
+    // Navigate based on section
+    switch (section) {
+      case 'profile':
+        navigation.navigate("Profile");
+        break;
+      case 'orders':
+        navigation.navigate("OrderHistory");
+        break;
+      case 'cart':
+        navigation.navigate("Cart");
+        break;
+      case 'wishlist':
+        navigation.navigate("WishList");
+        break;
+      case 'address':
+        navigation.navigate("Address");
+        break;
+      case 'settings':
+        navigation.navigate("Settings");
+        break;
+      case 'logout':
+        // Handle logout logic here
+        navigation.navigate("App", { screen: "Login" });
+        break;
+      default:
+        navigation.navigate("App", { screen: "Login" });
+    }
   };
 
   // Dropdown items
@@ -174,8 +230,31 @@ const Header = (props) => {
     </View>
   );
 
+  // Profile dropdown
+  const renderProfileDropdown = () => (
+    <View
+      style={styles.profileDropdown}
+      onMouseEnter={() => setIsHoveringProfileDropdown(true)}
+      onMouseLeave={() => setIsHoveringProfileDropdown(false)}
+    >
+      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('profile')}>
+        <AntDesign name="user" size={16} color="#333" style={styles.profileIcon} />
+        <Text style={styles.profileDropdownText}>Profile</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('orders')}>
+        <AntDesign name="filetext1" size={16} color="#333" style={styles.profileIcon} />
+        <Text style={styles.profileDropdownText}>Order History</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
+        <AntDesign name="logout" size={16} color="#333" style={styles.profileIcon} />
+        <Text style={styles.profileDropdownText}>Log-out</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || saleDropdownVisible || showSearchBar ? 200 : null }]}>
+    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || saleDropdownVisible || profileDropdownVisible || showSearchBar ? 200 : null }]}>
       <OfferStrip />
       <View style={styles.subContainer}>
         <View style={styles.leftSubContainer}>
@@ -262,9 +341,14 @@ const Header = (props) => {
           </View>
           {!isMobile() && (
             <View style={[styles.paddingContainer, { width: '15%' }]}>
-              <TouchableOpacity onPress={() => navigation.navigate("App", { screen: "Login" })}>
+              <Pressable
+                onMouseEnter={() => setIsHoveringProfileLink(true)}
+                onMouseLeave={() => setIsHoveringProfileLink(false)}
+                onPress={() => navigation.navigate("App", { screen: "Login" })}
+              >
                 <AntDesign name="user" size={24} color="black" />
-              </TouchableOpacity>
+              </Pressable>
+              {profileDropdownVisible && renderProfileDropdown()}
             </View>
           )}
         </View>
@@ -339,6 +423,42 @@ const styles = StyleSheet.create({
   },
   saleText: {
     color: "#b42124",
+  },
+  profileDropdown: {
+    position: "absolute",
+    top: 30,
+    right: 0,
+    zIndex: 9999,
+    width: 180,
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  profileDropdownItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  profileIcon: {
+    width: 20,
+    marginRight: 12,
+  },
+  profileDropdownText: {
+    fontSize: 14,
+    color: "#333",
+    fontFamily: "Jura",
   },
 });
 
