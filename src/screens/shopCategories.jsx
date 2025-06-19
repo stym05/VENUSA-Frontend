@@ -20,6 +20,7 @@ class ShopCategories extends Component {
     constructor(props) {
         super(props);
         let categorie = "mens"
+        console.log("---------this.props.route.params", this.props.route.params)
         if (this.props.route && this.props.route.params) {
             categorie = this.props.route.params.categorie || "mens"
             console.log("categorie selected is =", categorie)
@@ -214,7 +215,7 @@ class ShopCategories extends Component {
 
         const backgroundImageStyle = {
             width: screenData.width,
-            height: Math.min(screenData.height * 0.8, 600), // Cap the height
+            height: Math.min(screenData.height * 4.0, 600), // Cap the height
             marginTop: 10
         };
 
@@ -227,7 +228,7 @@ class ShopCategories extends Component {
                         {this.renderHeaderButtons()}
 
                         <Image
-                            source={categorie.category === "mens" ?
+                            source={this.props.route.params.type === "Mens" ?
                                 require('./Mens BG.png') :
                                 require('./Womens BG.png')
                             }
