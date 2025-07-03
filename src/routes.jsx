@@ -28,6 +28,7 @@ import CheckoutScreen from "./screens/CheckOutScreen";
 import OrderHistory from "./screens/OrderScreen";
 import OrderDetails from "./screens/OrderDetails";
 import TrendingScrollBanner from "./screens/trendingScroller";
+import ProfileScreen from "./components/header/profile";
 
 // Get screen dimensions for responsiveness
 const dimensions = Dimensions.get("window");
@@ -59,6 +60,7 @@ const linking = {
                     AboutUs: "/AboutUs",
                     CheckoutScreen: "/CheckoutScreen",
                     OrderHistory: "/OrderHistory",
+                    Profile: "/Profile",
                     OrderDetails: "/OrderHistory/OrderDetails",
                     TrendingScrollBanner: "/TrendingScrollBanner/",
 
@@ -215,6 +217,13 @@ const Routes = () => {
                         component={OrderDetails}
                         options={{ headerShown: false }}
                     />
+                    <Stack.Screen
+                        name="ProfileScreen"
+                        component={ProfileScreen}
+                        options={{ headerShown: false }}
+                    />
+
+
 
                 </Stack.Navigator>
             </NavigationContainer>

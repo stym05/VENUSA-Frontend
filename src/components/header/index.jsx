@@ -167,7 +167,7 @@ const Header = (props) => {
     // Navigate based on section
     switch (section) {
       case 'profile':
-        navigation.navigate("Profile");
+        navigation.navigate("ProfileScreen");
         break;
       case 'orders':
         navigation.navigate("OrderHistory");
