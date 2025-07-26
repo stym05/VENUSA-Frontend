@@ -134,7 +134,7 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "https://venusa-bucket.blr1.digitaloceanspaces.com/C0021_3.mp4" }}
+                source={{ uri: " https://venusa-bucket.blr1.digitaloceanspaces.com/videos/C0021_3.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 resizeMode='cover'
@@ -160,9 +160,10 @@ export default class Dashboard extends Component {
                 <Image
                   contentFit="cover"
                   // source={require("../../assets/temp.jpg")}
-                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/title_pic_P.jpg"}
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/title_pic.jpg"}
                   style={{
                     height: "100%",
+                    width: "100%",
                   }}
                 />
               </View>
@@ -201,7 +202,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <Image
                   contentFit="contain"
-                  source={'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg'}
+                  source={'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg'}
                   style={{
                     height: 600,
                   }}
@@ -210,7 +211,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <Image
                   contentFit="contain"
-                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/women_pic_P.jpg"}
+                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/women_pic_P.jpg"}
                   style={{
                     height: 600,
                   }}
@@ -234,7 +235,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
@@ -254,7 +255,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
@@ -276,7 +277,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
@@ -296,7 +297,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
@@ -318,7 +319,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
@@ -339,7 +340,7 @@ export default class Dashboard extends Component {
               <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
                 <ImageBackground
                   contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/mens_pic_D.jpg' }}
+                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
                   style={{
                     height: 600,
                     justifyContent: 'flex-end', // Vertically center
