@@ -134,7 +134,7 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: " https://venusa-bucket.blr1.digitaloceanspaces.com/videos/C0021_3.mp4" }}
+                source={{ uri: "https://venusa-bucket.blr1.cdn.digitaloceanspaces.com/videos/C0021_3.mp4" }}
                 // Store reference  
                 ref={this.VideoRef}
                 resizeMode='cover'
