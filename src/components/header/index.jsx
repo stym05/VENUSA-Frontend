@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   Pressable,
   Platform,
   Image,
+  Animated,
 } from "react-native";
 import OfferStrip from "../offerStrip/index.jsx";
 import AntDesign from "@expo/vector-icons/AntDesign";
@@ -29,6 +30,12 @@ const Header = (props) => {
   const [categories, setCategories] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Animated values for smooth transitions
+  const menDropdownAnimation = useRef(new Animated.Value(0)).current;
+  const womenDropdownAnimation = useRef(new Animated.Value(0)).current;
+  const saleDropdownAnimation = useRef(new Animated.Value(0)).current;
+  const profileDropdownAnimation = useRef(new Animated.Value(0)).current;
+
   // Used to handle hover states correctly
   const [isHoveringMenLink, setIsHoveringMenLink] = useState(false);
   const [isHoveringMenDropdown, setIsHoveringMenDropdown] = useState(false);
@@ -38,6 +45,20 @@ const Header = (props) => {
   const [isHoveringSaleDropdown, setIsHoveringSaleDropdown] = useState(false);
   const [isHoveringProfileLink, setIsHoveringProfileLink] = useState(false);
   const [isHoveringProfileDropdown, setIsHoveringProfileDropdown] = useState(false);
+
+  // Animation configuration
+  const animationConfig = {
+    duration: 200,
+    useNativeDriver: false,
+  };
+
+  // Animate dropdown show/hide
+  const animateDropdown = (animatedValue, show) => {
+    Animated.timing(animatedValue, {
+      toValue: show ? 1 : 0,
+      ...animationConfig,
+    }).start();
+  };
 
   // Fetch categories on component mount
   useEffect(() => {
@@ -72,63 +93,107 @@ const Header = (props) => {
 
   // Effect to manage men dropdown visibility
   useEffect(() => {
-    if (isHoveringMenLink || isHoveringMenDropdown) {
+    const shouldShow = isHoveringMenLink || isHoveringMenDropdown;
+    
+    if (shouldShow && !menDropdownVisible) {
       setMenDropdownVisible(true);
       setWomenDropdownVisible(false);
       setSaleDropdownVisible(false);
       setProfileDropdownVisible(false);
-    } else {
+      
+      // Hide other dropdowns immediately
+      animateDropdown(womenDropdownAnimation, false);
+      animateDropdown(saleDropdownAnimation, false);
+      animateDropdown(profileDropdownAnimation, false);
+      
+      // Show men dropdown
+      animateDropdown(menDropdownAnimation, true);
+    } else if (!shouldShow && menDropdownVisible) {
       const timer = setTimeout(() => {
-        setMenDropdownVisible(false);
-      }, 50); // Small delay to prevent flickering
+        animateDropdown(menDropdownAnimation, false);
+        setTimeout(() => setMenDropdownVisible(false), animationConfig.duration);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isHoveringMenLink, isHoveringMenDropdown]);
+  }, [isHoveringMenLink, isHoveringMenDropdown, menDropdownVisible]);
 
   // Effect to manage women dropdown visibility
   useEffect(() => {
-    if (isHoveringWomenLink || isHoveringWomenDropdown) {
+    const shouldShow = isHoveringWomenLink || isHoveringWomenDropdown;
+    
+    if (shouldShow && !womenDropdownVisible) {
       setWomenDropdownVisible(true);
       setMenDropdownVisible(false);
       setSaleDropdownVisible(false);
       setProfileDropdownVisible(false);
-    } else {
+      
+      // Hide other dropdowns immediately
+      animateDropdown(menDropdownAnimation, false);
+      animateDropdown(saleDropdownAnimation, false);
+      animateDropdown(profileDropdownAnimation, false);
+      
+      // Show women dropdown
+      animateDropdown(womenDropdownAnimation, true);
+    } else if (!shouldShow && womenDropdownVisible) {
       const timer = setTimeout(() => {
-        setWomenDropdownVisible(false);
-      }, 50); // Small delay to prevent flickering
+        animateDropdown(womenDropdownAnimation, false);
+        setTimeout(() => setWomenDropdownVisible(false), animationConfig.duration);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isHoveringWomenLink, isHoveringWomenDropdown]);
+  }, [isHoveringWomenLink, isHoveringWomenDropdown, womenDropdownVisible]);
 
   // Effect to manage sale dropdown visibility
   useEffect(() => {
-    if (isHoveringSaleLink || isHoveringSaleDropdown) {
+    const shouldShow = isHoveringSaleLink || isHoveringSaleDropdown;
+    
+    if (shouldShow && !saleDropdownVisible) {
       setSaleDropdownVisible(true);
       setMenDropdownVisible(false);
       setWomenDropdownVisible(false);
       setProfileDropdownVisible(false);
-    } else {
+      
+      // Hide other dropdowns immediately
+      animateDropdown(menDropdownAnimation, false);
+      animateDropdown(womenDropdownAnimation, false);
+      animateDropdown(profileDropdownAnimation, false);
+      
+      // Show sale dropdown
+      animateDropdown(saleDropdownAnimation, true);
+    } else if (!shouldShow && saleDropdownVisible) {
       const timer = setTimeout(() => {
-        setSaleDropdownVisible(false);
-      }, 50); // Small delay to prevent flickering
+        animateDropdown(saleDropdownAnimation, false);
+        setTimeout(() => setSaleDropdownVisible(false), animationConfig.duration);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isHoveringSaleLink, isHoveringSaleDropdown]);
+  }, [isHoveringSaleLink, isHoveringSaleDropdown, saleDropdownVisible]);
 
   // Effect to manage profile dropdown visibility
   useEffect(() => {
-    if (isHoveringProfileLink || isHoveringProfileDropdown) {
+    const shouldShow = isHoveringProfileLink || isHoveringProfileDropdown;
+    
+    if (shouldShow && !profileDropdownVisible) {
       setProfileDropdownVisible(true);
       setMenDropdownVisible(false);
       setWomenDropdownVisible(false);
       setSaleDropdownVisible(false);
-    } else {
+      
+      // Hide other dropdowns immediately
+      animateDropdown(menDropdownAnimation, false);
+      animateDropdown(womenDropdownAnimation, false);
+      animateDropdown(saleDropdownAnimation, false);
+      
+      // Show profile dropdown
+      animateDropdown(profileDropdownAnimation, true);
+    } else if (!shouldShow && profileDropdownVisible) {
       const timer = setTimeout(() => {
-        setProfileDropdownVisible(false);
-      }, 50); // Small delay to prevent flickering
+        animateDropdown(profileDropdownAnimation, false);
+        setTimeout(() => setProfileDropdownVisible(false), animationConfig.duration);
+      }, 50);
       return () => clearTimeout(timer);
     }
-  }, [isHoveringProfileLink, isHoveringProfileDropdown]);
+  }, [isHoveringProfileLink, isHoveringProfileDropdown, profileDropdownVisible]);
 
   // Handle navigation to shop categories
   const navigateToCategory = (categoryType) => {
@@ -193,68 +258,110 @@ const Header = (props) => {
     }
   };
 
-  // Dropdown items
-  const renderDropdown = (category) => (
-    <View
-      style={[
-        styles.dropdown,
-        category === "men" ? styles.menDropdown :
-          category === "women" ? styles.womenDropdown :
-            styles.saleDropdown
-      ]}
-      onMouseEnter={() => {
-        if (category === "men") setIsHoveringMenDropdown(true);
-        else if (category === "women") setIsHoveringWomenDropdown(true);
-        else setIsHoveringSaleDropdown(true);
-      }}
-      onMouseLeave={() => {
-        if (category === "men") setIsHoveringMenDropdown(false);
-        else if (category === "women") setIsHoveringWomenDropdown(false);
-        else setIsHoveringSaleDropdown(false);
-      }}
-    >
-      <TouchableOpacity onPress={() => navigateToCategory(category)}>
-        <Text style={styles.dropdownItem}>
-          {category === "men" ? "T-Shirts" :
-            category === "women" ? "Tops" :
-              "Men's Sale"}
-        </Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigateToCategory(category)}>
-        <Text style={styles.dropdownItem}>
-          {category === "men" ? "Pants" :
-            category === "women" ? "Dresses" :
-              "Women's Sale"}
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  // Dropdown items with animation
+  const renderDropdown = (category, animatedValue) => {
+    const animatedStyle = {
+      opacity: animatedValue,
+      transform: [
+        {
+          translateY: animatedValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [-10, 0],
+          }),
+        },
+        {
+          scaleY: animatedValue.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.95, 1],
+          }),
+        },
+      ],
+    };
 
-  // Profile dropdown
-  const renderProfileDropdown = () => (
-    <View
-      style={styles.profileDropdown}
-      onMouseEnter={() => setIsHoveringProfileDropdown(true)}
-      onMouseLeave={() => setIsHoveringProfileDropdown(false)}
-    >
-      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('profile')}>
-        <AntDesign name="user" size={16} color="#333" style={styles.profileIcon} />
-        <Text style={styles.profileDropdownText}>Profile</Text>
-      </TouchableOpacity>
+    return (
+      <Animated.View
+        style={[
+          styles.dropdown,
+          animatedStyle,
+          category === "men" ? styles.menDropdown :
+            category === "women" ? styles.womenDropdown :
+              styles.saleDropdown
+        ]}
+        onMouseEnter={() => {
+          if (category === "men") setIsHoveringMenDropdown(true);
+          else if (category === "women") setIsHoveringWomenDropdown(true);
+          else setIsHoveringSaleDropdown(true);
+        }}
+        onMouseLeave={() => {
+          if (category === "men") setIsHoveringMenDropdown(false);
+          else if (category === "women") setIsHoveringWomenDropdown(false);
+          else setIsHoveringSaleDropdown(false);
+        }}
+      >
+        <TouchableOpacity onPress={() => navigateToCategory(category)}>
+          <Text style={styles.dropdownItem}>
+            {category === "men" ? "T-Shirts" :
+              category === "women" ? "Tops" :
+                "Men's Sale"}
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigateToCategory(category)}>
+          <Text style={styles.dropdownItem}>
+            {category === "men" ? "Pants" :
+              category === "women" ? "Dresses" :
+                "Women's Sale"}
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
-      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('orders')}>
-        <AntDesign name="filetext1" size={16} color="#333" style={styles.profileIcon} />
-        <Text style={styles.profileDropdownText}>Order History</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
-        <AntDesign name="logout" size={16} color="#333" style={styles.profileIcon} />
-        <Text style={styles.profileDropdownText}>Log-out</Text>
-      </TouchableOpacity>
-    </View>
-  );
+  // Profile dropdown with animation
+  const renderProfileDropdown = () => {
+    const animatedStyle = {
+      opacity: profileDropdownAnimation,
+      transform: [
+        {
+          translateY: profileDropdownAnimation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [-10, 0],
+          }),
+        },
+        {
+          scaleY: profileDropdownAnimation.interpolate({
+            inputRange: [0, 1],
+            outputRange: [0.95, 1],
+          }),
+        },
+      ],
+    };
+
+    return (
+      <Animated.View
+        style={[styles.profileDropdown, animatedStyle]}
+        onMouseEnter={() => setIsHoveringProfileDropdown(true)}
+        onMouseLeave={() => setIsHoveringProfileDropdown(false)}
+      >
+        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('profile')}>
+          <AntDesign name="user" size={16} color="#333" style={styles.profileIcon} />
+          <Text style={styles.profileDropdownText}>Profile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('orders')}>
+          <AntDesign name="filetext1" size={16} color="#333" style={styles.profileIcon} />
+          <Text style={styles.profileDropdownText}>Order History</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
+          <AntDesign name="logout" size={16} color="#333" style={styles.profileIcon} />
+          <Text style={styles.profileDropdownText}>Log-out</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   return (
-    <View style={[styles.container, { height: menDropdownVisible || womenDropdownVisible || saleDropdownVisible || profileDropdownVisible || showSearchBar ? 200 : null }]}>
+    <View style={styles.container}>
       <OfferStrip />
       <View style={styles.subContainer}>
         <View style={styles.leftSubContainer}>
@@ -274,7 +381,7 @@ const Header = (props) => {
               >
                 <Text style={styles.text}>Men</Text>
               </Pressable>
-              {menDropdownVisible && renderDropdown("men")}
+              {menDropdownVisible && renderDropdown("men", menDropdownAnimation)}
             </View>
           )}
 
@@ -288,7 +395,7 @@ const Header = (props) => {
               >
                 <Text style={styles.text}>Women</Text>
               </Pressable>
-              {womenDropdownVisible && renderDropdown("women")}
+              {womenDropdownVisible && renderDropdown("women", womenDropdownAnimation)}
             </View>
           )}
 
@@ -302,7 +409,7 @@ const Header = (props) => {
               >
                 <Text style={[styles.text, styles.saleText]}>Sale</Text>
               </Pressable>
-              {saleDropdownVisible && renderDropdown("sale")}
+              {saleDropdownVisible && renderDropdown("sale", saleDropdownAnimation)}
             </View>
           )}
 
@@ -362,6 +469,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderBottomColor: "#808080",
     borderBottomWidth: 1,
+    position: "relative",
+    zIndex: 1000,
   },
   subContainer: {
     width: "100%",
@@ -400,12 +509,30 @@ const styles = StyleSheet.create({
   },
   dropdown: {
     position: "absolute",
-    top: 20,
+    top: 30,
     left: 0,
-    zIndex: 9999,
+    zIndex: 999999,
     width: 250,
     backgroundColor: "#fff",
     padding: 10,
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 999,
+    borderWidth: 1,
+    borderColor: "#e0e0e0",
+    // Ensure dropdown appears above other content
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        zIndex: 999999,
+      },
+    }),
   },
   menDropdown: {
     // Add any specific styles for men dropdown if needed
@@ -417,31 +544,41 @@ const styles = StyleSheet.create({
     // Add any specific styles for sale dropdown if needed
   },
   dropdownItem: {
-    padding: 10,
+    padding: 12,
     fontSize: 16,
-    color: "#000",
+    color: "#333",
+    fontFamily: "Jura",
+    borderRadius: 4,
+    marginVertical: 2,
   },
   saleText: {
     color: "#b42124",
   },
   profileDropdown: {
     position: "absolute",
-    top: 30,
+    top: 35,
     right: 0,
-    zIndex: 9999,
+    zIndex: 999999,
     width: 180,
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#e0e0e0",
-    borderRadius: 4,
+    borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 999,
+    // Ensure dropdown appears above other content
+    ...Platform.select({
+      web: {
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        zIndex: 999999,
+      },
+    }),
   },
   profileDropdownItem: {
     flexDirection: "row",
