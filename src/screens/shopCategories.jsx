@@ -19,16 +19,15 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 class ShopCategories extends Component {
     constructor(props) {
         super(props);
-        let categorie = "mens"
-        console.log("---------this.props.route.params", this.props.route.params)
+        let categoryId = "";
         if (this.props.route && this.props.route.params) {
-            categorie = this.props.route.params.categorie || "mens"
-            console.log("categorie selected is =", categorie)
+            categoryId = this.props.route.params.categorie.categoryId
         }
+        console.log("categoryId is ", this.props.route.params)
         this.state = {
             isloading: false,
-            categorie,
-            subCategories: [],
+            categoryId,
+            subCategory: [],
             screenData: Dimensions.get('window')
         }
     }
@@ -36,13 +35,13 @@ class ShopCategories extends Component {
     componentDidMount = async () => {
         try {
             const {
-                categorie
+                categoryId
             } = this.state;
             this.setState({ isloading: true })
-            const response = await getSubCategorieById(categorie.id);
+            const response = await getSubCategorieById(categoryId);
             if (response && response.success) {
-                const { subCategories } = response;
-                this.setState({ subCategories, isloading: false })
+                const { subCategory } = response;
+                this.setState({ subCategory, isloading: false })
             }
         } catch (err) {
             console.log("error in shopCategories is = ", err)
@@ -121,7 +120,7 @@ class ShopCategories extends Component {
 
         return (
             <TouchableOpacity
-                onPress={() => this.navigateToProducts(item._id, item.name)}
+                onPress={() => this.navigateToProducts(item.subCategoryId, item.name)}
                 style={[styles.categoryItem, { width: itemWidth }]}
             >
                 <Image
@@ -199,7 +198,7 @@ class ShopCategories extends Component {
 
     render() {
         const {
-            subCategories,
+            subCategory,
             categorie,
             isloading,
             screenData
@@ -236,9 +235,9 @@ class ShopCategories extends Component {
                             resizeMode="cover"
                         />
 
-                        {this.renderSection("Shop by Categories", subCategories)}
-                        {this.renderSection("New Arrivals", subCategories)}
-                        {this.renderSection("Trending", subCategories)}
+                        {this.renderSection("Shop by Categories", subCategory)}
+                        {this.renderSection("New Arrivals", subCategory)}
+                        {this.renderSection("Trending", subCategory)}
                     </View>
                     <Footer navigation={this.props.navigation} />
                 </ScrollView>

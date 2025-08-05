@@ -4,7 +4,7 @@ import Store from "../store";
 
 // export const DOMAIN = "https://webservices.venusa.co.in/";
 
-export const LOCAL_DOMAIN = "http://localhost:8000";
+export const DOMAIN = "http://localhost:8000";
 
 
 

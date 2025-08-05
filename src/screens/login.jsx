@@ -53,7 +53,7 @@ export default class Login extends Component {
       // for OTP genration
       this.setState({ isLoading: true })
       const payload = {
-        userName: this.state.mobileNumber
+        phoneNumber: this.state.mobileNumber
       }
       const response = await getOTP(payload)
       if (response.success) {
@@ -72,28 +72,27 @@ export default class Login extends Component {
     } else {
       this.setState({ isLoading: true })
       const payload = {
-        userId: this.state.userId,
+        phoneNumber: this.state.mobileNumber,
         otp: this.state.otp
       }
       const response = await validateOTP(payload);
+      this.setState({ isLoading: false })
       if (response.success) {
         this.setState({ isLoading: false, showOTP: true });
         Toast.show({
           type: "success",
           text1: "hii, welcome to venusa"
         })
-        const jwt = response.authToken;
-
-        // Store JWT token in AsyncStorage
-        await AsyncStorage.setItem("jwt", jwt);
-        console.log("Users Data is ", response)
-        // Dispatch actions to Redux
+        const res = response.message;
+        await AsyncStorage.setItem("jwt", res.access);
+        await AsyncStorage.setItem("userId", res.userId);
         Store.dispatch({ type: AUTH, payload: true });
-        Store.dispatch({ type: USER_DATA, payload: response.customer });
-        Store.dispatch({ type: AUTH_TOKEN, payload: jwt });
+        Store.dispatch({ type: USER_DATA, payload: res.user });
+        Store.dispatch({ type: AUTH_TOKEN, payload: res.access });
         console.log("this.state.from", this.state.from, this.props.navigation)
         this.props.navigation.navigate(this.state.from ? this.state.from : "Dashboard")
       } else {
+        
         Toast.show({
           type: "error",
           text1: "something went wrong"

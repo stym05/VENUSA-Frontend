@@ -49,7 +49,7 @@ export default class Dashboard extends Component {
         let categorie = {};
         data.forEach((item) => {
           categorie[item.name] = {
-            id: item._id,
+            categoryId: item.categoryId,
             categoryImage: item.image,
           }
         })
@@ -173,16 +173,16 @@ export default class Dashboard extends Component {
                   <Text style={{ fontSize: isMobile() ? 20 : 36, color: '#F8F3F0' }}>Up to 35% Off</Text>
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
-                  {console.log("-------------categorie--------", categorie['Mens'])}
+                  {console.log("-------------categorie--------", categorie)}
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie["Mens"],
+                    categorie: categorie.Mens,
                     type: "Mens"
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie["Womens"],
+                    categorie: categorie.Womens,
                     type: "Womens"
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
