@@ -318,6 +318,7 @@ const Header = (props) => {
 
   // Profile dropdown with animation
   const renderProfileDropdown = () => {
+    let isAuthenticated = Store.getState().user.isAuthenticated;
     const animatedStyle = {
       opacity: profileDropdownAnimation,
       transform: [
@@ -342,7 +343,9 @@ const Header = (props) => {
         onMouseEnter={() => setIsHoveringProfileDropdown(true)}
         onMouseLeave={() => setIsHoveringProfileDropdown(false)}
       >
-        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('profile')}>
+        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => {
+            navigateToProfile( isAuthenticated ? 'profile': 'Login' );
+          }}>
           <AntDesign name="user" size={16} color="#333" style={styles.profileIcon} />
           <Text style={styles.profileDropdownText}>Profile</Text>
         </TouchableOpacity>
@@ -352,10 +355,10 @@ const Header = (props) => {
           <Text style={styles.profileDropdownText}>Order History</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
+        { isAuthenticated && <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
           <AntDesign name="logout" size={16} color="#333" style={styles.profileIcon} />
           <Text style={styles.profileDropdownText}>Log-out</Text>
-        </TouchableOpacity>
+        </TouchableOpacity>}
       </Animated.View>
     );
   };
@@ -451,7 +454,6 @@ const Header = (props) => {
               <Pressable
                 onMouseEnter={() => setIsHoveringProfileLink(true)}
                 onMouseLeave={() => setIsHoveringProfileLink(false)}
-                onPress={() => navigation.navigate("App", { screen: "Login" })}
               >
                 <AntDesign name="user" size={24} color="black" />
               </Pressable>

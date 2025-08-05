@@ -2,7 +2,7 @@
 export const URL = {
     getAllCategories: "/api/categories",
     getSubCategorieById: "/api/categories/subcategory",
-    getProductBySubCategory: "/api/products/subcategory",
+    getProductBySubCategory: "/api/categories/products/subcategory",
     getProductById: "/api/products",
     CREATE_SUBSCRIBER: "/api/subscriber/create",
     GENRATE_OTP: "/apis/auth/send-otp/",

@@ -18,16 +18,16 @@ import { getProductBySubCategory } from "../../apis";
 class ItemSection extends React.Component {
     constructor(props) {
         super(props);
-        let productId = "";
+        let subCategoryId = "";
         let productName = "";
         if (this.props.route && this.props.route.params) {
-            productId = this.props.route.params.productId;
+            subCategoryId = this.props.route.params.subCategoryId;
             productName = this.props.route.params.productName;
         }
         this.state = {
             loading: false,
             productName,
-            productId,
+            subCategoryId,
             productarray: [],
             selectedSortBy: null,
             selectedSize: null,
@@ -41,9 +41,9 @@ class ItemSection extends React.Component {
 
     componentDidMount = async () => {
         try {
-            const { productId } = this.state;
+            const { subCategoryId } = this.state;
             this.setState({ loading: true });
-            const response = await getProductBySubCategory(productId);
+            const response = await getProductBySubCategory(subCategoryId);
             console.log("-----------------getProductBySubCategory-----------", response)
             if (response && response.success) {
                 const { products } = response;

@@ -107,9 +107,8 @@ class ShopCategories extends Component {
     }
 
     navigateToProducts = (id, name) => {
-        console.log("hello world")
         this.props.navigation.navigate("ItemSection", {
-            productId: id,
+            subCategoryId: id,
             productName: name
         })
     }
