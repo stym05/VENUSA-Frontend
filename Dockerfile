@@ -1,23 +1,23 @@
-# Use Node.js 18 alpine for smaller image size
+# Use a lightweight Node.js image
 FROM node:18-alpine
 
-# Install Expo CLI globally
+# Install necessary packages and Expo CLI globally
 RUN npm install -g @expo/cli
 
-# Set working directory
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json (if available)
+# Copy only package files first to leverage Docker cache
 COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
-# Copy the entire project
+# Copy the rest of the application code
 COPY . .
 
-# Expose port 8081 (default Expo web port)
+# Expose the Expo Web default port
 EXPOSE 8081
 
-# Command to run Expo web
-CMD ["npx", "expo", "start", "--web", "--host", "0.0.0.0"]
+# Start Expo in web mode using correct host option
+CMD ["npx", "expo", "start", "--web", "--host", "lan"]
