@@ -1,11 +1,80 @@
 version: '3.8'
 
 services:
-  frontend:
+  expo-react-native-web:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: venusa-web-frontend
+    container_name: expo-react-native-web
     ports:
-      - "8080:80"  # Serve static site on external port 8080 since port 80 is in use
+      - "8081:8081"  # Metro bundler
+      - "19000:19000" # Expo DevTools
+      - "19001:19001" # Expo tunnel
+      - "19002:19002" # Expo web
+    volumes:
+      # Bind mount source code for hot reloading
+      - .:/app
+      # Exclude node_modules from bind mount for performance
+      - /app/node_modules
+      # Cache directories to persist between container restarts
+      - expo_cache:/root/.expo
+      - npm_cache:/root/.npm
+    environment:
+      - NODE_ENV=development
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - WDS_SOCKET_PORT=8081
+    stdin_open: true
+    tty: true
     restart: unless-stopped
+    networks:
+      - expo-network
+    # Increase memory and CPU limits
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+          cpus: '2.0'
+        reservations:
+          memory: 2G
+          cpus: '1.0'
+    # Add ulimits for file watchers
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    # Custom command to handle dependency updates
+    command: >
+      sh -c "
+        echo 'Installing/updating dependencies...' &&
+        npm ci &&
+        echo 'Starting Expo development server...' &&
+        npx expo start --web --host 0.0.0.0 --port 8081 --clear
+      "
+
+  # Optional: Add a development tools container
+  expo-devtools:
+    image: node:20-alpine
+    container_name: expo-devtools
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    ports:
+      - "19006:19006"  # Additional development port
+    environment:
+      - NODE_ENV=development
+    networks:
+      - expo-network
+    profiles:
+      - tools  # Only start when using --profile tools
+    command: ["tail", "-f", "/dev/null"]  # Keep container running
+
+volumes:
+  expo_cache:
+  npm_cache:
+
+networks:
+  expo-network:
+    driver: bridge
