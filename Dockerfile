@@ -15,13 +15,13 @@ RUN npm install -g @expo/cli
 # Copy project files
 COPY . .
 
-# Build the web version
-RUN npx expo export:web
+# Build the web version using the new command
+RUN npx expo export --platform web
 
 # Production stage
 FROM nginx:alpine
 
-# Copy built files from previous stage
+# Copy built files from previous stage (note: output is in 'dist' folder)
 COPY --from=0 /app/dist /usr/share/nginx/html
 
 # Copy nginx configuration
