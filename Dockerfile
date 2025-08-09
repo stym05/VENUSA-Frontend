@@ -1,51 +1,34 @@
-# Use Node.js 20 LTS (compatible with Expo SDK 52)
-FROM node:20-alpine
+# Build stage
+FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install system dependencies needed for React Native
-RUN apk add --no-cache \
-    git \
-    python3 \
-    make \
-    g++ \
-    && npm install -g @expo/cli
-
-# Set environment variables
-ENV NODE_ENV=development
-ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-ENV WATCHPACK_POLLING=true
-
-# Increase memory limit for Node.js
-ENV NODE_OPTIONS="--max-old-space-size=4096"
-
-# Increase file watcher limits (for Alpine Linux)
-RUN echo 'fs.inotify.max_user_watches = 524288' >> /etc/sysctl.conf || true
-
-# Copy package files first (for better Docker layer caching)
+# Copy package files
 COPY package*.json ./
-COPY yarn.lock* ./
 
 # Install dependencies
-RUN npm ci --only=production=false
+RUN npm install
 
-# Copy the rest of the application code
+# Install Expo CLI globally
+RUN npm install -g @expo/cli
+
+# Copy project files
 COPY . .
 
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nextjs -u 1001 && \
-    chown -R nextjs:nodejs /app
+# Build the web version
+RUN npx expo export:web
 
-USER nextjs
+# Production stage
+FROM nginx:alpine
 
-# Expose ports
-EXPOSE 8081 8082 19000 19001 19002
+# Copy built files from previous stage
+COPY --from=0 /app/dist /usr/share/nginx/html
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8081 || exit 1
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Default command
-CMD ["npx", "expo", "start", "--web", "--host", "0.0.0.0", "--port", "8081"]
+# Expose port
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
