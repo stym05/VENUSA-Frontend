@@ -3,6 +3,11 @@ FROM node:18-alpine
 
 WORKDIR /app
 
+# Set environment variables to make it non-interactive
+ENV CI=true
+ENV EXPO_NO_TELEMETRY=1
+ENV NODE_ENV=production
+
 # Copy package files
 COPY package*.json ./
 
@@ -15,8 +20,8 @@ RUN npm install -g @expo/cli
 # Copy project files
 COPY . .
 
-# Build the web version with non-interactive flags
-RUN npx expo export --platform web --no-dev --no-minify --output-dir dist
+# Build the web version (expo export outputs to 'dist' by default)
+RUN npx expo export --platform web
 
 # Production stage
 FROM nginx:alpine
