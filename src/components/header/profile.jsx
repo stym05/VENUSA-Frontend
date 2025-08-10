@@ -31,7 +31,7 @@ const ProfileScreen = () => {
         { id: 'ShoppingCart', label: 'Shopping Cart', icon: 'shoppingcart', route: 'Cart' },
         { id: 'Wishlist', label: 'Wishlist', icon: 'hearto', route: 'WishList' },
         { id: 'CardsAddress', label: 'Cards & Address', icon: 'creditcard', route: 'Address' },
-        { id: 'Setting', label: 'Setting', icon: 'setting', route: 'Settings' },
+        // { id: 'Setting', label: 'Setting', icon: 'setting', route: 'Settings' },
         { id: 'LogOut', label: 'Log-out', icon: 'logout', route: 'Login' }
     ];
 

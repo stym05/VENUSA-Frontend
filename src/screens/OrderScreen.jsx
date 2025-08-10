@@ -40,12 +40,12 @@ const OrderHistory = () => {
 
     // Sidebar items
     const sidebarItems = [
-        { icon: 'time-outline', text: 'Order History', active: true },
-        { icon: 'cart-outline', text: 'Shopping Cart' },
-        { icon: 'heart-outline', text: 'Wishlist' },
-        { icon: 'card-outline', text: 'Cards & Address' },
+        { icon: 'time-outline', text: 'Profile', screen: 'ProfileScreen' },
+        { icon: 'time-outline', text: 'Order History', active: true, screen: 'OrderHistoryScreen' },
+        { icon: 'cart-outline', text: 'Cart', screen: 'Cart' },
+        { icon: 'heart-outline', text: 'Wishlist', screen: 'WishList' },
+        { icon: 'card-outline', text: 'Cards & Address', screen: 'CardsAddressScreen' },
     ];
-
     // Pagination items
     const paginationItems = [
         { number: '01', active: true },
@@ -81,7 +81,30 @@ const OrderHistory = () => {
                 <View style={styles.contentContainer}>
                     {/* Sidebar */}
                     <View style={styles.sidebar}>
-                        {sidebarItems.map((item, index) => (
+                        {sidebarItems.map((item, idx) => (
+                            <TouchableOpacity
+                                key={idx}
+                                onPress={() => navigation.navigate(item.screen)}
+                                style={[styles.sidebarItem,
+                                item.active && styles.sidebarItemActive]}
+                            >
+                                {/* Render icon and text here */}
+                                <Ionicons
+                                    name={item.icon}
+                                    size={20}
+                                    color={item.active ? "#fff" : "#333"}
+                                />
+                                <Text style={[
+                                    styles.sidebarText,
+                                    item.active && styles.sidebarTextActive
+                                ]}>
+                                    {item.text}
+                                </Text>
+
+                            </TouchableOpacity>
+                        ))}
+
+                        {/* {sidebarItems.map((item, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[
@@ -101,7 +124,7 @@ const OrderHistory = () => {
                                     {item.text}
                                 </Text>
                             </TouchableOpacity>
-                        ))}
+                        ))} */}
                     </View>
 
                     {/* Order Panel */}
