@@ -2,9 +2,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { URL } from "./urls";
 import Store from "../store";
 
-// export const DOMAIN = "https://webservices.venusa.co.in/";
+export const DOMAIN = "https://webservices.venusa.co.in";
 
-export const DOMAIN = "http://localhost:8000";
+// export const DOMAIN = "http://localhost:8000";
 
 
 
