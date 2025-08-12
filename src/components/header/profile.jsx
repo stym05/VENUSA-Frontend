@@ -13,6 +13,7 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import Feather from '@expo/vector-icons/Feather';
 import { isMobile } from '../../utils/index.js';
+import { updateProfile } from '../../apis/index.js';
 
 const ProfileScreen = () => {
     const navigation = useNavigation();
@@ -52,8 +53,10 @@ const ProfileScreen = () => {
     };
 
     const handleUpdate = () => {
+        const response = updateProfile(formData);
         // Handle profile update logic here
-        console.log('Updated profile data:', formData);
+
+        console.log('Updated profile data:', formData, response);
         // You can add API call here to update profile
     };
 

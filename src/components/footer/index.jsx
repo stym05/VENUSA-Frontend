@@ -9,6 +9,7 @@ import {
     Platform,
     Linking
 } from "react-native";
+import Store from "../../store";
 import Feather from '@expo/vector-icons/Feather';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
@@ -52,12 +53,16 @@ class Footer extends React.Component {
     };
 
     handleSubscribe = async () => {
+        const userId = Store.getState().user.userData._id;
+        console.log("userId is ", userId);
+
         this.setState({ isLoading: true })
         try {
             console.log(validateEmail(this.state.text))
             if (validateEmail(this.state.text)) {
                 const payload = {
-                    email: this.state.text
+                    email: this.state.text,
+                    userId: userId
                 }
                 const response = await createSubsciber(payload);
                 console.log("response is ", response);
