@@ -31,6 +31,19 @@ export const getUserAddress = async (id) => {
     }
 }
 
+export const getOrderHistory = async (userId) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.ORDER_HISTORY + `${userId}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getOrderHistory", err);
+        return err;
+    }
+}
 
 export const createAddress = async () => {
     try {
@@ -42,6 +55,21 @@ export const createAddress = async () => {
         return await response.json();
     } catch (err) {
         console.log("error in getAllCategories", err);
+        return err;
+    }
+}
+
+export const updateProfile = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.UPDATE_PROFILE, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in updateProfile", err);
         return err;
     }
 }

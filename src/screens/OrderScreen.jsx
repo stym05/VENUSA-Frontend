@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -12,6 +12,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Footer from '../components/footer';
 import { useNavigation } from '@react-navigation/native';
+import { getOrderHistory } from '../apis/index.js';
+import Store from '../store';
 
 const OrderHistory = () => {
     // Sample order data
@@ -55,6 +57,20 @@ const OrderHistory = () => {
         { number: '05', active: false },
         { number: '06', active: false },
     ];
+
+    useEffect(() => {
+
+        const userId = Store.getState().user.userData.userId;
+
+        console.log("userId is000000000000", userId, Store.getState().user.userData.userId);
+        const response = getOrderHistory(userId);
+        console.log("response is ", response);
+
+
+    }, []);
+
+
+
 
     return (
         <SafeAreaView style={styles.container}>

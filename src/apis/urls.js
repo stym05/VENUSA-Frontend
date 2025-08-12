@@ -4,7 +4,7 @@ export const URL = {
     getSubCategorieById: "/api/categories/subcategory",
     getProductBySubCategory: "/api/categories/products/subcategory",
     getProductById: "/api/categories/products/productId",
-    CREATE_SUBSCRIBER: "/api/subscriber/create",
+    CREATE_SUBSCRIBER: "/apis/subscribe",
     GENRATE_OTP: "/apis/auth/send-otp/",
     VALIDATE_OTP: "/apis/auth/verify-otp/",
     GET_CART_ITEMS: "/api/transactions/cart/",
@@ -16,4 +16,6 @@ export const URL = {
     CREATE_ADDRESS: "/api/addresses",
     CREATE_ORDER: "/api/createOrder",
     CREATE_PRE_ORDER: "/api/order/createPreOrder",
+    UPDATE_PROFILE: "/apis/auth/update-profile/",
+    ORDER_HISTORY: "/api/transactions/order_history/",
 }
