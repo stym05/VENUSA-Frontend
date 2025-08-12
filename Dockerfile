@@ -1,39 +1,23 @@
-# Build stage
+# 1️⃣ Base image
 FROM node:22-alpine
 
+# 2️⃣ Set working directory
 WORKDIR /app
 
-# Set environment variables to make it non-interactive
-ENV CI=true
-ENV EXPO_NO_TELEMETRY=1
-ENV NODE_ENV=production
-
-# Copy package files
+# 3️⃣ Install dependencies
 COPY package*.json ./
+RUN npm install --legacy-peer-deps
 
-# Install dependencies
-RUN npm install
-
-# Install Expo CLI globally
-RUN npm install -g @expo/cli
-
-# Copy project files
+# 4️⃣ Copy project files
 COPY . .
 
-# Build the web version (expo export outputs to 'dist' by default)
-RUN npx expo export --platform web
+# 5️⃣ Expose web dev port
+EXPOSE 8081
+EXPOSE 19006
 
-# Production stage
-FROM nginx:alpine
+# 6️⃣ Set environment variables
+ENV NODE_ENV=production
+ENV EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
 
-# Copy built files from previous stage
-COPY --from=0 /app/dist /usr/share/nginx/html
-
-# Copy nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# 7️⃣ Start Expo web
+CMD ["npx", "expo", "start", "--web", "--host", "0.0.0.0"]
