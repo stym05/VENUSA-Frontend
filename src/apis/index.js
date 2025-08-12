@@ -104,7 +104,7 @@ export const getProductBySubCategory = async (id) => {
 
 export const getProductById = async (id) => {
     try {
-        const headers = await setAuthorizationHeader();
+        const headers = await setAuthorizationHeader();w
         const response = await fetch(DOMAIN + URL.getProductById + `/${id}`, {
             method: "GET",
             headers,
