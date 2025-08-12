@@ -20,13 +20,16 @@ class ShopCategories extends Component {
     constructor(props) {
         super(props);
         let categoryId = "";
+        let categoryImage = "";
         if (this.props.route && this.props.route.params) {
             categoryId = this.props.route.params.categorie.categoryId
+            categoryImage = this.props.route.params.categorie.categoryImage
         }
         console.log("categoryId is ", this.props.route.params)
         this.state = {
             isloading: false,
             categoryId,
+            categoryImage,
             subCategory: [],
             screenData: Dimensions.get('window')
         }
@@ -226,10 +229,11 @@ class ShopCategories extends Component {
                         {this.renderHeaderButtons()}
 
                         <Image
-                            source={this.props.route.params.type === "Mens" ?
-                                require('./Mens BG.png') :
-                                require('./Womens BG.png')
-                            }
+                            // source={this.props.route.params.type === "Mens" ?
+                            //     require('./Mens BG.png') :
+                            //     require('./Womens BG.png')
+                            // }
+                            source={{ uri: this.state.categoryImage }}
                             style={backgroundImageStyle}
                             resizeMode="cover"
                         />

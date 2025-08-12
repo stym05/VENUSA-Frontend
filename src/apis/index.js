@@ -3,8 +3,9 @@ import { URL } from "./urls";
 import Store from "../store";
 
 // export const DOMAIN = "https://webservices.venusa.co.in";
+export const DOMAIN = "https://webservices.venusa.co.in";
 
-export const DOMAIN = "http://localhost:8000";
+// export const DOMAIN = "http://localhost:8000";
 
 
 
@@ -236,10 +237,10 @@ export const removeFromWishList = async (data) => {
     }
 }
 
-export const addToCart = async (data) => {
+export const addToCart = async (data, userId) => {
     try {
         const headers = await setAuthorizationHeader();
-        const response = await fetch(DOMAIN + URL.ADD_TO_CART, {
+        const response = await fetch(DOMAIN + URL.ADD_TO_CART + `/${userId}`, {
             method: "POST",
             headers,
             body: JSON.stringify(data),

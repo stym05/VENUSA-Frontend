@@ -45,8 +45,8 @@ class ItemSection extends React.Component {
             this.setState({ loading: true });
             const response = await getProductBySubCategory(subCategoryId);
             console.log("-----------------getProductBySubCategory-----------", response)
-            if (response && response.success) {
-                const { products } = response;
+            if (response) {
+                const products = response;
                 this.setState({
                     productarray: products,
                     productCount: products.length,
@@ -92,23 +92,35 @@ class ItemSection extends React.Component {
 
     renderProductCard = (product, index) => {
         const ProductCard = () => {
-            // Adjust these property names based on your actual API response structure
-            const productId = product.id || product._id || product.productId;
-            const productName = product.name || product.title || product.productName;
-            const productPrice = product.price || product.cost || product.amount;
-            const productImages = product.images || [product.image || product.imageUrl || product.thumbnail || 'https://via.placeholder.com/200x250'];
+            // Updated property mappings for your JSON structure
+            const productId = product.productId;
+            const productName = product.productName;
+            const productPrice = parseFloat(product.price);
+            const discount = parseFloat(product.discount);
+            const discountPerc = parseFloat(product.discountPerc);
+            
+            // Handle images - use placeholder if empty array
+            const productImages = product.images && product.images.length > 0 
+                ? product.images[0].image 
+                : 'https://via.placeholder.com/200x250?text=No+Image';
+            console.log("Product Images: ", productImages);
+            // Calculate discounted price if discount exists
+            const finalPrice = discount > 0 ? productPrice - discount : productPrice;
+            const hasDiscount = discount > 0 || discountPerc > 0;
 
             // State to manage the current image index
             const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
-            // Effect to change the image every 3 seconds
-            React.useEffect(() => {
-                const interval = setInterval(() => {
-                    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % productImages.length);
-                }, 3000); // Change image every 3 seconds
+            // Effect to change the image every 3 seconds (only if multiple images)
+            // React.useEffect(() => {
+            //     if (productImages.length > 1) {
+            //         const interval = setInterval(() => {
+            //             setCurrentImageIndex((prevIndex) => (prevIndex + 1) % productImages.length);
+            //         }, 3000);
 
-                return () => clearInterval(interval); // Cleanup on unmount
-            }, [productImages.length]);
+            //         return () => clearInterval(interval);
+            //     }
+            // }, [productImages.length]);
 
             return (
                 <TouchableOpacity
@@ -124,24 +136,54 @@ class ItemSection extends React.Component {
                 >
                     <View style={styles.productImageContainer}>
                         <Image
-                            source={{ uri: productImages[currentImageIndex] }} // Display the current image
+                            source={{ uri: productImages }}
                             style={styles.productImage}
                             resizeMode="cover"
                         />
                         <TouchableOpacity style={styles.wishlistButton}>
                             <Text style={styles.wishlistIcon}>♡</Text>
                         </TouchableOpacity>
-                        {index % 3 === 0 && (
+                        {/* Show sale badge if there's a discount */}
+                        {hasDiscount && (
                             <View style={styles.saleBadge}>
-                                <Text style={styles.saleBadgeText}>Sale</Text>
+                                <Text style={styles.saleBadgeText}>
+                                    {discountPerc > 0 ? `${discountPerc}% OFF` : 'Sale'}
+                                </Text>
+                            </View>
+                        )}
+                        {/* Show tags as badges */}
+                        {product.tags && product.tags.length > 0 && (
+                            <View style={styles.tagsContainer}>
+                                {product.tags.slice(0, 2).map((tag, tagIndex) => (
+                                    <View key={tag.id} style={styles.tagBadge}>
+                                        <Text style={styles.tagText}>{tag.tag}</Text>
+                                    </View>
+                                ))}
                             </View>
                         )}
                     </View>
                     <View style={styles.productInfo}>
-                        <Text style={styles.productName}>{productName}</Text>
-                        <Text style={styles.productPrice}>
-                            {typeof productPrice === 'number' ? `₹${productPrice.toFixed(2)}` : productPrice}
+                        <Text style={styles.productName} numberOfLines={2}>
+                            {productName}
                         </Text>
+                        <View style={styles.priceContainer}>
+                            <Text style={styles.productPrice}>
+                                ₹{finalPrice.toFixed(2)}
+                            </Text>
+                            {hasDiscount && (
+                                <Text style={styles.originalPrice}>
+                                    ₹{productPrice.toFixed(2)}
+                                </Text>
+                            )}
+                        </View>
+                        {/* Show materials if available */}
+                        {product.materials && product.materials.length > 0 && (
+                            <Text style={styles.materialText}>
+                                {product.materials[0].material}
+                            </Text>
+                        )}
+                        {/* Show SKU */}
+                        <Text style={styles.skuText}>SKU: {product.SKU}</Text>
                     </View>
                 </TouchableOpacity>
             );
@@ -420,6 +462,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: '#f5f5f5',
+        borderRadius: 8,
     },
     wishlistButton: {
         position: 'absolute',
@@ -444,25 +487,69 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 10,
         left: 10,
-        backgroundColor: '#000',
+        backgroundColor: '#ff4444',
         paddingHorizontal: 8,
         paddingVertical: 4,
+        borderRadius: 4,
     },
     saleBadgeText: {
         color: '#fff',
         fontSize: 12,
         fontWeight: '500',
     },
+    tagsContainer: {
+        position: 'absolute',
+        bottom: 10,
+        left: 10,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+    },
+    tagBadge: {
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        paddingHorizontal: 6,
+        paddingVertical: 2,
+        borderRadius: 10,
+        marginRight: 4,
+        marginBottom: 2,
+    },
+    tagText: {
+        color: '#fff',
+        fontSize: 10,
+        fontWeight: '400',
+    },
     productInfo: {
         marginTop: 5,
     },
     productName: {
         fontSize: 14,
+        marginBottom: 6,
+        fontWeight: '500',
+        lineHeight: 18,
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: 4,
     },
     productPrice: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#000',
+    },
+    originalPrice: {
         fontSize: 14,
-        fontWeight: '500',
+        color: '#999',
+        textDecorationLine: 'line-through',
+        marginLeft: 8,
+    },
+    materialText: {
+        fontSize: 12,
+        color: '#666',
+        marginBottom: 2,
+    },
+    skuText: {
+        fontSize: 10,
+        color: '#999',
     },
     paginationContainer: {
         flexDirection: 'row',
