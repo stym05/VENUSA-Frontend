@@ -21,6 +21,7 @@ class ShopCategories extends Component {
         super(props);
         let categoryId = "";
         let categoryImage = "";
+        console.log(this.props.route)
         if (this.props.route && this.props.route.params) {
             categoryId = this.props.route.params.categorie.categoryId
             categoryImage = this.props.route.params.categorie.categoryImage

@@ -1,14 +1,6 @@
-version: '3.8'
-
-services:
-  expo-web:
-    build: .
-    ports:
-      - "19006:19006"
-      - "8081:8081"
-    environment:
-      - NODE_ENV=production
-      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-    volumes:
-      - .:/app
-      - /app/node_modules
+frontend:
+  build:
+    context: ./VENUSA-Frontend
+  container_name: venusa-frontend
+  expose:
+    - "80"
