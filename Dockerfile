@@ -1,35 +1,34 @@
-# Frontend Dockerfile
-FROM node:18-alpine
+# Use Node.js LTS version
+FROM node:18-alpine as builder
 
 # Set working directory
 WORKDIR /app
 
-# Install Expo CLI globally
-RUN npm install -g @expo/cli
-
 # Copy package files
 COPY package*.json ./
+COPY yarn.lock* ./
 
 # Install dependencies
-RUN npm install
+RUN npm install -g expo-cli @expo/cli
+RUN yarn install --frozen-lockfile || npm ci
 
-# Copy project files
+# Copy source code
 COPY . .
 
-# Create a non-root user
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S reactuser -u 1001
+# Build the web app
+RUN npx expo export -p web --output-dir dist
 
-# Change ownership of the app directory
-RUN chown -R reactuser:nodejs /app
-USER reactuser
+# Production stage with nginx
+FROM nginx:alpine
 
-# Expose port for Expo dev server
-EXPOSE 8081
+# Copy built app from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:8081 || exit 1
+# Copy nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Start Expo development server for web
-CMD ["npx", "expo", "start", "--web", "--port", "8081", "--host", "0.0.0.0"]
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

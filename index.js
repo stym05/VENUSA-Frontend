@@ -1,8 +1,20 @@
-import { registerRootComponent } from 'expo';
-
+import 'react-native-gesture-handler';
+import { AppRegistry, Platform } from 'react-native';
 import App from './App';
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+// App name should match your project
+const appName = 'VENUSA';
+
+// Check if we're running in a web environment
+if (typeof window !== 'undefined' && Platform.OS === 'web') {
+    // Web-specific registration
+    AppRegistry.registerComponent(appName, () => App);
+    AppRegistry.runApplication(appName, {
+        initialProps: {},
+        rootTag: document.getElementById('root') || document.getElementById('main')
+    });
+} else {
+    // Mobile registration using registerRootComponent
+    const { registerRootComponent } = require('expo');
+    registerRootComponent(App);
+}
