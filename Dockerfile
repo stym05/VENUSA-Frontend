@@ -1,18 +1,17 @@
-# Use Node base image
-FROM node:18
+# Use the official Nginx image as base
+FROM nginx:alpine
 
-# Set working directory
-WORKDIR /app
+# Remove default nginx website
+RUN rm -rf /usr/share/nginx/html/*
 
-# Copy package files and install dependencies
-COPY package*.json ./
-RUN npm install
+# Copy the built dist folder to nginx html directory
+COPY dist/ /usr/share/nginx/html/
 
-# Copy the rest of the app
-COPY . .
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
 
-# Expose the web port (default for expo web is 19006)
-EXPOSE 8081
+# Expose port 80
+EXPOSE 80
 
-# Start the Expo web server
-CMD ["npx", "expo", "start", "--web", "--tunnel", "--no-open"]
+# Start Nginx
+CMD ["nginx", "-g", "daemon off;"]
