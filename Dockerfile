@@ -1,17 +1,15 @@
-# Use the official Nginx image as base
+# Use official Nginx image
 FROM nginx:alpine
 
 # Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy the built dist folder to nginx html directory
+# Copy build output
 COPY dist/ /usr/share/nginx/html/
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Expose port 80
-EXPOSE 80
+EXPOSE 80 443
 
-# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

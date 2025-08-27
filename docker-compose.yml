@@ -8,12 +8,8 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./dist:/usr/share/nginx/html:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro   # Mount SSL certs from host
     restart: unless-stopped
-    environment:
-      - NGINX_HOST=venusa.co.in
-      - NGINX_PORT=80
     networks:
       - venusa-network
 
