@@ -9,7 +9,6 @@ const WebApp = () => {
 
 // Register for web
 AppRegistry.registerComponent('VENUSA', () => WebApp);
-
 // Auto-start the app
 if (typeof window !== 'undefined') {
     AppRegistry.runApplication('VENUSA', {
