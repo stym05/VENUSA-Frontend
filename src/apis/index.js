@@ -2,7 +2,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { URL } from "./urls";
 import Store from "../store";
 
-// export const DOMAIN = "https://webservices.venusa.co.in";
 export const DOMAIN = "https://webservices.venusa.co.in";
 
 // export const DOMAIN = "http://localhost:8000";
@@ -133,7 +132,7 @@ export const getProductBySubCategory = async (id) => {
 
 export const getProductById = async (id) => {
     try {
-        const headers = await setAuthorizationHeader();w
+        const headers = await setAuthorizationHeader();
         const response = await fetch(DOMAIN + URL.getProductById + `/${id}`, {
             method: "GET",
             headers,
@@ -265,10 +264,10 @@ export const removeFromWishList = async (data) => {
     }
 }
 
-export const addToCart = async (data, userId) => {
+export const addToCart = async (data) => {
     try {
         const headers = await setAuthorizationHeader();
-        const response = await fetch(DOMAIN + URL.ADD_TO_CART + `/${userId}`, {
+        const response = await fetch(DOMAIN + URL.ADD_TO_CART, {
             method: "POST",
             headers,
             body: JSON.stringify(data),

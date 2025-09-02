@@ -37,7 +37,7 @@ class Cart extends Component {
             this.setState({ loading: true });
             const { isAuthenticated } = this.state;
             if (isAuthenticated) {
-                const userId = Store.getState().user.userData._id;
+                const userId = Store.getState().user.userData.userId;
                 const response = await getCartItem(userId);
                 if (response.success) {
                     console.log("cart data is ", response.cart);

@@ -14,6 +14,7 @@ import Footer from "../../components/footer";
 import { addToCart, createPreOrder, DOMAIN, getProductById } from "../../apis";
 import Store from "../../store";
 import Toast from "react-native-toast-message";
+import Modal from "react-native-modal";
 
 const { width } = Dimensions.get("window");
 
@@ -35,6 +36,7 @@ class ItemDescription extends React.Component {
             description: "",
             selectedSize: "",
             selectedColor: "",
+            isModalVisible: false,
             availableColors: [],
             availableSizes: [],
             tags: [],
@@ -57,18 +59,18 @@ class ItemDescription extends React.Component {
             console.log(response)
             if (response) {
                 console.log("Product data", response);
-                
+
                 // Handle images
                 const imgs = response.images || [];
                 const images = imgs.map((item) => {
                     const imageUrl = item.image || item.url || item;
                     return imageUrl?.includes("http") ? imageUrl : DOMAIN + imageUrl;
                 });
-                
+
                 // Extract unique colors and sizes from stocks
                 const uniqueColors = [...new Set(response.stocks?.map(stock => stock.color) || [])];
                 const uniqueSizes = [...new Set(response.stocks?.map(stock => stock.size) || [])];
-                
+
                 this.setState({
                     images,
                     mainImage: images[0] || "",
@@ -104,12 +106,18 @@ class ItemDescription extends React.Component {
         try {
             this.setState({ isLoading: true });
             const { productId, selectedSize, selectedColor } = this.state;
-            const userId = Store.getState().user.userData._id
+            const userId = Store.getState().user.userData.userId;
+            console.log(Store.getState().user.userData)
+            if (!userId) {
+                this.setState({ isModalVisible: true })
+                return;
+            }
             const payload = {
-                userId: userId,
+                userId,
                 productId,
-                size: selectedSize,
-                color: selectedColor
+                quantity: 1
+                // size: selectedSize,
+                // color: selectedColor
             }
             const response = await addToCart(payload);
             if (response.success) {
@@ -159,12 +167,12 @@ class ItemDescription extends React.Component {
 
     renderPrice = () => {
         const { price, discount, discountPerc } = this.state;
-        
+
         if (discount > 0 || discountPerc > 0) {
-            const discountedPrice = discountPerc > 0 
+            const discountedPrice = discountPerc > 0
                 ? price - (price * discountPerc / 100)
                 : price - discount;
-            
+
             return (
                 <View style={styles.priceContainer}>
                     <Text style={styles.currentPrice}>
@@ -176,7 +184,7 @@ class ItemDescription extends React.Component {
                 </View>
             );
         }
-        
+
         return (
             <Text style={styles.currentPrice}>
                 ₹ {price.toFixed(2)}
@@ -202,9 +210,10 @@ class ItemDescription extends React.Component {
             availableColors,
             availableSizes,
             rating,
-            SKU
+            SKU,
+            isModalVisible
         } = this.state;
-        
+
         return (
             <SafeAreaView style={styles.container}>
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -213,8 +222,8 @@ class ItemDescription extends React.Component {
                         <View style={styles.imageSection}>
                             {/* Main Image */}
                             <View style={styles.mainImageContainer}>
-                                <Image 
-                                    source={{ uri: mainImage || images[0] }} 
+                                <Image
+                                    source={{ uri: mainImage || images[0] }}
                                     style={styles.mainImage}
                                     resizeMode="cover"
                                 />
@@ -222,11 +231,11 @@ class ItemDescription extends React.Component {
                                     <Text style={styles.heartText}>♡</Text>
                                 </TouchableOpacity>
                             </View>
-                            
+
                             {/* Thumbnail Grid */}
                             <View style={styles.thumbnailGrid}>
                                 {images.slice(0, 4).map((image, index) => (
-                                    <TouchableOpacity 
+                                    <TouchableOpacity
                                         key={index}
                                         style={[
                                             styles.thumbnail,
@@ -234,8 +243,8 @@ class ItemDescription extends React.Component {
                                         ]}
                                         onPress={() => this.handleImagePress(image)}
                                     >
-                                        <Image 
-                                            source={{ uri: image }} 
+                                        <Image
+                                            source={{ uri: image }}
                                             style={styles.thumbnailImage}
                                             resizeMode="cover"
                                         />
@@ -250,23 +259,23 @@ class ItemDescription extends React.Component {
                             <Text style={styles.breadcrumb}>
                                 Women Clothing / Blouses & Tops
                             </Text>
-                            
+
                             {/* Product Name */}
                             <Text style={styles.productName}>{name}</Text>
-                            
+
                             {/* Price */}
                             {this.renderPrice()}
-                            
+
                             {/* Rating */}
                             <View style={styles.ratingContainer}>
                                 <View style={styles.starsContainer}>
                                     {this.renderStars(Math.floor(rating))}
                                 </View>
                             </View>
-                            
+
                             {/* Description */}
                             <Text style={styles.description}>{description}</Text>
-                            
+
                             {/* Color Selection */}
                             <View style={styles.selectionContainer}>
                                 <Text style={styles.selectionLabel}>Color</Text>
@@ -284,7 +293,7 @@ class ItemDescription extends React.Component {
                                     ))}
                                 </View>
                             </View>
-                            
+
                             {/* Size Selection */}
                             <View style={styles.selectionContainer}>
                                 <Text style={styles.selectionLabel}>Select Size</Text>
@@ -311,10 +320,10 @@ class ItemDescription extends React.Component {
                                     <Text style={styles.sizeGuide}>Size Guide</Text>
                                 </TouchableOpacity>
                             </View>
-                            
+
                             {/* Add to Cart Button */}
-                            <TouchableOpacity 
-                                style={styles.addToCartButton} 
+                            <TouchableOpacity
+                                style={styles.addToCartButton}
                                 onPress={this.handleAddToCart}
                                 disabled={isLoading}
                             >
@@ -324,14 +333,14 @@ class ItemDescription extends React.Component {
                                     <Text style={styles.addToCartText}>Add to cart</Text>
                                 )}
                             </TouchableOpacity>
-                            
+
                             {/* Additional Info */}
                             <View style={styles.additionalInfo}>
                                 <TouchableOpacity style={styles.infoItem}>
                                     <Text style={styles.infoLabel}>Delivery Availability</Text>
                                     <Text style={styles.checkText}>Check</Text>
                                 </TouchableOpacity>
-                                
+
                                 <View style={styles.infoItem}>
                                     <Text style={styles.shippingIcon}>🚚</Text>
                                     <View>
@@ -341,7 +350,7 @@ class ItemDescription extends React.Component {
                                         </Text>
                                     </View>
                                 </View>
-                                
+
                                 <View style={styles.infoItem}>
                                     <Text style={styles.returnIcon}>↩️</Text>
                                     <View>
@@ -352,19 +361,19 @@ class ItemDescription extends React.Component {
                                     </View>
                                 </View>
                             </View>
-                            
+
                             {/* Expandable Sections */}
                             <View style={styles.expandableSections}>
                                 <TouchableOpacity style={styles.expandableItem}>
                                     <Text style={styles.expandableTitle}>Description</Text>
                                     <Text style={styles.expandableArrow}>⌄</Text>
                                 </TouchableOpacity>
-                                
+
                                 <TouchableOpacity style={styles.expandableItem}>
                                     <Text style={styles.expandableTitle}>Material</Text>
                                     <Text style={styles.expandableArrow}>⌄</Text>
                                 </TouchableOpacity>
-                                
+
                                 <TouchableOpacity style={styles.expandableItem}>
                                     <Text style={styles.expandableTitle}>Care Guide</Text>
                                     <Text style={styles.expandableArrow}>⌄</Text>
@@ -372,7 +381,21 @@ class ItemDescription extends React.Component {
                             </View>
                         </View>
                     </View>
-                    
+                    <Modal isVisible={isModalVisible}>
+                        <View style={styles.modalContainer}>
+                            <Text style={styles.modalTitle}>Oops, you're not logged in</Text>
+                            <Text style={styles.modalText}>Login to view your wishlist</Text>
+                            <TouchableOpacity
+                                style={styles.button}
+                                onPress={() => {
+                                    this.setState({ isModalVisible: false });
+                                    this.props.navigation.replace("Login");
+                                }}
+                            >
+                                <Text style={styles.buttonText}>Login</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </Modal>
                     <Footer navigation={this.props.navigation} />
                 </ScrollView>
             </SafeAreaView>
@@ -636,6 +659,9 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#666',
     },
+    modalContainer: { padding: 25, backgroundColor: '#fff', alignItems: 'center' },
+    modalTitle: { fontSize: 24, fontWeight: '600' },
+    modalText: { fontSize: 18, fontWeight: '300', marginTop: 20 }
 });
 
 export default ItemDescription;

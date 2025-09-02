@@ -11,7 +11,7 @@ export const URL = {
     GET_WISHLIST: "/api/transactions/wishlist",
     ADD_TO_WISHLIST: "/api/wishlist/add",
     REMOVE_FROM_WISHLIST: "/api/wishlist/remove",
-    ADD_TO_CART: "/api/transactions/cart/",
+    ADD_TO_CART: "/api/transactions/cart/add", // api/ transactions /
     GET_CUSTOMER_ADDRESS: "/api/addresses/customer",
     CREATE_ADDRESS: "/api/addresses",
     CREATE_ORDER: "/api/createOrder",

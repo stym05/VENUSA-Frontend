@@ -39,12 +39,12 @@ const fetchWrapper = async (method, url, data = null, isFormData = false) => {
     headers["Content-Type"] = "application/json";
   }
   try {
-  const response = await fetch(URL, {
-    method,
-    headers: {
-      ...headers,
-    },
-    body: data ? (isFormData ? data : JSON.stringify(data)) : null,
+    const response = await fetch(URL, {
+      method,
+      headers: {
+        ...headers,
+      },
+      body: data ? (isFormData ? data : JSON.stringify(data)) : null,
     })
     return response;
   } catch (err) {

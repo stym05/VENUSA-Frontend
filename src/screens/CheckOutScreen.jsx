@@ -33,7 +33,7 @@ const CheckoutScreen = (props) => {
     const [postalCode, setPostalCode] = useState('');
     const [userId, setUserId] = useState('');
     const [city, setCity] = useState('');
-    const [state, setState] =  useState('');
+    const [state, setState] = useState('');
     const [phone, setPhone] = useState('');
     const [alternate_mobile_number, set_alternate_mobile_number] = useState("");
     const [saveInfo, setSaveInfo] = useState(false);
@@ -54,10 +54,10 @@ const CheckoutScreen = (props) => {
     useEffect(async () => {
         try {
             console.log("user", userData);
-            const { _id, email } = userData.userData;
-            console.log("user", _id);
-            setUserId(_id);
-            const addressResponce = await getUserAddress(_id)
+            const { userId, email } = userData.userData;
+            console.log("user", userId);
+            setUserId(userId);
+            const addressResponce = await getUserAddress(userId)
             console.log(addressResponce);
             if (addressResponce.success) {
                 const { addresses } = addressResponce;
@@ -82,7 +82,7 @@ const CheckoutScreen = (props) => {
 
     const confirmAddress = async () => {
         try {
-            const payload  = {
+            const payload = {
                 customer: userId,
                 street_address: address,
                 city,
@@ -91,11 +91,11 @@ const CheckoutScreen = (props) => {
                 country: "india",
                 is_default: true,
                 mobile_number: phone,
-                alternate_mobile_number 
+                alternate_mobile_number
             }
 
             const response = await createAddress(payload);
-            if(response.success){
+            if (response.success) {
                 genrateOrder();
             }
 

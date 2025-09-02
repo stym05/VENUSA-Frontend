@@ -35,11 +35,11 @@ class WishList extends React.Component {
         try {
             this.setState({ loading: true });
             const { isAuthenticated } = this.state;
-            
+
             if (isAuthenticated) {
-                const userId = Store.getState().user.userData._id;
+                const userId = Store.getState().user.userData.userId;
                 const response = await getWishList(userId);
-                
+
                 if (response.status) {
                     const products = response.wishlist?.products || [];
                     this.setState({ cartProducts: products, loading: false });
@@ -56,13 +56,13 @@ class WishList extends React.Component {
     }
 
     handleTrashItem = (item) => {
-        
+
         console.log("Remove item from wishlist:", item);
     };
 
     render() {
         const { totalItemCount, totalAmount, cartProducts, isModalVisible } = this.state;
-        
+
         return (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
@@ -71,8 +71,8 @@ class WishList extends React.Component {
                             <View style={styles.modalContainer}>
                                 <Text style={styles.modalTitle}>Oops, you're not logged in</Text>
                                 <Text style={styles.modalText}>Login to view your wishlist</Text>
-                                <TouchableOpacity 
-                                    style={styles.button} 
+                                <TouchableOpacity
+                                    style={styles.button}
                                     onPress={() => {
                                         this.setState({ isModalVisible: false });
                                         this.props.navigation.replace("Login");

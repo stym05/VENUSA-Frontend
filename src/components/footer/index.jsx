@@ -53,7 +53,7 @@ class Footer extends React.Component {
     };
 
     handleSubscribe = async () => {
-        const userId = Store.getState().user.userData._id;
+        const userId = Store.getState().user.userData.userId;
         console.log("userId is ", userId);
 
         this.setState({ isLoading: true })
