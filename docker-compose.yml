@@ -8,8 +8,20 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /etc/letsencrypt:/etc/letsencrypt:ro   # Mount SSL certs from host
+      - ./ssl:/etc/ssl/certs
+      - ./letsencrypt:/etc/letsencrypt
     restart: unless-stopped
+    networks:
+      - venusa-network
+
+  # Optional: Certbot for automatic SSL certificate management
+  certbot:
+    image: certbot/certbot
+    container_name: venusa-certbot
+    volumes:
+      - ./letsencrypt:/etc/letsencrypt
+      - ./ssl:/var/lib/letsencrypt
+    command: certonly --webroot -w /var/lib/letsencrypt -d venusa.co.in -d www.venusa.co.in --email abhishek.s.chauhan2002@gmail.com --agree-tos --no-eff-email
     networks:
       - venusa-network
 
