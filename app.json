@@ -23,13 +23,7 @@
     },
     "web": {
       "favicon": "./assets/images/logo_round.png",
-      "bundler": "metro",
-      "output": "static",
-      "build": {
-        "babel": {
-          "include": ["@expo/vector-icons"]
-        }
-      }
+      "bundler": "metro"
     }
   }
 }

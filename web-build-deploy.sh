@@ -40,7 +40,7 @@ echo ""
 
 # Step 3: Build for web
 echo -e "${YELLOW}[3/6] Building Expo web app...${NC}"
-npx expo export:web
+npx expo export --platform web
 if [ $? -eq 0 ]; then
     echo -e "${GREEN}✓ Web build completed${NC}"
 else
@@ -49,11 +49,13 @@ else
 fi
 echo ""
 
-# Step 4: Rename dist folder
+# Step 4: Check dist folder
 echo -e "${YELLOW}[4/6] Preparing distribution folder...${NC}"
-if [ -d "web-build" ]; then
-    mv web-build dist
+if [ -d "dist" ]; then
     echo -e "${GREEN}✓ Distribution folder ready${NC}"
+elif [ -d "web-build" ]; then
+    mv web-build dist
+    echo -e "${GREEN}✓ Distribution folder renamed${NC}"
 else
     echo -e "${RED}✗ Build folder not found${NC}"
     exit 1
