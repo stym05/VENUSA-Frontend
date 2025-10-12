@@ -1,8 +1,10 @@
 import { Platform } from "react-native";
 
-// const apiMainURL = "https://webservices.venusa.co.in/"; // Replace with your API base URL.
+// Production API URL
+const apiMainURL = "http://3.110.46.10/";
 
-const apiMainURL = "http://localhost:8000/";
+// For local development, uncomment the line below:
+// const apiMainURL = "http://localhost:8000/";
 
 const setAuthorizationHeader = (url) => {
   return {

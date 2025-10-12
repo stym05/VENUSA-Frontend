@@ -2,9 +2,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { URL } from "./urls";
 import Store from "../store";
 
-// export const DOMAIN = "https://webservices.venusa.co.in/";
+// Production API URL
+export const DOMAIN = "http://3.110.46.10";
 
-export const DOMAIN = "http://localhost:8000";
+// For local development, uncomment the line below:
+// export const DOMAIN = "http://localhost:8000";
 
 
 
