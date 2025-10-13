@@ -13,7 +13,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { isMobile } from '../utils/index';
 import Footer from '../components/footer/index';
 import Store from "../store";
-import { getCartItem } from "../apis";
+import { getCartItem, removeFromCart, updateCartItem } from "../apis";
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
 
@@ -41,7 +41,9 @@ class Cart extends Component {
                 const response = await getCartItem(userId);
                 if (response.success) {
                     console.log("cart data is ", response.cart);
-                    this.setState({ cartProducts: response?.cart?.products, loading: false });
+                    const products = response?.cart?.products || [];
+                    this.calculateTotals(products);
+                    this.setState({ cartProducts: products, loading: false });
                 } else {
                     this.setState({ cartProducts: [], loading: false });
                 }
@@ -54,12 +56,59 @@ class Cart extends Component {
         }
     }
 
+    calculateTotals = (products) => {
+        const totalItemCount = products.reduce((sum, item) => sum + (item.quantity || 1), 0);
+        const totalAmount = products.reduce((sum, item) => sum + (item.product.price * (item.quantity || 1)), 0);
+        this.setState({ totalItemCount, totalAmount });
+    }
+
+    fetchCartData = async () => {
+        try {
+            const userId = Store.getState().user.userData._id;
+            const response = await getCartItem(userId);
+            if (response.success) {
+                const products = response?.cart?.products || [];
+                this.calculateTotals(products);
+                this.setState({ cartProducts: products });
+            }
+        } catch (err) {
+            console.error("Error fetching cart items", err);
+        }
+    }
+
     toggleModal = () => {
         this.setState((prevState) => ({ isModalVisible: !prevState.isModalVisible }));
     };
 
-    handleTrashItem = (item) => {
-        // Implement logic to remove item from cart
+    handleTrashItem = async (item) => {
+        try {
+            const userId = Store.getState().user.userData._id;
+            const response = await removeFromCart(userId, item._id);
+            if (response.success) {
+                console.log("Item removed from cart successfully");
+                await this.fetchCartData();
+            } else {
+                console.error("Failed to remove item from cart");
+            }
+        } catch (err) {
+            console.error("Error removing item from cart", err);
+        }
+    };
+
+    handleUpdateQuantity = async (item, newQuantity) => {
+        try {
+            if (newQuantity < 1) return;
+            const userId = Store.getState().user.userData._id;
+            const response = await updateCartItem(userId, item._id, { quantity: newQuantity });
+            if (response.success) {
+                console.log("Cart item quantity updated successfully");
+                await this.fetchCartData();
+            } else {
+                console.error("Failed to update cart item quantity");
+            }
+        } catch (err) {
+            console.error("Error updating cart item quantity", err);
+        }
     };
 
     render() {
@@ -104,12 +153,27 @@ class Cart extends Component {
                                                     <Text style={styles.text}>{item.product.name}</Text>
                                                     <Text style={styles.text2}>Size: {item.size}</Text>
                                                     <Text style={styles.text2}>Color: {item.color}</Text>
+                                                    <View style={styles.quantityContainer}>
+                                                        <TouchableOpacity
+                                                            style={styles.quantityButton}
+                                                            onPress={() => this.handleUpdateQuantity(item, (item.quantity || 1) - 1)}
+                                                        >
+                                                            <Text style={styles.quantityButtonText}>-</Text>
+                                                        </TouchableOpacity>
+                                                        <Text style={styles.quantityText}>{item.quantity || 1}</Text>
+                                                        <TouchableOpacity
+                                                            style={styles.quantityButton}
+                                                            onPress={() => this.handleUpdateQuantity(item, (item.quantity || 1) + 1)}
+                                                        >
+                                                            <Text style={styles.quantityButtonText}>+</Text>
+                                                        </TouchableOpacity>
+                                                    </View>
                                                 </View>
                                                 <TouchableOpacity onPress={() => this.handleTrashItem(item)}>
                                                     <FontAwesome name="trash-o" size={24} color="black" />
                                                 </TouchableOpacity>
                                             </View>
-                                            <Text style={styles.text}>₹{item.product.price}</Text>
+                                            <Text style={styles.text}>₹{item.product.price * (item.quantity || 1)}</Text>
                                         </View>
                                     </View>
                                 ))}
@@ -157,7 +221,12 @@ const styles = StyleSheet.create({
     modalContent: { alignItems: 'center' },
     modalTitle: { fontSize: 32, fontWeight: '600' },
     modalSubtitle: { fontSize: 18, fontWeight: '300', marginTop: 50 },
-    checkoutNote: { textAlign: 'center' }
+    checkoutNote: { textAlign: 'center' },
+    quantityContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 10 },
+    quantityButton: { backgroundColor: '#1A1A1A', width: 30, height: 30, justifyContent: 'center', alignItems: 'center', borderRadius: 5 },
+    quantityButtonText: { color: '#fff', fontSize: 18, fontWeight: '600' },
+    quantityText: { marginHorizontal: 15, fontSize: 16, fontWeight: '500' },
+    payContainer: { padding: 20 }
 });
 
 export default Cart;

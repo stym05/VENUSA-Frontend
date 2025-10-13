@@ -18,7 +18,7 @@ import MovingTextStrip from '../components/MovingTextStrip/index.jsx';
 import Video, { VideoRef } from 'react-native-video';
 import { isMobile } from '../utils/index.js';
 import { Image, ImageBackground } from 'expo-image';
-import { getAllCategories } from '../apis/index.js';
+import { getAllCategories, getDashboardData } from '../apis/index.js';
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
 import TrendingScrollBanner from './trendingScroller.jsx';
@@ -35,32 +35,62 @@ export default class Dashboard extends Component {
       theme,
       allCategoriesData: [],
       categorie: {},
-      isModalVisible: true
+      isModalVisible: true,
+      dashboardVideo: '',
+      featuredProducts: [],
+      newArrivals: [],
+      bestsellers: []
     }
   }
 
   componentDidMount = async () => {
     try {
       this.setState({ isLoading: true });
-      const allCategoriesData = await getAllCategories();
-      console.log("data we got is ", Store.getState().user);
-      if (allCategoriesData && allCategoriesData.success) {
-        const data = allCategoriesData.categories;
+      const dashboardResponse = await getDashboardData();
+      console.log("Dashboard data: ", dashboardResponse);
+
+      if (dashboardResponse && dashboardResponse.status === 'success') {
+        const { dashboard_video, data } = dashboardResponse;
         let categorie = {};
-        data.forEach((item) => {
-          categorie[item.name] = {
-            categoryId: item.categoryId,
-            categoryImage: item.image,
+        let allProducts = [];
+
+        // Process categories and collect products
+        data.forEach((category) => {
+          categorie[category.categoryName] = {
+            categoryId: category.categoryId,
+            categoryImage: category.categoryImage,
+          };
+
+          // Collect products from subcategories
+          if (category.subcategories && category.subcategories.length > 0) {
+            category.subcategories.forEach((subcat) => {
+              if (subcat.products && subcat.products.length > 0) {
+                allProducts = [...allProducts, ...subcat.products];
+              }
+            });
           }
-        })
-        console.log("data we filtered", categorie);
-        this.setState({ isLoading: false, categorie, allCategoriesData: data });
+        });
+
+        // Separate products for different sections
+        const newArrivals = allProducts.slice(0, 4);
+        const bestsellers = allProducts.slice(4, 8);
+
+        this.setState({
+          isLoading: false,
+          categorie,
+          allCategoriesData: data,
+          dashboardVideo: dashboard_video || "https://venusa-bucket.blr1.cdn.digitaloceanspaces.com/videos/C0021_3.mp4",
+          newArrivals,
+          bestsellers,
+          featuredProducts: allProducts
+        });
+      } else {
+        this.setState({ isLoading: false });
       }
     } catch (err) {
       this.setState({ isLoading: false });
-      console.log("Error at ITEM :: ", err);
+      console.log("Error at Dashboard :: ", err);
     }
-    this.setState({ isLoading: false });
   }
 
   onBuffer = () => {
@@ -134,14 +164,14 @@ export default class Dashboard extends Component {
               </TouchableOpacity> */}
               <Video
                 // Can be a URL or a local file.
-                source={{ uri: "https://venusa-bucket.blr1.cdn.digitaloceanspaces.com/videos/C0021_3.mp4" }}
-                // Store reference  
+                source={{ uri: this.state.dashboardVideo }}
+                // Store reference
                 ref={this.VideoRef}
                 resizeMode='cover'
-                // Callback when remote video is buffering                                      
+                // Callback when remote video is buffering
                 onBuffer={this.onBuffer}
                 muted={"muted"}
-                // Callback when video cannot be loaded              
+                // Callback when video cannot be loaded
                 onError={() => console.log("something went wrong")}
                 style={styles(theme).backgroundVideo}
                 repeat

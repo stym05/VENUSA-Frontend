@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -7,26 +7,57 @@ import {
     TouchableOpacity,
     TextInput,
     SafeAreaView,
-    StatusBar
+    StatusBar,
+    ActivityIndicator
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Footer from '../components/footer';
 import { useNavigation } from '@react-navigation/native';
+import { getOrderHistory } from '../apis/index.js';
+import { useSelector } from 'react-redux';
 
 const OrderHistory = () => {
-    // Sample order data
-    const orders = [
-        { id: '#96459761', status: 'IN PROGRESS', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#71667167', status: 'COMPLETED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#95214362', status: 'CANCELLED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#71667167', status: 'COMPLETED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#51746385', status: 'COMPLETED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#51746385', status: 'CANCELLED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#673971743', status: 'COMPLETED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-        { id: '#673971743', status: 'COMPLETED', date: 'Mar 30, 2025', total: '₹1,400.00', products: 5 },
-    ];
-
+    const [orders, setOrders] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const userData = useSelector((state) => state.user);
     const navigation = useNavigation();
+
+    useEffect(() => {
+        fetchOrders();
+    }, []);
+
+    const fetchOrders = async () => {
+        try {
+            setIsLoading(true);
+            const userId = userData?.userData?._id;
+            if (!userId) {
+                setError('User not logged in');
+                setIsLoading(false);
+                return;
+            }
+
+            const response = await getOrderHistory(userId);
+            console.log('Order history response:', response);
+
+            if (response && response.success) {
+                setOrders(response.orders || []);
+            } else {
+                setError('Failed to fetch orders');
+            }
+        } catch (err) {
+            console.error('Error fetching orders:', err);
+            setError('Failed to fetch orders');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const formatDate = (dateString) => {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
 
     // Helper function to determine status color
     const getStatusColor = (status) => {
@@ -137,25 +168,48 @@ const OrderHistory = () => {
                                 <Text style={[styles.headerCell, { flex: 1 }]}>Action</Text>
                             </View>
 
+                            {/* Loading State */}
+                            {isLoading && (
+                                <View style={styles.loadingContainer}>
+                                    <ActivityIndicator size="large" color="#333" />
+                                    <Text style={styles.loadingText}>Loading orders...</Text>
+                                </View>
+                            )}
+
+                            {/* Error State */}
+                            {error && !isLoading && (
+                                <View style={styles.errorContainer}>
+                                    <Text style={styles.errorText}>{error}</Text>
+                                </View>
+                            )}
+
+                            {/* Empty State */}
+                            {!isLoading && !error && orders.length === 0 && (
+                                <View style={styles.emptyContainer}>
+                                    <Text style={styles.emptyText}>No orders found</Text>
+                                </View>
+                            )}
+
                             {/* Table Rows */}
-                            {orders.map((order, index) => (
-                                <View key={index} style={styles.tableRow}>
-                                    <Text style={[styles.cell, { flex: 1 }]}>{order.id}</Text>
+                            {!isLoading && !error && orders.map((order, index) => (
+                                <View key={order._id || index} style={styles.tableRow}>
+                                    <Text style={[styles.cell, { flex: 1 }]}>#{order.order_number || order._id?.substring(0, 8)}</Text>
                                     <Text
                                         style={[
                                             styles.cell,
-                                            { flex: 1, color: getStatusColor(order.status), fontWeight: '500' }
+                                            { flex: 1, color: getStatusColor(order.status?.toUpperCase()), fontWeight: '500' }
                                         ]}
                                     >
-                                        {order.status}
+                                        {order.status?.toUpperCase() || 'PENDING'}
                                     </Text>
-                                    <Text style={[styles.cell, { flex: 1 }]}>{order.date}</Text>
+                                    <Text style={[styles.cell, { flex: 1 }]}>{formatDate(order.createdAt)}</Text>
                                     <Text style={[styles.cell, { flex: 1.5 }]}>
-                                        {order.total} ({order.products} Products)
+                                        ₹{order.total_amount?.toFixed(2) || '0.00'} ({order.items?.length || 0} Products)
                                     </Text>
                                     <View style={[styles.cell, { flex: 1, alignItems: 'flex-end' }]}>
-                                        <TouchableOpacity style={styles.viewDetailsButton}
-                                            onPress={() => navigation.navigate('OrderDetails')}
+                                        <TouchableOpacity
+                                            style={styles.viewDetailsButton}
+                                            onPress={() => navigation.navigate('OrderDetails', { orderId: order._id })}
                                         >
                                             <Text style={styles.viewDetailsText}>View Details</Text>
                                             <Ionicons name="arrow-forward" size={16} color="#333" />
@@ -461,6 +515,39 @@ const styles = StyleSheet.create({
     copyrightText: {
         fontSize: 14,
         color: '#555',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 14,
+        color: '#777',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+    },
+    errorText: {
+        fontSize: 14,
+        color: '#d32f2f',
+        textAlign: 'center',
+    },
+    emptyContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 40,
+    },
+    emptyText: {
+        fontSize: 14,
+        color: '#777',
+        textAlign: 'center',
     },
 });
 

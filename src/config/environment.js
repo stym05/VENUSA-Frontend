@@ -23,7 +23,7 @@ const API_URLS = {
     name: 'Local Development',
   },
   production: {
-    base: 'http://3.110.46.10',
+    base: 'https://webservices.venusa.co.in',
     name: 'Production Server',
   },
 };

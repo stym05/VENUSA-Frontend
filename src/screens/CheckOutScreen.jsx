@@ -14,8 +14,9 @@ import {
 import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
-import { createAddress, getUserAddress } from '../apis';
+import { createAddress, getUserAddress, getCartItem, createOrderAPI } from '../apis';
 import { useSelector } from 'react-redux';
+import Store from '../store';
 
 
 
@@ -49,40 +50,55 @@ const CheckoutScreen = (props) => {
     // const [cardType, setCardType] = useState('');
     const { error, isLoading, Razorpay } = useRazorpay();
     const userData = useSelector((state) => state.user);
+    const [cartItems, setCartItems] = useState([]);
+    const [loadingCart, setLoadingCart] = useState(true);
 
 
-    useEffect(async () => {
-        try {
-            console.log("user", userData);
-            const { _id, email } = userData.userData;
-            console.log("user", _id);
-            setUserId(_id);
-            const addressResponce = await getUserAddress(_id)
-            console.log(addressResponce);
-            if (addressResponce.success) {
-                const { addresses } = addressResponce;
-                // if(addresses.length != 0) {
-                const add = addresses[0];
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                console.log("user", userData);
+                const { _id, email } = userData.userData;
+                console.log("user", _id);
+                setUserId(_id);
 
-                setEmail(email);
-                setAddress(add?.street_address)
-                setCity(add?.city)
-                setState(add?.state);
-                setPostalCode(add?.postal_code);
-                setPhone(add?.mobile_number);
-                set_alternate_mobile_number(add?.alternate_mobile_number);
-                // }
+                // Fetch cart items
+                const cartResponse = await getCartItem(_id);
+                console.log("Cart response:", cartResponse);
+                if (cartResponse.success) {
+                    setCartItems(cartResponse.cart?.items || []);
+                }
+                setLoadingCart(false);
+
+                // Fetch address
+                const addressResponce = await getUserAddress(_id);
+                console.log(addressResponce);
+                if (addressResponce.success) {
+                    const { addresses } = addressResponce;
+                    const add = addresses[0];
+
+                    setEmail(email);
+                    setAddress(add?.street_address)
+                    setCity(add?.city)
+                    setState(add?.state);
+                    setPostalCode(add?.postal_code);
+                    setPhone(add?.mobile_number);
+                    set_alternate_mobile_number(add?.alternate_mobile_number);
+                }
+            } catch (err) {
+                console.log(err);
+                setLoadingCart(false);
             }
-        } catch (err) {
-            console.log(err)
-        }
+        };
+
+        fetchData();
     }, [])
 
 
 
     const confirmAddress = async () => {
         try {
-            const payload  = {
+            const payload = {
                 customer: userId,
                 street_address: address,
                 city,
@@ -91,25 +107,62 @@ const CheckoutScreen = (props) => {
                 country: "india",
                 is_default: true,
                 mobile_number: phone,
-                alternate_mobile_number 
+                alternate_mobile_number
             }
 
             const response = await createAddress(payload);
             if(response.success){
-                genrateOrder();
+                genrateOrder(response.address);
+            } else {
+                alert('Failed to save address');
             }
 
         } catch (error) {
-            console.error("Error during payment:", error);
+            console.error("Error during address creation:", error);
+            alert('Error creating address');
         }
     }
 
 
-    const genrateOrder = async () => {
+    const genrateOrder = async (savedAddress) => {
         try {
-            const response = await createOrder();
-        } catch (error) {
+            // Calculate totals from cart items
+            const orderItems = cartItems.map(item => ({
+                product: item.product._id || item.product.productId,
+                quantity: item.quantity || 1,
+                price: item.product.price,
+                size: item.size,
+                color: item.color
+            }));
 
+            const subtotal = cartItems.reduce((sum, item) => {
+                const price = item.product?.price || 0;
+                const quantity = item.quantity || 1;
+                return sum + (price * quantity);
+            }, 0);
+
+            const orderPayload = {
+                userId: userId,
+                items: orderItems,
+                totalAmount: subtotal,
+                shippingAddress: savedAddress?._id || savedAddress,
+                billingAddress: savedAddress?._id || savedAddress,
+                paymentMethod: 'razorpay',
+                paymentStatus: 'pending'
+            };
+
+            const response = await createOrderAPI(orderPayload);
+
+            if (response.success) {
+                console.log('Order created:', response.order);
+                // Proceed to payment
+                handlePayment(response.order);
+            } else {
+                alert('Failed to create order');
+            }
+        } catch (error) {
+            console.error("Error creating order:", error);
+            alert('Error creating order');
         }
     }
 
@@ -143,46 +196,16 @@ const CheckoutScreen = (props) => {
         }
     };
 
-    const cartItems = [
-        {
-            id: 1,
-            name: 'Georgie Petite Trim Insert Top',
-            size: 'S',
-            price: 3200.00,
-            image: require('../../assets/images/prod1/1.jpg'), // Replace with your actual image path
-            quantity: quantity1,
-        },
-        {
-            id: 2,
-            name: 'Petite Insert Top',
-            size: 'S',
-            price: 1200.00,
-            image: require('../../assets/images/prod1/1.jpg'), // Replace with your actual image path
-            quantity: quantity2,
-        },
-    ];
-
-    const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const subtotal = cartItems.reduce((sum, item) => {
+        const price = item.product?.price || 0;
+        const quantity = item.quantity || 1;
+        return sum + (price * quantity);
+    }, 0);
     const discount = 800.00;
     const estimatedTax = 1200.00;
     const shipping = 'Free';
     const total = subtotal - discount + estimatedTax;
 
-    const incrementQuantity = (id) => {
-        if (id === 1) {
-            setQuantity1(quantity1 + 1);
-        } else {
-            setQuantity2(quantity2 + 1);
-        }
-    };
-
-    const decrementQuantity = (id) => {
-        if (id === 1 && quantity1 > 1) {
-            setQuantity1(quantity1 - 1);
-        } else if (id === 2 && quantity2 > 1) {
-            setQuantity2(quantity2 - 1);
-        }
-    };
 
     const getCardType = (cardNumber) => {
         const firstDigit = cardNumber.charAt(0);
@@ -462,44 +485,49 @@ const CheckoutScreen = (props) => {
                             <Text style={styles.cartTitle}>Cart</Text>
                             <Text style={styles.cartTotal}>₹{total.toFixed(2)}</Text>
 
-                            {cartItems.map((item) => (
-                                <View key={item.id} style={styles.cartItem}>
-                                    <View style={styles.productImageContainer}>
-                                        <Image source={item.image} style={styles.productImage} />
-                                    </View>
-
-                                    <View style={styles.productDetails}>
-                                        <View style={styles.productInfoContainer}>
-                                            <View>
-                                                <Text style={styles.productName}>{item.name}</Text>
-                                                <Text style={styles.productSize}>Size: {item.size}</Text>
-                                            </View>
-                                            <TouchableOpacity>
-                                                <Text style={styles.removeIcon}>🗑️</Text>
-                                            </TouchableOpacity>
-                                        </View>
-
-                                        <View style={styles.productPriceContainer}>
-                                            <Text style={styles.productPrice}>₹{item.price.toFixed(2)}</Text>
-                                            <View style={styles.quantityControls}>
-                                                <TouchableOpacity
-                                                    style={styles.quantityButton}
-                                                    onPress={() => incrementQuantity(item.id)}
-                                                >
-                                                    <Text style={styles.quantityButtonText}>+</Text>
-                                                </TouchableOpacity>
-                                                <Text style={styles.quantityText}>{item.id === 1 ? quantity1 : quantity2}</Text>
-                                                <TouchableOpacity
-                                                    style={styles.quantityButton}
-                                                    onPress={() => decrementQuantity(item.id)}
-                                                >
-                                                    <Text style={styles.quantityButtonText}>−</Text>
-                                                </TouchableOpacity>
-                                            </View>
-                                        </View>
-                                    </View>
+                            {loadingCart ? (
+                                <View style={styles.loadingContainer}>
+                                    <Text>Loading cart...</Text>
                                 </View>
-                            ))}
+                            ) : cartItems.length === 0 ? (
+                                <View style={styles.emptyCartContainer}>
+                                    <Text>Your cart is empty</Text>
+                                </View>
+                            ) : (
+                                cartItems.map((item, index) => {
+                                    const product = item.product || {};
+                                    const price = product.price || 0;
+                                    const quantity = item.quantity || 1;
+
+                                    return (
+                                        <View key={item._id || index} style={styles.cartItem}>
+                                            <View style={styles.productImageContainer}>
+                                                <Image
+                                                    source={{ uri: product.images?.[0] || 'https://via.placeholder.com/80' }}
+                                                    style={styles.productImage}
+                                                />
+                                            </View>
+
+                                            <View style={styles.productDetails}>
+                                                <View style={styles.productInfoContainer}>
+                                                    <View>
+                                                        <Text style={styles.productName}>{product.name || 'Unknown Product'}</Text>
+                                                        {item.size && <Text style={styles.productSize}>Size: {item.size}</Text>}
+                                                        {item.color && <Text style={styles.productSize}>Color: {item.color}</Text>}
+                                                    </View>
+                                                </View>
+
+                                                <View style={styles.productPriceContainer}>
+                                                    <Text style={styles.productPrice}>₹{price.toFixed(2)}</Text>
+                                                    <View style={styles.quantityDisplay}>
+                                                        <Text style={styles.quantityText}>Qty: {quantity}</Text>
+                                                    </View>
+                                                </View>
+                                            </View>
+                                        </View>
+                                    );
+                                })
+                            )}
 
                             <View style={styles.promoContainer}>
                                 <TextInput
@@ -535,7 +563,7 @@ const CheckoutScreen = (props) => {
                                 </View>
                             </View>
 
-                            <TouchableOpacity style={styles.placeOrderButton} onPress={handlePayment}>
+                            <TouchableOpacity style={styles.placeOrderButton} onPress={confirmAddress}>
                                 <Text style={styles.placeOrderButtonText}>Place Order</Text>
                             </TouchableOpacity>
                         </View>
@@ -831,6 +859,17 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    loadingContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    emptyCartContainer: {
+        padding: 20,
+        alignItems: 'center',
+    },
+    quantityDisplay: {
+        padding: 5,
     },
 });
 

@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 
 // Production API URL
-const apiMainURL = "http://3.110.46.10/";
+const apiMainURL = "https://webservices.venusa.co.in/";
 
 // For local development, uncomment the line below:
 // const apiMainURL = "http://localhost:8000/";

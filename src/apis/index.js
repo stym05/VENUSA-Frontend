@@ -3,7 +3,7 @@ import { URL } from "./urls";
 import Store from "../store";
 
 // Production API URL
-export const DOMAIN = "http://3.110.46.10";
+export const DOMAIN = "https://webservices.venusa.co.in";
 
 // For local development, uncomment the line below:
 // export const DOMAIN = "http://localhost:8000";
@@ -33,16 +33,17 @@ export const getUserAddress = async (id) => {
 }
 
 
-export const createAddress = async () => {
+export const createAddress = async (data) => {
     try {
         const headers = await setAuthorizationHeader();
         const response = await fetch(DOMAIN + URL.CREATE_ADDRESS, {
             method: "POST",
             headers,
+            body: JSON.stringify(data),
         });
         return await response.json();
     } catch (err) {
-        console.log("error in getAllCategories", err);
+        console.log("error in createAddress", err);
         return err;
     }
 }
@@ -72,6 +73,20 @@ export const getAllCategories = async () => {
         return await response.json();
     } catch (err) {
         console.log("error in getAllCategories", err);
+        return err;
+    }
+};
+
+export const getDashboardData = async () => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.getDashboard, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getDashboardData", err);
         return err;
     }
 };
@@ -249,6 +264,78 @@ export const addToCart = async (data) => {
         return await response.json();
     } catch (err) {
         console.log("error in addToCart", err);
+        return err;
+    }
+}
+
+export const updateCartItem = async (userId, itemId, data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.UPDATE_CART_ITEM + `/${userId}/update/${itemId}`, {
+            method: "PUT",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in updateCartItem", err);
+        return err;
+    }
+}
+
+export const removeFromCart = async (userId, itemId) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.REMOVE_FROM_CART + `/${userId}/remove/${itemId}`, {
+            method: "DELETE",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in removeFromCart", err);
+        return err;
+    }
+}
+
+export const getOrderHistory = async (userId) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.GET_ORDER_HISTORY + `/${userId}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getOrderHistory", err);
+        return err;
+    }
+}
+
+export const getOrderDetails = async (userId, orderId) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.GET_ORDER_DETAILS + `/${userId}/${orderId}`, {
+            method: "GET",
+            headers,
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getOrderDetails", err);
+        return err;
+    }
+}
+
+export const createOrderAPI = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.CREATE_ORDER, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in createOrderAPI", err);
         return err;
     }
 }

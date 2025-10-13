@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -8,10 +8,93 @@ import {
     TouchableOpacity,
     SafeAreaView,
     StatusBar,
+    ActivityIndicator,
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5, Feather } from '@expo/vector-icons';
+import { useRoute } from '@react-navigation/native';
+import { getOrderDetails } from '../apis/index.js';
+import Store from '../store';
 
 const OrderDetails = () => {
+    const route = useRoute();
+    const { orderId } = route.params || {};
+    const [orderData, setOrderData] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetchOrderDetails();
+    }, []);
+
+    const fetchOrderDetails = async () => {
+        try {
+            setLoading(true);
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id;
+
+            if (!userId || !orderId) {
+                setError('Missing user or order information');
+                setLoading(false);
+                return;
+            }
+
+            const response = await getOrderDetails(userId, orderId);
+
+            if (response.success) {
+                setOrderData(response.order);
+            } else {
+                setError(response.message || 'Failed to load order details');
+            }
+        } catch (err) {
+            console.error("Error fetching order details:", err);
+            setError('An error occurred while loading order details');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+    };
+
+    if (loading) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>ORDER DETAILS</Text>
+                </View>
+                <View style={styles.loadingContainer}>
+                    <ActivityIndicator size="large" color="#c00" />
+                    <Text style={styles.loadingText}>Loading order details...</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
+    if (error || !orderData) {
+        return (
+            <SafeAreaView style={styles.container}>
+                <StatusBar backgroundColor="#fff" barStyle="dark-content" />
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>ORDER DETAILS</Text>
+                </View>
+                <View style={styles.errorContainer}>
+                    <Ionicons name="alert-circle-outline" size={48} color="#c00" />
+                    <Text style={styles.errorText}>{error || 'Order not found'}</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <StatusBar backgroundColor="#fff" barStyle="dark-content" />
@@ -61,10 +144,12 @@ const OrderDetails = () => {
                         <View style={styles.orderCard}>
                             <View style={styles.orderHeader}>
                                 <View>
-                                    <Text style={styles.orderNumber}>#96459761</Text>
-                                    <Text style={styles.orderInfo}>4 Products • Order Placed in 17 Jan, 2023 at 7:32 PM</Text>
+                                    <Text style={styles.orderNumber}>#{orderData.orderId || orderData._id}</Text>
+                                    <Text style={styles.orderInfo}>
+                                        {orderData.items?.length || 0} Products • Order Placed in {formatDate(orderData.createdAt)}
+                                    </Text>
                                 </View>
-                                <Text style={styles.orderPrice}>₹1,400.00</Text>
+                                <Text style={styles.orderPrice}>₹{orderData.totalAmount?.toFixed(2) || '0.00'}</Text>
                             </View>
 
                             {/* Order Status */}
@@ -166,7 +251,7 @@ const OrderDetails = () => {
 
                             {/* Product Section */}
                             <View style={styles.productSection}>
-                                <Text style={styles.sectionTitle}>Product (02)</Text>
+                                <Text style={styles.sectionTitle}>Product ({orderData.items?.length || 0})</Text>
 
                                 <View style={styles.productTableHeader}>
                                     <Text style={styles.productHeaderText}>PRODUCTS</Text>
@@ -175,59 +260,78 @@ const OrderDetails = () => {
                                     <Text style={styles.subtotalHeaderText}>SUB-TOTAL</Text>
                                 </View>
 
-                                <View style={styles.productItem}>
-                                    <View style={styles.productDetails}>
-                                        <Image
-                                            source={{ uri: 'https://via.placeholder.com/60x80/e8f4ff/333' }}
-                                            style={styles.productImage}
-                                        />
-                                        <View style={styles.productInfo}>
-                                            <Text style={styles.brandText}>Tops</Text>
-                                            <Text style={styles.productTitle}>Petite Insert Top</Text>
-                                        </View>
-                                    </View>
-                                    <Text style={styles.productPrice}>₹3,200.00</Text>
-                                    <Text style={styles.productQuantity}>x1</Text>
-                                    <Text style={styles.productSubtotal}>₹3,200.00</Text>
-                                </View>
+                                {orderData.items?.map((item, index) => {
+                                    const product = item.product || item;
+                                    const price = product.price || 0;
+                                    const quantity = item.quantity || 1;
+                                    const subtotal = price * quantity;
 
-                                <View style={styles.productItem}>
-                                    <View style={styles.productDetails}>
-                                        <Image
-                                            source={{ uri: 'https://via.placeholder.com/60x80/fff5f5/333' }}
-                                            style={styles.productImage}
-                                        />
-                                        <View style={styles.productInfo}>
-                                            <Text style={styles.brandText}>Tops</Text>
-                                            <Text style={styles.productTitle}>Petite Insert Top</Text>
+                                    return (
+                                        <View key={index} style={styles.productItem}>
+                                            <View style={styles.productDetails}>
+                                                <Image
+                                                    source={{ uri: product.images?.[0] || 'https://via.placeholder.com/60x80/e8f4ff/333' }}
+                                                    style={styles.productImage}
+                                                />
+                                                <View style={styles.productInfo}>
+                                                    <Text style={styles.brandText}>{product.category || 'Product'}</Text>
+                                                    <Text style={styles.productTitle}>{product.name || 'Unknown Product'}</Text>
+                                                    {item.size && <Text style={styles.productMeta}>Size: {item.size}</Text>}
+                                                    {item.color && <Text style={styles.productMeta}>Color: {item.color}</Text>}
+                                                </View>
+                                            </View>
+                                            <Text style={styles.productPrice}>₹{price.toFixed(2)}</Text>
+                                            <Text style={styles.productQuantity}>x{quantity}</Text>
+                                            <Text style={styles.productSubtotal}>₹{subtotal.toFixed(2)}</Text>
                                         </View>
-                                    </View>
-                                    <Text style={styles.productPrice}>₹3,200.00</Text>
-                                    <Text style={styles.productQuantity}>x1</Text>
-                                    <Text style={styles.productSubtotal}>₹3,200.00</Text>
-                                </View>
+                                    );
+                                })}
                             </View>
 
                             {/* Address Section */}
                             <View style={styles.addressSection}>
                                 <View style={styles.addressColumn}>
                                     <Text style={styles.addressTitle}>Billing Address</Text>
-                                    <Text style={styles.addressName}>Nezuko</Text>
-                                    <Text style={styles.addressText}>3-21, Ashok Nagar, Jubilee Hills</Text>
-                                    <Text style={styles.addressText}>Hyderabad</Text>
-                                    <Text style={styles.addressText}>Telangana - 500032</Text>
-                                    <Text style={styles.addressText}>Phone Number: +91-912-555-0118</Text>
-                                    <Text style={styles.addressText}>Email: nezuko.ds@gmail.com</Text>
+                                    {orderData.billingAddress ? (
+                                        <>
+                                            <Text style={styles.addressName}>{orderData.billingAddress.name || 'N/A'}</Text>
+                                            <Text style={styles.addressText}>{orderData.billingAddress.street || ''}</Text>
+                                            <Text style={styles.addressText}>{orderData.billingAddress.city || ''}</Text>
+                                            <Text style={styles.addressText}>
+                                                {orderData.billingAddress.state || ''} - {orderData.billingAddress.pincode || ''}
+                                            </Text>
+                                            {orderData.billingAddress.phone && (
+                                                <Text style={styles.addressText}>Phone: {orderData.billingAddress.phone}</Text>
+                                            )}
+                                            {orderData.billingAddress.email && (
+                                                <Text style={styles.addressText}>Email: {orderData.billingAddress.email}</Text>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Text style={styles.addressText}>No billing address provided</Text>
+                                    )}
                                 </View>
 
                                 <View style={styles.addressColumn}>
                                     <Text style={styles.addressTitle}>Shipping Address</Text>
-                                    <Text style={styles.addressName}>Nezuko</Text>
-                                    <Text style={styles.addressText}>3-21, Ashok Nagar, Jubilee Hills</Text>
-                                    <Text style={styles.addressText}>Hyderabad</Text>
-                                    <Text style={styles.addressText}>Telangana - 500032</Text>
-                                    <Text style={styles.addressText}>Phone Number: +91-912-555-0118</Text>
-                                    <Text style={styles.addressText}>Email: nezuko.ds@gmail.com</Text>
+                                    {orderData.shippingAddress ? (
+                                        <>
+                                            <Text style={styles.addressName}>{orderData.shippingAddress.name || 'N/A'}</Text>
+                                            <Text style={styles.addressText}>{orderData.shippingAddress.street || ''}</Text>
+                                            <Text style={styles.addressText}>{orderData.shippingAddress.city || ''}</Text>
+                                            <Text style={styles.addressText}>
+                                                {orderData.shippingAddress.state || ''} - {orderData.shippingAddress.pincode || ''}
+                                            </Text>
+                                            {orderData.shippingAddress.phone && (
+                                                <Text style={styles.addressText}>Phone: {orderData.shippingAddress.phone}</Text>
+                                            )}
+                                            {orderData.shippingAddress.email && (
+                                                <Text style={styles.addressText}>Email: {orderData.shippingAddress.email}</Text>
+                                            )}
+                                        </>
+                                    ) : (
+                                        <Text style={styles.addressText}>No shipping address provided</Text>
+                                    )}
                                 </View>
                             </View>
                         </View>
@@ -563,6 +667,34 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#555',
         marginBottom: 3,
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 14,
+        color: '#777',
+    },
+    errorContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    errorText: {
+        marginTop: 10,
+        fontSize: 16,
+        color: '#c00',
+        textAlign: 'center',
+    },
+    productMeta: {
+        fontSize: 12,
+        color: '#777',
+        marginTop: 2,
     },
 });
 

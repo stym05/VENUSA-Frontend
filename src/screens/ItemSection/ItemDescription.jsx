@@ -35,7 +35,9 @@ class ItemDescription extends React.Component {
             description: "",
             size: "S",
             color: "",
-            sizeAvailable: []
+            sizeAvailable: [],
+            selectedSize: "",
+            selectedColor: ""
         };
     }
 
@@ -80,13 +82,35 @@ class ItemDescription extends React.Component {
 
     handleAddToCart = async () => {
         try {
-            const { productId, size, color } = this.state;
+            const { productId, selectedSize, selectedColor } = this.state;
+
+            // Validate that size and color are selected
+            if (!selectedSize || selectedSize === "") {
+                console.error("Please select a size before adding to cart");
+                Toast.show({
+                    text1: "Please select a size",
+                    type: "error",
+                    visibilityTime: 3000
+                });
+                return;
+            }
+
+            if (!selectedColor || selectedColor === "") {
+                console.error("Please select a color before adding to cart");
+                Toast.show({
+                    text1: "Please select a color",
+                    type: "error",
+                    visibilityTime: 3000
+                });
+                return;
+            }
+
             const userId = Store.getState().user.userData._id
             const payload = {
                 userId: userId,
                 productId,
-                size,
-                color
+                size: selectedSize,
+                color: selectedColor
             }
             const response = await addToCart(payload);
             if (response.success) {
@@ -213,8 +237,8 @@ class ItemDescription extends React.Component {
                                     {this.state.colors.map((color, index) => (
                                         <TouchableOpacity
                                             key={index}
-                                            style={[styles.colorButton, { backgroundColor: color }]}
-                                            onPress={() => onPress && onPress(color)}
+                                            style={[styles.colorButton, { backgroundColor: color, borderColor: this.state.selectedColor === color ? "#000" : "#fff", borderWidth: this.state.selectedColor === color ? 3 : 2 }]}
+                                            onPress={() => this.setState({ selectedColor: color })}
                                         />
                                     ))}
                                 </View>
@@ -232,14 +256,14 @@ class ItemDescription extends React.Component {
                                     {sizeAvailable.map((item, index) => (
                                         <TouchableOpacity
                                             key={index}
-                                            style={[styles.colorButton, { backgroundColor: "#ddd", justifyContent: 'center', alignItems: 'center' }]}
-                                            onPress={() => console.log(`Selected size: ${item.size}`)}
+                                            style={[styles.colorButton, { backgroundColor: this.state.selectedSize === item.size ? "#333" : "#ddd", justifyContent: 'center', alignItems: 'center' }]}
+                                            onPress={() => this.setState({ selectedSize: item.size })}
                                         >
                                             <Text style={{
                                                 fontSize: 14,
                                                 fontWeight: "bold",
                                                 textAlign: 'center',
-                                                color: "#333",
+                                                color: this.state.selectedSize === item.size ? "#fff" : "#333",
                                             }}>{item.size}</Text>
                                         </TouchableOpacity>
                                     ))}

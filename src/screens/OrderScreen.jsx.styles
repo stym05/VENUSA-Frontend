@@ -1,0 +1,30 @@
+    loadingContainer: {
+        padding: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    loadingText: {
+        marginTop: 10,
+        fontSize: 14,
+        color: '#666',
+    },
+    errorContainer: {
+        padding: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    errorText: {
+        fontSize: 14,
+        color: '#d32f2f',
+        textAlign: 'center',
+    },
+    emptyContainer: {
+        padding: 40,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emptyText: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+    },
