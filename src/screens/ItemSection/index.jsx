@@ -487,6 +487,8 @@ const styles = StyleSheet.create({
     categoryHeader: {
         marginBottom: 30,
         alignItems: 'center',
+        position: 'relative',
+        zIndex: 100,
     },
     breadcrumb: {
         flexDirection: 'row',
@@ -512,12 +514,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         flexWrap: 'wrap',
+        position: 'relative',
+        zIndex: 9998,
     },
     filterDropdown: {
         marginRight: 15,
         marginBottom: 10,
         position: 'relative',
-        zIndex: 1000,
+        zIndex: 9999,
     },
     dropdownWrapper: {
         position: 'relative',
@@ -525,6 +529,7 @@ const styles = StyleSheet.create({
         borderColor: '#ddd',
         borderRadius: 4,
         backgroundColor: '#fff',
+        zIndex: 9999,
     },
     dropdownButton: {
         flexDirection: 'row',
@@ -560,12 +565,12 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 4,
         maxHeight: 200,
         overflow: 'scroll',
-        zIndex: 1001,
+        zIndex: 10000,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        elevation: 3,
+        elevation: 5,
     },
     dropdownItem: {
         paddingHorizontal: 12,
@@ -635,12 +640,16 @@ const styles = StyleSheet.create({
         flexWrap: 'wrap',
         marginHorizontal: -10,
         gap: 15,
+        position: 'relative',
+        zIndex: 1,
     },
     productCard: {
         width: isMobile() ? '48%' : '23%',  // 4 columns on desktop, 2 on mobile
         marginBottom: 25,
         backgroundColor: '#fff',
         overflow: 'visible',
+        position: 'relative',
+        zIndex: 1,
     },
     productImageContainer: {
         position: 'relative',

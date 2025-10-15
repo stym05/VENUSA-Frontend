@@ -4,14 +4,15 @@ import {
     ScrollView,
     View,
     StyleSheet,
-    FlatList,
     Image,
     Dimensions,
     Text,
     TouchableOpacity,
+    ActivityIndicator,
+    Platform
 } from "react-native";
 import Footer from "../../components/footer";
-import { addToCart, createPreOrder, DOMAIN, getProductById } from "../../apis";
+import { addToCart, getProductById } from "../../apis";
 import Store from "../../store";
 import Toast from "react-native-toast-message";
 
@@ -20,73 +21,129 @@ const { width } = Dimensions.get("window");
 class ItemDescription extends React.Component {
     constructor(props) {
         super(props);
+
         let productId = "";
-        if (this.props && this.props.route) {
-            productId = this.props.route.params.productId;
+        let productName = "";
+
+        // Try to get from route params first
+        if (this.props.route && this.props.route.params) {
+            productId = this.props.route.params.productId || "";
+            productName = this.props.route.params.productName || "";
         }
+
+        // For web, also check URL parameters on refresh
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!productId) {
+                productId = urlParams.get('productId') || "";
+            }
+            if (!productName) {
+                productName = urlParams.get('productName') || "";
+            }
+        }
+
         this.state = {
             productId,
+            productName,
             images: [],
-            activeIndex: 0,
-            colors: ["#FF5733", "#33FF57", "#3357FF", "#F3FF33", "#FF33A1"],
+            activeImageIndex: 0,
             isLoading: false,
-            name: "",
+            productData: null,
             price: 0,
+            discountedPrice: 0,
             description: "",
-            size: "S",
-            color: "",
-            sizeAvailable: [],
-            selectedSize: "",
-            selectedColor: ""
+            availableSizes: [],
+            availableColors: [],
+            selectedSize: null,
+            selectedColor: null,
+            materials: [],
+            keyFeatures: [],
+            stocks: []
         };
     }
 
     componentDidMount = async () => {
         try {
-            this.setState({ isloading: true });
+            this.setState({ isLoading: true });
             const { productId } = this.state;
-            console.log("Product id we get is = ", productId);
+            console.log("Fetching product with ID:", productId);
+
             const response = await getProductById(productId);
-            console.log(response)
-            if (response && response.success) {
-                console.log("images", response)
-                let size = response.product.stock.filter((item) => {
-                    return item.quantity > 0
-                })
-                console.log("images", size)
-                const imgs = response.product.images;
-                console.log("images", imgs)
-                const images = imgs.map((item) => {
-                    return item?.includes("http") ? item : DOMAIN + item;
-                })
-                console.log("images", images)
+            console.log("Product response:", response);
+
+            if (response) {
+                // Extract images
+                const images = response.images && response.images.length > 0
+                    ? response.images.map(img => img.image)
+                    : [];
+
+                // Extract unique sizes and colors from stocks
+                const sizesSet = new Set();
+                const colorsMap = new Map();
+
+                if (response.stocks && response.stocks.length > 0) {
+                    response.stocks.forEach(stock => {
+                        if (stock.quantity > 0) {
+                            sizesSet.add(stock.size);
+                            if (stock.color) {
+                                colorsMap.set(stock.color, stock.color);
+                            }
+                        }
+                    });
+                }
+
+                const availableSizes = Array.from(sizesSet).sort((a, b) => a - b);
+                const availableColors = Array.from(colorsMap.keys());
+
+                // Calculate discounted price
+                const price = parseFloat(response.price || 0);
+                const discount = parseFloat(response.discount || 0);
+                const discountPerc = parseFloat(response.discountPerc || 0);
+
+                let discountedPrice = price;
+                if (discount > 0) {
+                    discountedPrice = price - discount;
+                } else if (discountPerc > 0) {
+                    discountedPrice = price * (1 - discountPerc / 100);
+                }
+
+                // Extract materials and features
+                const materials = response.materials ? response.materials.map(m => m.material) : [];
+                const keyFeatures = response.keyFeatures ? response.keyFeatures.map(f => f.feature) : [];
+
                 this.setState({
+                    productData: response,
                     images,
-                    colors: response.product.colors,
-                    name: response.product.name,
-                    price: response.product.price,
-                    description: response.product.description,
-                    sizeAvailable: size
-                })
+                    productName: response.productName || this.state.productName,
+                    price,
+                    discountedPrice,
+                    description: response.description || "",
+                    availableSizes,
+                    availableColors,
+                    materials,
+                    keyFeatures,
+                    stocks: response.stocks || [],
+                    isLoading: false
+                });
+            } else {
+                this.setState({ isLoading: false });
             }
-            this.setState({ isloading: false })
         } catch (err) {
-            console.log("ItemDescription error is ", err);
+            console.log("ItemDescription error:", err);
+            this.setState({ isLoading: false });
         }
     }
 
-    handleScroll = (event) => {
-        const activeIndex = Math.round(event.nativeEvent.contentOffset.x / (width * 0.45));
-        this.setState({ activeIndex });
-    };
+    handleImageSelect = (index) => {
+        this.setState({ activeImageIndex: index });
+    }
 
     handleAddToCart = async () => {
         try {
             const { productId, selectedSize, selectedColor } = this.state;
 
             // Validate that size and color are selected
-            if (!selectedSize || selectedSize === "") {
-                console.error("Please select a size before adding to cart");
+            if (!selectedSize) {
                 Toast.show({
                     text1: "Please select a size",
                     type: "error",
@@ -95,8 +152,7 @@ class ItemDescription extends React.Component {
                 return;
             }
 
-            if (!selectedColor || selectedColor === "") {
-                console.error("Please select a color before adding to cart");
+            if (!selectedColor) {
                 Toast.show({
                     text1: "Please select a color",
                     type: "error",
@@ -105,177 +161,244 @@ class ItemDescription extends React.Component {
                 return;
             }
 
-            const userId = Store.getState().user.userData._id
+            const userId = Store.getState().user.userData._id;
             const payload = {
-                userId: userId,
+                userId,
                 productId,
                 size: selectedSize,
                 color: selectedColor
-            }
+            };
+
             const response = await addToCart(payload);
             if (response.success) {
                 Toast.show({
-                    text1: "Product added to cart",
+                    text1: "Added to cart successfully!",
                     type: "success",
-                    visibilityTime: 5000
-                })
+                    visibilityTime: 3000
+                });
             } else {
                 Toast.show({
-                    text1: "something went wrong. please try again later",
+                    text1: "Failed to add to cart",
                     type: "error",
-                    visibilityTime: 5000
-                })
+                    visibilityTime: 3000
+                });
             }
         } catch (err) {
-            console.log("Error to adding cart is ", err);
+            console.log("Error adding to cart:", err);
             Toast.show({
-                text1: "something went wrong. please try again later",
+                text1: "Something went wrong",
                 type: "error",
-                visibilityTime: 5000
-            })
+                visibilityTime: 3000
+            });
         }
     }
 
     render() {
         const {
             isLoading,
-            sizeAvailable
+            images,
+            activeImageIndex,
+            productName,
+            price,
+            discountedPrice,
+            description,
+            availableSizes,
+            availableColors,
+            selectedSize,
+            selectedColor,
+            materials,
+            keyFeatures,
+            productData
         } = this.state;
+
+        const hasDiscount = price > discountedPrice;
+
+        if (isLoading) {
+            return (
+                <SafeAreaView style={styles.container}>
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color="#2C2C2C" />
+                    </View>
+                </SafeAreaView>
+            );
+        }
+
         return (
             <SafeAreaView style={styles.container}>
                 <ScrollView>
-                    <View style={styles.itemDescriptionContainer}>
-                        <View style={{ height: 400, width: "45%", borderWidth: 1, marginRight: 20 }}>
-                            {/* Swappable Images */}
-                            <FlatList
-                                data={this.state.images}
-                                horizontal
-                                pagingEnabled
-                                onScroll={this.handleScroll}
-                                showsHorizontalScrollIndicator={false}
-                                keyExtractor={(item, index) => index.toString()}
-                                renderItem={({ item }) => (
-                                    <View style={{ height: 400 }}>
-                                        <Image source={{ uri: item }} style={{
-                                            width: width * 0.45,
-                                            height: "100%",
-                                            resizeMode: "cover",
-                                        }} />
+                    <View style={styles.productContainer}>
+                        {/* Left Side - Image Gallery */}
+                        <View style={styles.imageSection}>
+                            {/* Main Image */}
+                            <View style={styles.mainImageContainer}>
+                                {images.length > 0 ? (
+                                    <Image
+                                        source={{ uri: images[activeImageIndex] }}
+                                        style={styles.mainImage}
+                                        resizeMode="cover"
+                                    />
+                                ) : (
+                                    <View style={styles.noImageContainer}>
+                                        <Text style={styles.noImageText}>No Image</Text>
                                     </View>
                                 )}
-                            />
-                            {/* Dots Indicator */}
-                            <View style={styles.overlayDotContainer}>
-                                {this.state.images.map((_, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        style={[
-                                            styles.dot,
-                                            this.state.activeIndex === index && styles.activeDot,
-                                        ]}
-                                    />
-                                ))}
                             </View>
-                        </View>
 
-                        <View style={{ marginLeft: 50 }}>
-                            <View style={styles.paddedItem}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 16,
-                                    fontWeight: '400',
-                                    lineHeight: 20,
-                                    color: '#808080'
-                                }}>{this.props.route.params.ItemDescription}</Text>
-                            </View>
-                            <View style={styles.paddedItem}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 20,
-                                    fontWeight: '400',
-                                    lineHeight: 24,
-                                    color: '#000'
-                                }}>{this.state.name}</Text>
-                            </View>
-                            {/* <View style={styles.paddedItem}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 20,
-                                    fontWeight: '400',
-                                    lineHeight: 24,
-                                    color: '#000'
-                                }}>{"₹"}{this.state.price}</Text>
-                            </View> */}
-                            <View style={styles.paddedItem}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 20,
-                                    fontWeight: '400',
-                                    lineHeight: 24,
-                                    color: '#000'
-                                }}>{"*****"}</Text>
-                            </View>
-                            <View style={styles.paddedItem}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 16,
-                                    fontWeight: '400',
-                                    lineHeight: 20,
-                                    color: '#808080'
-                                }}>{this.state.description}</Text>
-                            </View>
-                            <View style={[styles.paddedItem]}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 20,
-                                    fontWeight: '400',
-                                    lineHeight: 24,
-                                    color: '#000',
-                                    marginBottom: 10
-                                }}>Colors</Text>
-                                <View style={{ display: 'flex', flexDirection: 'row' }}>
-                                    {this.state.colors.map((color, index) => (
+                            {/* Image Thumbnails */}
+                            {images.length > 1 && (
+                                <View style={styles.thumbnailContainer}>
+                                    {images.map((image, index) => (
                                         <TouchableOpacity
                                             key={index}
-                                            style={[styles.colorButton, { backgroundColor: color, borderColor: this.state.selectedColor === color ? "#000" : "#fff", borderWidth: this.state.selectedColor === color ? 3 : 2 }]}
-                                            onPress={() => this.setState({ selectedColor: color })}
-                                        />
-                                    ))}
-                                </View>
-                            </View>
-                            <View style={[styles.paddedItem]}>
-                                <Text style={{
-                                    fontFamily: 'Roboto',
-                                    fontSize: 14,
-                                    fontWeight: '400',
-                                    lineHeight: 24,
-                                    color: '#333333',
-                                    marginBottom: 10
-                                }}>Select Size</Text>
-                                <View style={{ display: 'flex', flexDirection: 'row', fontWeight: 400, fontSize: 14, }}>
-                                    {sizeAvailable.map((item, index) => (
-                                        <TouchableOpacity
-                                            key={index}
-                                            style={[styles.colorButton, { backgroundColor: this.state.selectedSize === item.size ? "#333" : "#ddd", justifyContent: 'center', alignItems: 'center' }]}
-                                            onPress={() => this.setState({ selectedSize: item.size })}
+                                            onPress={() => this.handleImageSelect(index)}
+                                            style={[
+                                                styles.thumbnail,
+                                                activeImageIndex === index && styles.activeThumbnail
+                                            ]}
                                         >
-                                            <Text style={{
-                                                fontSize: 14,
-                                                fontWeight: "bold",
-                                                textAlign: 'center',
-                                                color: this.state.selectedSize === item.size ? "#fff" : "#333",
-                                            }}>{item.size}</Text>
+                                            <Image
+                                                source={{ uri: image }}
+                                                style={styles.thumbnailImage}
+                                                resizeMode="cover"
+                                            />
                                         </TouchableOpacity>
                                     ))}
                                 </View>
-                                <View>
-                                    <Text style={{ fontFamily: "Roboto", textDecorationLine: "underline" }}>Size Guide</Text>
-                                </View>
+                            )}
+                        </View>
+
+                        {/* Right Side - Product Details */}
+                        <View style={styles.detailsSection}>
+                            {/* Product Name */}
+                            <Text style={styles.productName}>{productName}</Text>
+
+                            {/* Price */}
+                            <View style={styles.priceContainer}>
+                                <Text style={styles.currentPrice}>
+                                    ₹{Math.round(discountedPrice).toLocaleString('en-IN')}
+                                </Text>
+                                {hasDiscount && (
+                                    <>
+                                        <Text style={styles.originalPrice}>
+                                            ₹{Math.round(price).toLocaleString('en-IN')}
+                                        </Text>
+                                        <View style={styles.discountBadge}>
+                                            <Text style={styles.discountText}>
+                                                {Math.round(((price - discountedPrice) / price) * 100)}% OFF
+                                            </Text>
+                                        </View>
+                                    </>
+                                )}
                             </View>
-                            <View>
-                                <TouchableOpacity style={styles.button} onPress={this.handleAddToCart}>
-                                    {isLoading ? (<ActivityIndicator size={"small"} color={"#fff"} />) : (<Text style={styles.buttonText}>Pre Order</Text>)}
-                                </TouchableOpacity>
+
+                            {/* Rating placeholder */}
+                            <View style={styles.ratingContainer}>
+                                <Text style={styles.ratingText}>★★★★★</Text>
+                                <Text style={styles.reviewCount}>(Reviews coming soon)</Text>
+                            </View>
+
+                            {/* Description */}
+                            <View style={styles.descriptionContainer}>
+                                <Text style={styles.sectionTitle}>Description</Text>
+                                <Text style={styles.description}>{description}</Text>
+                            </View>
+
+                            {/* Materials */}
+                            {materials.length > 0 && (
+                                <View style={styles.materialsContainer}>
+                                    <Text style={styles.sectionTitle}>Materials</Text>
+                                    <Text style={styles.materialsText}>{materials.join(', ')}</Text>
+                                </View>
+                            )}
+
+                            {/* Key Features */}
+                            {keyFeatures.length > 0 && (
+                                <View style={styles.featuresContainer}>
+                                    <Text style={styles.sectionTitle}>Key Features</Text>
+                                    {keyFeatures.map((feature, index) => (
+                                        <Text key={index} style={styles.featureItem}>• {feature}</Text>
+                                    ))}
+                                </View>
+                            )}
+
+                            {/* Color Selection */}
+                            {availableColors.length > 0 && (
+                                <View style={styles.selectionContainer}>
+                                    <Text style={styles.selectionTitle}>
+                                        Color {selectedColor && <Text style={styles.selectedValue}>({selectedColor})</Text>}
+                                    </Text>
+                                    <View style={styles.colorOptions}>
+                                        {availableColors.map((color, index) => (
+                                            <TouchableOpacity
+                                                key={index}
+                                                style={[
+                                                    styles.colorButton,
+                                                    { backgroundColor: color },
+                                                    selectedColor === color && styles.selectedColorButton
+                                                ]}
+                                                onPress={() => this.setState({ selectedColor: color })}
+                                            />
+                                        ))}
+                                    </View>
+                                </View>
+                            )}
+
+                            {/* Size Selection */}
+                            {availableSizes.length > 0 && (
+                                <View style={styles.selectionContainer}>
+                                    <View style={styles.sizeTitleRow}>
+                                        <Text style={styles.selectionTitle}>
+                                            Size {selectedSize && <Text style={styles.selectedValue}>({selectedSize})</Text>}
+                                        </Text>
+                                        <TouchableOpacity>
+                                            <Text style={styles.sizeGuideLink}>Size Guide</Text>
+                                        </TouchableOpacity>
+                                    </View>
+                                    <View style={styles.sizeOptions}>
+                                        {availableSizes.map((size, index) => (
+                                            <TouchableOpacity
+                                                key={index}
+                                                style={[
+                                                    styles.sizeButton,
+                                                    selectedSize === size && styles.selectedSizeButton
+                                                ]}
+                                                onPress={() => this.setState({ selectedSize: size })}
+                                            >
+                                                <Text style={[
+                                                    styles.sizeButtonText,
+                                                    selectedSize === size && styles.selectedSizeText
+                                                ]}>
+                                                    {size}
+                                                </Text>
+                                            </TouchableOpacity>
+                                        ))}
+                                    </View>
+                                </View>
+                            )}
+
+                            {/* Add to Cart Button */}
+                            <TouchableOpacity
+                                style={styles.addToCartButton}
+                                onPress={this.handleAddToCart}
+                                disabled={!selectedSize || !selectedColor}
+                            >
+                                <Text style={styles.addToCartText}>Add to Cart</Text>
+                            </TouchableOpacity>
+
+                            {/* Additional Info */}
+                            <View style={styles.additionalInfo}>
+                                <View style={styles.infoItem}>
+                                    <Text style={styles.infoIcon}>🚚</Text>
+                                    <Text style={styles.infoText}>Free shipping on orders above ₹999</Text>
+                                </View>
+                                <View style={styles.infoItem}>
+                                    <Text style={styles.infoIcon}>↩️</Text>
+                                    <Text style={styles.infoText}>Easy 30-day returns</Text>
+                                </View>
+                                <View style={styles.infoItem}>
+                                    <Text style={styles.infoIcon}>✓</Text>
+                                    <Text style={styles.infoText}>100% authentic products</Text>
+                                </View>
                             </View>
                         </View>
                     </View>
@@ -289,65 +412,261 @@ class ItemDescription extends React.Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#FFFFFF",
     },
-    dotContainer: {
-        flexDirection: "row",
-        justifyContent: "center",
-        marginTop: 10,
-    },
-    overlayDotContainer: {
-        position: "absolute",
-        bottom: 10,
-        width: "100%",
-        flexDirection: "row",
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    dot: {
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        backgroundColor: "#ddd",
-        marginHorizontal: 5,
-    },
-    activeDot: {
-        backgroundColor: "#333",
-    },
-    imagePlaceholder: {
-        width: "100%",
-        height: "100%",
-    },
-    itemDescriptionContainer: {
-        display: 'flex',
-        flexDirection: 'row',
-        padding: 50
-    },
-    paddedItem: {
-        paddingVertical: 10,
-        width: width * 0.30
-    },
-    colorButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        margin: 10,
-        borderWidth: 2,
-        borderColor: "#fff",
-    },
-    button: {
-        marginTop: 50,
-        backgroundColor: '#1A1A1A',
-        width: '100%',
-        padding: 15,
+    loadingContainer: {
+        flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        textAlign: 'center'
+        minHeight: 400,
     },
-    buttonText: {
-        color: "#fff",
-        fontWeight: "600",
-        fontFamily: "Roboto"
+    productContainer: {
+        flexDirection: 'row',
+        paddingHorizontal: 50,
+        paddingVertical: 30,
+        gap: 40,
+    },
+    // Image Section
+    imageSection: {
+        flex: 1,
+        maxWidth: '50%',
+    },
+    mainImageContainer: {
+        width: '100%',
+        height: 480,
+        backgroundColor: '#F8F8F8',
+        marginBottom: 16,
+        overflow: 'hidden',
+    },
+    mainImage: {
+        width: '100%',
+        height: '100%',
+    },
+    noImageContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    noImageText: {
+        fontSize: 16,
+        color: '#999',
+    },
+    thumbnailContainer: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    thumbnail: {
+        width: 70,
+        height: 88,
+        backgroundColor: '#F8F8F8',
+        borderWidth: 2,
+        borderColor: 'transparent',
+        overflow: 'hidden',
+    },
+    activeThumbnail: {
+        borderColor: '#2C2C2C',
+    },
+    thumbnailImage: {
+        width: '100%',
+        height: '100%',
+    },
+    // Details Section
+    detailsSection: {
+        flex: 1,
+        maxWidth: '50%',
+    },
+    productName: {
+        fontFamily: 'Roboto',
+        fontSize: 26,
+        fontWeight: '400',
+        color: '#2C2C2C',
+        marginBottom: 12,
+        lineHeight: 32,
+    },
+    priceContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 12,
+        gap: 10,
+    },
+    currentPrice: {
+        fontFamily: 'Roboto',
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#2C2C2C',
+    },
+    originalPrice: {
+        fontFamily: 'Roboto',
+        fontSize: 18,
+        fontWeight: '400',
+        color: '#999',
+        textDecorationLine: 'line-through',
+    },
+    discountBadge: {
+        backgroundColor: '#E74C3C',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 4,
+    },
+    discountText: {
+        color: '#FFFFFF',
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+        gap: 6,
+    },
+    ratingText: {
+        fontSize: 14,
+        color: '#FFB800',
+    },
+    reviewCount: {
+        fontSize: 13,
+        color: '#666',
+    },
+    descriptionContainer: {
+        marginBottom: 18,
+        paddingBottom: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    sectionTitle: {
+        fontFamily: 'Roboto',
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#2C2C2C',
+        marginBottom: 6,
+    },
+    description: {
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        lineHeight: 22,
+        color: '#666',
+    },
+    materialsContainer: {
+        marginBottom: 16,
+    },
+    materialsText: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        color: '#666',
+    },
+    featuresContainer: {
+        marginBottom: 18,
+        paddingBottom: 18,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    featureItem: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        color: '#666',
+        lineHeight: 20,
+    },
+    selectionContainer: {
+        marginBottom: 18,
+    },
+    selectionTitle: {
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#2C2C2C',
+        marginBottom: 10,
+    },
+    selectedValue: {
+        fontWeight: '400',
+        color: '#666',
+    },
+    sizeTitleRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    sizeGuideLink: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        color: '#2C2C2C',
+        textDecorationLine: 'underline',
+    },
+    colorOptions: {
+        flexDirection: 'row',
+        gap: 10,
+    },
+    colorButton: {
+        width: 38,
+        height: 38,
+        borderRadius: 19,
+        borderWidth: 2,
+        borderColor: '#E0E0E0',
+    },
+    selectedColorButton: {
+        borderColor: '#2C2C2C',
+        borderWidth: 3,
+    },
+    sizeOptions: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 10,
+    },
+    sizeButton: {
+        paddingHorizontal: 18,
+        paddingVertical: 10,
+        borderWidth: 1,
+        borderColor: '#D0D0D0',
+        backgroundColor: '#FFFFFF',
+        minWidth: 55,
+        alignItems: 'center',
+    },
+    selectedSizeButton: {
+        backgroundColor: '#2C2C2C',
+        borderColor: '#2C2C2C',
+    },
+    sizeButtonText: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#333',
+    },
+    selectedSizeText: {
+        color: '#FFFFFF',
+    },
+    addToCartButton: {
+        backgroundColor: '#2C2C2C',
+        paddingVertical: 14,
+        alignItems: 'center',
+        marginTop: 10,
+        marginBottom: 24,
+    },
+    addToCartText: {
+        fontFamily: 'Roboto',
+        fontSize: 15,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        letterSpacing: 1,
+        textTransform: 'uppercase',
+    },
+    additionalInfo: {
+        paddingTop: 18,
+        borderTopWidth: 1,
+        borderTopColor: '#E0E0E0',
+    },
+    infoItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 10,
+        gap: 10,
+    },
+    infoIcon: {
+        fontSize: 18,
+    },
+    infoText: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        color: '#666',
     },
 });
 
