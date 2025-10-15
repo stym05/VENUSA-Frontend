@@ -14,6 +14,8 @@ export const URL = {
     // Auth
     GENRATE_OTP: "/api/auth/send-otp/",
     VALIDATE_OTP: "/api/auth/verify-otp/",
+    SIGNUP: "/api/auth/signup",
+    SEND_OTP_MOB_NUM: "/api/auth/send-otp-mobile/",
 
     // Cart
     GET_CART_ITEMS: "/api/transactions/cart",
