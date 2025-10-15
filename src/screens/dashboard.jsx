@@ -22,6 +22,7 @@ import { getAllCategories, getDashboardData } from '../apis/index.js';
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
 import TrendingScrollBanner from './trendingScroller.jsx';
+import { DashboardProductSkeleton } from '../components/SkeletonLoader/index.jsx';
 
 export default class Dashboard extends Component {
 
@@ -100,11 +101,7 @@ export default class Dashboard extends Component {
 
   render() {
     const { isLoading, theme, categorie, isModalVisible } = this.state;
-    return isLoading ? (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size={"large"} color={"black"} />
-      </View>
-    ) : (
+    return (
       <SafeAreaView style={styles(theme).container}>
         <ScrollView>
           <View style={styles(theme).subContainer}>
@@ -226,8 +223,14 @@ export default class Dashboard extends Component {
               textColor="#ffffff"
             />
 
-            {/* Render Dashboard Data */}
-            {this.state.allCategoriesData && this.state.allCategoriesData.length > 0 &&
+            {/* Render Dashboard Data or Skeleton */}
+            {isLoading ? (
+              <>
+                <DashboardProductSkeleton />
+                <DashboardProductSkeleton />
+              </>
+            ) : (
+              this.state.allCategoriesData && this.state.allCategoriesData.length > 0 &&
               this.state.allCategoriesData.map((category, categoryIndex) => (
                 <View key={categoryIndex}>
                   {/* Category Header */}
@@ -357,7 +360,7 @@ export default class Dashboard extends Component {
                   ))}
                 </View>
               ))
-            }
+            )}
           </View>
           <Footer navigation={this.props.navigation} />
         </ScrollView>

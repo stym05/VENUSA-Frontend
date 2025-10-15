@@ -15,6 +15,7 @@ import Item from "./item";
 import { isMobile } from "../../utils";
 import Footer from "../../components/footer";
 import { getProductBySubCategory } from "../../apis";
+import { ProductGridSkeleton } from "../../components/SkeletonLoader/index";
 
 class ItemSection extends React.Component {
     constructor(props) {
@@ -404,12 +405,9 @@ class ItemSection extends React.Component {
                                 </View>
                             </View>
 
-                            {/* Loading State */}
+                            {/* Loading State or Product Grid */}
                             {loading ? (
-                                <View style={styles.loadingContainer}>
-                                    <ActivityIndicator size="large" color="#000" />
-                                    <Text style={styles.loadingText}>Loading products...</Text>
-                                </View>
+                                <ProductGridSkeleton count={15} />
                             ) : (
                                 <>
                                     {/* Product Grid */}
@@ -514,12 +512,14 @@ const styles = StyleSheet.create({
     },
     categoryHeader: {
         marginBottom: 30,
+        alignItems: 'center',
     },
     breadcrumb: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
         marginBottom: 20,
+        gap: 20,
     },
     categoryText: {
         fontSize: 22,
@@ -536,6 +536,7 @@ const styles = StyleSheet.create({
     filtersContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         flexWrap: 'wrap',
     },
     filterDropdown: {
@@ -605,17 +606,6 @@ const styles = StyleSheet.create({
     selectedItemText: {
         fontWeight: '600',
         color: '#000',
-    },
-    loadingContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingVertical: 50,
-    },
-    loadingText: {
-        marginTop: 10,
-        fontSize: 16,
-        color: '#666',
     },
     noProductsContainer: {
         flex: 1,
