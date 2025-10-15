@@ -8,7 +8,8 @@ import {
     Text,
     FlatList,
     TouchableOpacity,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 import { ScrollView } from 'react-native-web';
 import Footer from '../components/footer';
@@ -19,14 +20,33 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 class ShopCategories extends Component {
     constructor(props) {
         super(props);
+
+        // Get parameters from route or URL
         let categoryId = "";
+        let type = "";
+
+        // Try to get from route params first
         if (this.props.route && this.props.route.params) {
-            categoryId = this.props.route.params.categorie.categoryId
+            categoryId = this.props.route.params.categoryId || "";
+            type = this.props.route.params.type || "";
         }
-        console.log("categoryId is ", this.props.route.params)
+
+        // For web, also check URL parameters on refresh
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!categoryId) {
+                categoryId = urlParams.get('categoryId') || "";
+            }
+            if (!type) {
+                type = urlParams.get('type') || "";
+            }
+        }
+
+        console.log("ShopCategories params:", { categoryId, type });
         this.state = {
             isloading: false,
             categoryId,
+            type,
             subCategory: [],
             screenData: Dimensions.get('window')
         }
@@ -198,7 +218,7 @@ class ShopCategories extends Component {
     render() {
         const {
             subCategory,
-            categorie,
+            type,
             isloading,
             screenData
         } = this.state;
@@ -221,12 +241,10 @@ class ShopCategories extends Component {
             <SafeAreaView style={styles.container}>
                 <ScrollView contentContainerStyle={styles.scrollContent}>
                     <View style={styles.subContainer}>
-                        {console.log(categorie, "------------------categorie")}
-
                         {this.renderHeaderButtons()}
 
                         <Image
-                            source={this.props.route.params.type === "Mens" ?
+                            source={type === "Mens" ?
                                 require('./Mens BG.png') :
                                 require('./Womens BG.png')
                             }

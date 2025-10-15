@@ -8,7 +8,8 @@ import {
     StyleSheet,
     TouchableOpacity,
     Image,
-    ActivityIndicator
+    ActivityIndicator,
+    Platform
 } from 'react-native';
 import Item from "./item";
 import { isMobile } from "../../utils";
@@ -18,24 +19,45 @@ import { getProductBySubCategory } from "../../apis";
 class ItemSection extends React.Component {
     constructor(props) {
         super(props);
+
+        // Get parameters from route or URL
         let subCategoryId = "";
         let productName = "";
+
+        // Try to get from route params first
         if (this.props.route && this.props.route.params) {
             subCategoryId = this.props.route.params.subCategoryId;
             productName = this.props.route.params.productName;
         }
+
+        // For web, also check URL parameters on refresh
+        if (Platform.OS === 'web' && typeof window !== 'undefined') {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!subCategoryId) {
+                subCategoryId = urlParams.get('subCategoryId') || "";
+            }
+            if (!productName) {
+                productName = urlParams.get('productName') || "";
+            }
+        }
+
         this.state = {
             loading: false,
             productName,
             subCategoryId,
             productarray: [],
-            selectedSortBy: null,
+            filteredProducts: [],
+            selectedSortBy: 'featured',
             selectedSize: null,
             selectedColor: null,
-            selectedProductType: null,
+            selectedMaterial: null,
+            availableSizes: [],
+            availableColors: [],
+            availableMaterials: [],
             productCount: 0,
             currentPage: 1,
-            itemsPerPage: 9
+            itemsPerPage: 15,  // 3 columns × 5 rows (matching Figma design)
+            openDropdown: null  // Track which dropdown is open
         };
     }
 
@@ -45,13 +67,48 @@ class ItemSection extends React.Component {
             this.setState({ loading: true });
             const response = await getProductBySubCategory(subCategoryId);
             console.log("-----------------getProductBySubCategory-----------", response)
-            if (response && response.success) {
-                const { products } = response;
-                this.setState({
-                    productarray: products,
-                    productCount: products.length,
-                    loading: false
+
+            // API returns array directly, not wrapped in {success, products}
+            if (response && Array.isArray(response)) {
+                // Extract unique sizes, colors, and materials
+                const sizesSet = new Set();
+                const colorsMap = new Map();
+                const materialsSet = new Set();
+
+                response.forEach(product => {
+                    // Extract sizes
+                    if (product.stocks) {
+                        product.stocks.forEach(stock => {
+                            sizesSet.add(stock.size);
+                            if (stock.color) {
+                                colorsMap.set(stock.color, stock.color);
+                            }
+                        });
+                    }
+                    // Extract materials
+                    if (product.materials) {
+                        product.materials.forEach(mat => {
+                            materialsSet.add(mat.material);
+                        });
+                    }
                 });
+
+                const availableSizes = Array.from(sizesSet).sort((a, b) => a - b);
+                const availableColors = Array.from(colorsMap.keys());
+                const availableMaterials = Array.from(materialsSet).sort();
+
+                this.setState({
+                    productarray: response,
+                    filteredProducts: response,
+                    productCount: response.length,
+                    availableSizes,
+                    availableColors,
+                    availableMaterials,
+                    loading: false
+                }, () => this.applyFilters());
+            } else if (response && response.error) {
+                console.log("API Error:", response.error);
+                this.setState({ loading: false });
             } else {
                 this.setState({ loading: false });
             }
@@ -61,19 +118,111 @@ class ItemSection extends React.Component {
         }
     };
 
-    renderFilterDropdown = (label, options) => {
-        const stateKey = `selected${label.replace(/\s+/g, '')}`;
+    applyFilters = () => {
+        const { productarray, selectedSortBy, selectedSize, selectedColor, selectedMaterial } = this.state;
+        let filtered = [...productarray];
+
+        // Filter by size
+        if (selectedSize) {
+            filtered = filtered.filter(product =>
+                product.stocks && product.stocks.some(stock => stock.size === selectedSize)
+            );
+        }
+
+        // Filter by color
+        if (selectedColor) {
+            filtered = filtered.filter(product =>
+                product.stocks && product.stocks.some(stock => stock.color === selectedColor)
+            );
+        }
+
+        // Filter by material
+        if (selectedMaterial) {
+            filtered = filtered.filter(product =>
+                product.materials && product.materials.some(mat => mat.material === selectedMaterial)
+            );
+        }
+
+        // Sort
+        switch (selectedSortBy) {
+            case 'price_low':
+                filtered.sort((a, b) => parseFloat(a.price) - parseFloat(b.price));
+                break;
+            case 'price_high':
+                filtered.sort((a, b) => parseFloat(b.price) - parseFloat(a.price));
+                break;
+            case 'newest':
+                filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                break;
+            case 'best_selling':
+                filtered.sort((a, b) => b.totalSales - a.totalSales);
+                break;
+            default:
+                // 'featured' - keep original order
+                break;
+        }
+
+        this.setState({
+            filteredProducts: filtered,
+            productCount: filtered.length,
+            currentPage: 1  // Reset to first page when filters change
+        });
+    };
+
+    toggleDropdown = (dropdownName) => {
+        this.setState(prevState => ({
+            openDropdown: prevState.openDropdown === dropdownName ? null : dropdownName
+        }));
+    };
+
+    renderFilterDropdown = (label, stateKey, options, displayFn = (val) => val, valueFn = (val) => val) => {
+        const selectedValue = this.state[stateKey];
+        const isOpen = this.state.openDropdown === stateKey;
 
         return (
             <View style={styles.filterDropdown}>
-                <Text style={styles.filterLabel}>{label}</Text>
                 <View style={styles.dropdownWrapper}>
-                    <TouchableOpacity style={styles.dropdownButton}>
-                        <Text style={styles.dropdownText}>
-                            {this.state[stateKey] || label}
+                    <TouchableOpacity
+                        style={styles.dropdownButton}
+                        onPress={() => this.toggleDropdown(stateKey)}
+                    >
+                        <Text style={[styles.dropdownText, selectedValue && styles.selectedText]}>
+                            {selectedValue ? displayFn(selectedValue) : label}
                         </Text>
-                        <Text style={styles.chevron}>▼</Text>
+                        <Text style={styles.chevron}>{isOpen ? '▲' : '▼'}</Text>
                     </TouchableOpacity>
+                    {isOpen && options && options.length > 0 && (
+                        <View style={styles.dropdownMenu}>
+                            <TouchableOpacity
+                                style={styles.dropdownItem}
+                                onPress={() => {
+                                    this.setState({ [stateKey]: null, openDropdown: null }, () => this.applyFilters());
+                                }}
+                            >
+                                <Text style={styles.dropdownItemText}>{label}</Text>
+                            </TouchableOpacity>
+                            {options.map((option, index) => {
+                                const optionValue = valueFn(option);
+                                const isSelected = selectedValue === optionValue;
+                                return (
+                                    <TouchableOpacity
+                                        key={index}
+                                        style={styles.dropdownItem}
+                                        onPress={() => {
+                                            this.setState({ [stateKey]: optionValue, openDropdown: null }, () => this.applyFilters());
+                                        }}
+                                    >
+                                        <Text style={[
+                                            styles.dropdownItemText,
+                                            isSelected && styles.selectedItemText
+                                        ]}>
+                                            {displayFn(option)}
+                                        </Text>
+                                    </TouchableOpacity>
+                                );
+                            })}
+                        </View>
+                    )}
                 </View>
             </View>
         );
@@ -92,30 +241,48 @@ class ItemSection extends React.Component {
 
     renderProductCard = (product, index) => {
         const ProductCard = () => {
-            // Adjust these property names based on your actual API response structure
-            const productId = product.id || product._id || product.productId;
-            const productName = product.name || product.title || product.productName;
-            const productPrice = product.price || product.cost || product.amount;
-            const productImages = product.images || [product.image || product.imageUrl || product.thumbnail || 'https://via.placeholder.com/200x250'];
+            // Extract product data from API response
+            const productId = product.productId;
+            const productName = product.productName;
+            const productPrice = parseFloat(product.price);
+            const productDiscount = parseFloat(product.discount);
+            const productDiscountPerc = parseFloat(product.discountPerc);
+            const productDescription = product.description;
+
+            // Calculate discounted price
+            let discountedPrice = productPrice;
+            if (productDiscount > 0) {
+                discountedPrice = productPrice - productDiscount;
+            } else if (productDiscountPerc > 0) {
+                discountedPrice = productPrice * (1 - productDiscountPerc / 100);
+            }
+
+            // Extract image URLs from images array
+            const imageUrls = product.images && product.images.length > 0
+                ? product.images.map(img => img.image)
+                : ['https://via.placeholder.com/300x400?text=No+Image'];
 
             // State to manage the current image index
             const [currentImageIndex, setCurrentImageIndex] = React.useState(0);
 
             // Effect to change the image every 3 seconds
             React.useEffect(() => {
-                const interval = setInterval(() => {
-                    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % productImages.length);
-                }, 3000); // Change image every 3 seconds
+                if (imageUrls.length > 1) {
+                    const interval = setInterval(() => {
+                        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % imageUrls.length);
+                    }, 3000);
+                    return () => clearInterval(interval);
+                }
+            }, [imageUrls.length]);
 
-                return () => clearInterval(interval); // Cleanup on unmount
-            }, [productImages.length]);
+            // Check if product has discount
+            const hasDiscount = productDiscount > 0 || productDiscountPerc > 0;
 
             return (
                 <TouchableOpacity
                     key={productId || index}
                     style={styles.productCard}
                     onPress={() => {
-                        // Navigate to product details
                         this.props.navigation.navigate('ItemDescription', {
                             productId: productId,
                             productName: productName
@@ -124,23 +291,27 @@ class ItemSection extends React.Component {
                 >
                     <View style={styles.productImageContainer}>
                         <Image
-                            source={{ uri: productImages[currentImageIndex] }} // Display the current image
+                            source={{ uri: imageUrls[currentImageIndex] }}
                             style={styles.productImage}
                             resizeMode="cover"
                         />
+                        {/* SALE badge at top-right */}
+                        {hasDiscount && (
+                            <View style={styles.saleBadge}>
+                                <Text style={styles.saleBadgeText}>SALE</Text>
+                            </View>
+                        )}
+                        {/* Wishlist heart at bottom-right */}
                         <TouchableOpacity style={styles.wishlistButton}>
                             <Text style={styles.wishlistIcon}>♡</Text>
                         </TouchableOpacity>
-                        {index % 3 === 0 && (
-                            <View style={styles.saleBadge}>
-                                <Text style={styles.saleBadgeText}>Sale</Text>
-                            </View>
-                        )}
                     </View>
                     <View style={styles.productInfo}>
-                        <Text style={styles.productName}>{productName}</Text>
+                        <Text style={styles.productName} numberOfLines={1}>
+                            {productName}
+                        </Text>
                         <Text style={styles.productPrice}>
-                            {typeof productPrice === 'number' ? `₹${productPrice.toFixed(2)}` : productPrice}
+                            ₹{Math.round(discountedPrice).toLocaleString('en-IN')}.00
                         </Text>
                     </View>
                 </TouchableOpacity>
@@ -151,12 +322,21 @@ class ItemSection extends React.Component {
     };
 
     render() {
-        const { loading, productarray, productCount, currentPage, itemsPerPage, productName } = this.state;
+        const { loading, filteredProducts, productCount, currentPage, itemsPerPage, productName, availableSizes, availableColors, availableMaterials } = this.state;
 
         // Calculate pagination
         const startIndex = (currentPage - 1) * itemsPerPage;
-        const paginatedProducts = productarray.slice(startIndex, startIndex + itemsPerPage);
+        const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
         const totalPages = Math.ceil(productCount / itemsPerPage);
+
+        // Sort By options
+        const sortOptions = [
+            { value: 'featured', label: 'Featured' },
+            { value: 'price_low', label: 'Price: Low to High' },
+            { value: 'price_high', label: 'Price: High to Low' },
+            { value: 'newest', label: 'Newest' },
+            { value: 'best_selling', label: 'Best Selling' }
+        ];
 
         return (
             <SafeAreaView style={styles.container}>
@@ -196,14 +376,31 @@ class ItemSection extends React.Component {
 
                                 {/* Filter options */}
                                 <View style={styles.filtersContainer}>
-                                    {this.renderFilterDropdown('Sort By')}
-                                    {this.renderFilterDropdown('Color')}
-                                    {this.renderFilterDropdown('Size')}
-                                    {this.renderFilterDropdown('Product Type')}
-
-                                    <TouchableOpacity style={styles.filtersButton}>
-                                        <Text style={styles.filtersButtonText}>Filters</Text>
-                                    </TouchableOpacity>
+                                    {this.renderFilterDropdown(
+                                        'Sort By',
+                                        'selectedSortBy',
+                                        sortOptions,
+                                        (opt) => typeof opt === 'object' ? opt.label : opt,
+                                        (opt) => typeof opt === 'object' ? opt.value : opt
+                                    )}
+                                    {this.renderFilterDropdown(
+                                        'Size',
+                                        'selectedSize',
+                                        availableSizes,
+                                        (size) => `Size ${size}`
+                                    )}
+                                    {this.renderFilterDropdown(
+                                        'Color',
+                                        'selectedColor',
+                                        availableColors,
+                                        (color) => color
+                                    )}
+                                    {this.renderFilterDropdown(
+                                        'Material',
+                                        'selectedMaterial',
+                                        availableMaterials,
+                                        (material) => material
+                                    )}
                                 </View>
                             </View>
 
@@ -344,16 +541,15 @@ const styles = StyleSheet.create({
     filterDropdown: {
         marginRight: 15,
         marginBottom: 10,
-    },
-    filterLabel: {
-        fontSize: 12,
-        color: '#666',
-        marginBottom: 4,
+        position: 'relative',
+        zIndex: 1000,
     },
     dropdownWrapper: {
+        position: 'relative',
         borderWidth: 1,
         borderColor: '#ddd',
         borderRadius: 4,
+        backgroundColor: '#fff',
     },
     dropdownButton: {
         flexDirection: 'row',
@@ -361,24 +557,54 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 12,
         paddingVertical: 8,
-        minWidth: 100,
+        minWidth: 120,
     },
     dropdownText: {
         fontSize: 14,
+        color: '#333',
+    },
+    selectedText: {
+        fontWeight: '500',
+        color: '#000',
     },
     chevron: {
         fontSize: 10,
-        marginLeft: 5,
+        marginLeft: 8,
+        color: '#666',
     },
-    filtersButton: {
+    dropdownMenu: {
+        position: 'absolute',
+        top: '100%',
+        left: 0,
+        right: 0,
+        backgroundColor: '#fff',
         borderWidth: 1,
         borderColor: '#ddd',
-        borderRadius: 4,
-        padding: 8,
-        marginLeft: 'auto',
+        borderTopWidth: 0,
+        borderBottomLeftRadius: 4,
+        borderBottomRightRadius: 4,
+        maxHeight: 200,
+        overflow: 'scroll',
+        zIndex: 1001,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
     },
-    filtersButtonText: {
+    dropdownItem: {
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#f0f0f0',
+    },
+    dropdownItemText: {
         fontSize: 14,
+        color: '#333',
+    },
+    selectedItemText: {
+        fontWeight: '600',
+        color: '#000',
     },
     loadingContainer: {
         flex: 1,
@@ -404,17 +630,22 @@ const styles = StyleSheet.create({
     productGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginHorizontal: -10,
+        marginHorizontal: -10,  // Negative margin for gap
+        gap: 20,  // Space between cards
     },
     productCard: {
-        width: isMobile() ? '50%' : '33.333%',
-        padding: 10,
-        marginBottom: 20,
+        width: isMobile() ? '48%' : '32%',  // 3 columns on desktop, 2 on mobile
+        marginBottom: 30,
+        backgroundColor: '#fff',
+        overflow: 'visible',
     },
     productImageContainer: {
         position: 'relative',
-        aspectRatio: 0.8,
+        width: '100%',
+        height: isMobile() ? 320 : 450,  // Taller for 3-column layout
         marginBottom: 10,
+        backgroundColor: '#f9f9f9',
+        overflow: 'hidden',
     },
     productImage: {
         width: '100%',
@@ -423,46 +654,56 @@ const styles = StyleSheet.create({
     },
     wishlistButton: {
         position: 'absolute',
-        top: 10,
+        bottom: 10,
         right: 10,
-        width: 30,
-        height: 30,
+        width: 32,
+        height: 32,
         backgroundColor: 'white',
-        borderRadius: 15,
+        borderRadius: 16,
         justifyContent: 'center',
         alignItems: 'center',
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        elevation: 2,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.15,
+        shadowRadius: 3,
+        elevation: 3,
     },
     wishlistIcon: {
-        fontSize: 18,
+        fontSize: 20,
+        color: '#000',
     },
     saleBadge: {
         position: 'absolute',
         top: 10,
-        left: 10,
+        right: 10,
         backgroundColor: '#000',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
     },
     saleBadgeText: {
         color: '#fff',
-        fontSize: 12,
-        fontWeight: '500',
+        fontSize: 11,
+        fontWeight: '600',
+        letterSpacing: 0.5,
     },
     productInfo: {
-        marginTop: 5,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingHorizontal: 0,
+        paddingVertical: 8,
     },
     productName: {
+        flex: 1,
         fontSize: 14,
-        marginBottom: 4,
+        fontWeight: '400',
+        color: '#000',
+        marginRight: 10,
     },
     productPrice: {
         fontSize: 14,
-        fontWeight: '500',
+        fontWeight: '600',
+        color: '#000',
     },
     paginationContainer: {
         flexDirection: 'row',

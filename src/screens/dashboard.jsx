@@ -205,14 +205,14 @@ export default class Dashboard extends Component {
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   {console.log("-------------categorie--------", categorie)}
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie.Mens,
+                    categoryId: categorie.Mens?.categoryId || "",
                     type: "Mens"
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
                   <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categorie: categorie.Womens,
+                    categoryId: categorie.Womens?.categoryId || "",
                     type: "Womens"
                   })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
@@ -220,174 +220,144 @@ export default class Dashboard extends Component {
                 </View>
               </View>
             </View>
-            <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{
-                fontFamily: "Jura",
-                fontSize: 28,
-                fontWeight: '600',
-                lineHeight: 38
-              }}>Bestsellers</Text>
-            </View>
-            <View style={styles(theme).imageContainer}>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <Image
-                  contentFit="contain"
-                  source={'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg'}
-                  style={{
-                    height: 600,
-                  }}
-                />
-              </View>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <Image
-                  contentFit="contain"
-                  source={"https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/women_pic_P.jpg"}
-                  style={{
-                    height: 600,
-                  }}
-                />
-              </View>
-            </View>
-            <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-              <Text style={{
-                fontFamily: "Jura",
-                fontSize: 28,
-                fontWeight: '600',
-                lineHeight: 38
-              }}>New Arrivals</Text>
-            </View>
             <TrendingScrollBanner
               text="FREE SHIPPING ON ALL ORDERS"
               backgroundColor="#4CAF50"
               textColor="#ffffff"
             />
-            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: 'white',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: 'white',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-            </View>
-            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: '#ddd',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: 'white',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-            </View>
-            <View style={[styles(theme).imageContainer, { marginVertical: 25 }]}>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: 'white',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
 
-              </View>
-              <View style={{ height: 600, width: isMobile() ? "100%" : '50%' }}>
-                <ImageBackground
-                  contentFit="contain"
-                  source={{ uri: 'https://venusa-bucket.blr1.digitaloceanspaces.com/images/Dashboard/mens_pic_D.jpg' }}
-                  style={{
-                    height: 600,
-                    justifyContent: 'flex-end', // Vertically center
-                    alignItems: 'center', // Horizontally center
-                  }}
-                >
-                  <TouchableOpacity style={{
-                    backgroundColor: 'white',
-                    padding: 20,
-                    borderRadius: 10,
-                    marginBottom: 50
-                  }}>
-                    <Text style={{ fontSize: 18, fontWeight: '500', color: "#000" }}>SHOP THE COLLECTION</Text>
-                  </TouchableOpacity>
-                </ImageBackground>
-              </View>
-            </View>
+            {/* Render Dashboard Data */}
+            {this.state.allCategoriesData && this.state.allCategoriesData.length > 0 &&
+              this.state.allCategoriesData.map((category, categoryIndex) => (
+                <View key={categoryIndex}>
+                  {/* Category Header */}
+                  <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
+                    <Text style={{
+                      fontFamily: "Jura",
+                      fontSize: 32,
+                      fontWeight: '700',
+                      lineHeight: 42,
+                      color: '#1A1A1A'
+                    }}>{category.categoryName}</Text>
+                  </View>
+
+                  {/* Subcategories and Products */}
+                  {category.subcategories && category.subcategories.map((subcategory, subIndex) => (
+                    <View key={subIndex} style={{ marginBottom: 50 }}>
+                      {/* Subcategory Header */}
+                      <View style={{ marginVertical: 20, paddingHorizontal: isMobile() ? 15 : 50 }}>
+                        <Text style={{
+                          fontFamily: "Jura",
+                          fontSize: 24,
+                          fontWeight: '600',
+                          lineHeight: 32,
+                          color: '#333'
+                        }}>{subcategory.subCategoryName}</Text>
+                        <Text style={{
+                          fontFamily: "Roboto",
+                          fontSize: 16,
+                          fontWeight: '400',
+                          color: '#666',
+                          marginTop: 5
+                        }}>Collection: {subcategory.collectionName}</Text>
+                      </View>
+
+                      {/* Products Grid */}
+                      <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={{ paddingHorizontal: isMobile() ? 15 : 50 }}
+                      >
+                        {subcategory.products && subcategory.products.map((product, productIndex) => (
+                          <TouchableOpacity
+                            key={productIndex}
+                            style={styles(theme).productCard}
+                            onPress={() => this.props.navigation.navigate("ProductDetail", {
+                              productId: product.productId
+                            })}
+                          >
+                            {/* Product Image */}
+                            <View style={styles(theme).productImageContainer}>
+                              {product.images && product.images.length > 0 ? (
+                                <Image
+                                  source={{ uri: product.images[0].image }}
+                                  style={styles(theme).productImage}
+                                  contentFit="cover"
+                                />
+                              ) : (
+                                <View style={[styles(theme).productImage, { backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center' }]}>
+                                  <Text style={{ color: '#999' }}>No Image</Text>
+                                </View>
+                              )}
+
+                              {/* Discount Badge */}
+                              {parseFloat(product.discountPerc) > 0 && (
+                                <View style={styles(theme).discountBadge}>
+                                  <Text style={styles(theme).discountText}>
+                                    -{product.discountPerc}%
+                                  </Text>
+                                </View>
+                              )}
+                            </View>
+
+                            {/* Product Info */}
+                            <View style={styles(theme).productInfo}>
+                              <Text
+                                style={styles(theme).productName}
+                                numberOfLines={2}
+                              >
+                                {product.productName}
+                              </Text>
+
+                              <Text
+                                style={styles(theme).productDescription}
+                                numberOfLines={2}
+                              >
+                                {product.description}
+                              </Text>
+
+                              {/* Price Section */}
+                              <View style={styles(theme).priceContainer}>
+                                <Text style={styles(theme).currentPrice}>
+                                  ₹{parseFloat(product.discountedPrice).toFixed(2)}
+                                </Text>
+                                {parseFloat(product.discount) > 0 && (
+                                  <Text style={styles(theme).originalPrice}>
+                                    ₹{parseFloat(product.price).toFixed(2)}
+                                  </Text>
+                                )}
+                              </View>
+
+                              {/* Tags */}
+                              {product.tags && product.tags.length > 0 && (
+                                <View style={styles(theme).tagsContainer}>
+                                  {product.tags.slice(0, 2).map((tag, tagIndex) => (
+                                    <View key={tagIndex} style={styles(theme).tag}>
+                                      <Text style={styles(theme).tagText}>{tag}</Text>
+                                    </View>
+                                  ))}
+                                </View>
+                              )}
+
+                              {/* Stock Info */}
+                              {product.totalStock > 0 ? (
+                                <Text style={styles(theme).stockText}>
+                                  In Stock ({product.totalStock} available)
+                                </Text>
+                              ) : (
+                                <Text style={[styles(theme).stockText, { color: '#d32f2f' }]}>
+                                  Out of Stock
+                                </Text>
+                              )}
+                            </View>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  ))}
+                </View>
+              ))
+            }
           </View>
           <Footer navigation={this.props.navigation} />
         </ScrollView>
@@ -423,7 +393,6 @@ const styles = (theme) => StyleSheet.create({
     top: 0,
     left: 0,
     bottom: 0,
-
     right: 0,
   },
   button: {
@@ -445,5 +414,96 @@ const styles = (theme) => StyleSheet.create({
     height: isMobile() ? null : Dimensions.get("window").height * 0.6,
     backgroundColor: '#fff',
     padding: 25
-  }
+  },
+  // Product Card Styles
+  productCard: {
+    width: isMobile() ? 280 : 320,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginRight: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+    overflow: 'hidden',
+  },
+  productImageContainer: {
+    position: 'relative',
+    width: '100%',
+    height: isMobile() ? 300 : 350,
+    backgroundColor: '#f5f5f5',
+  },
+  productImage: {
+    width: '100%',
+    height: '100%',
+  },
+  discountBadge: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+    backgroundColor: '#e53935',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  discountText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  productInfo: {
+    padding: 16,
+  },
+  productName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    marginBottom: 8,
+    fontFamily: 'Roboto',
+  },
+  productDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  priceContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  currentPrice: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+    marginRight: 10,
+  },
+  originalPrice: {
+    fontSize: 16,
+    color: '#999',
+    textDecorationLine: 'line-through',
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+  },
+  tag: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 15,
+    marginRight: 6,
+    marginBottom: 6,
+  },
+  tagText: {
+    fontSize: 12,
+    color: '#555',
+  },
+  stockText: {
+    fontSize: 13,
+    color: '#4caf50',
+    fontWeight: '500',
+  },
 });
