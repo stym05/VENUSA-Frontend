@@ -194,6 +194,38 @@ export const validateOTP = async (data) => {
     }
 };
 
+export const signupUser = async (data) => {
+    try {
+        const response = await fetch(DOMAIN + URL.SIGNUP, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in signupUser", err);
+        return err;
+    }
+};
+
+export const sendOTPForMobile = async (data) => {
+    try {
+        const response = await fetch(DOMAIN + URL.SEND_OTP_MOB_NUM, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in sendOTPForMobile", err);
+        return err;
+    }
+};
+
 
 export const getCartItem = async (userId) => {
     try {
