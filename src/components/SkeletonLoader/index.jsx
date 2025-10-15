@@ -43,17 +43,17 @@ const SkeletonBox = ({ width, height, style }) => {
 export const ProductCardSkeleton = () => {
     return (
         <View style={styles.productCard}>
-            <SkeletonBox width="100%" height={isMobile() ? 320 : 450} style={{ marginBottom: 10 }} />
+            <SkeletonBox width="100%" height={isMobile() ? 280 : 320} style={{ marginBottom: 8 }} />
             <View style={styles.productInfo}>
-                <SkeletonBox width="60%" height={16} style={{ marginBottom: 8 }} />
-                <SkeletonBox width="30%" height={16} />
+                <SkeletonBox width="60%" height={14} style={{ marginBottom: 6 }} />
+                <SkeletonBox width="30%" height={14} />
             </View>
         </View>
     );
 };
 
 // Product Grid Skeleton (for ItemSection)
-export const ProductGridSkeleton = ({ count = 15 }) => {
+export const ProductGridSkeleton = ({ count = 20 }) => {
     return (
         <View style={styles.productGrid}>
             {Array.from({ length: count }).map((_, index) => (
@@ -131,8 +131,8 @@ const styles = StyleSheet.create({
         borderRadius: 0,
     },
     productCard: {
-        width: isMobile() ? '48%' : '32%',
-        marginBottom: 30,
+        width: isMobile() ? '48%' : '23%',
+        marginBottom: 25,
         backgroundColor: '#fff',
         overflow: 'visible',
     },

@@ -57,7 +57,7 @@ class ItemSection extends React.Component {
             availableMaterials: [],
             productCount: 0,
             currentPage: 1,
-            itemsPerPage: 15,  // 3 columns × 5 rows (matching Figma design)
+            itemsPerPage: 20,  // 4 columns × 5 rows
             openDropdown: null  // Track which dropdown is open
         };
     }
@@ -229,17 +229,6 @@ class ItemSection extends React.Component {
         );
     };
 
-    renderSidebarItem = (title, items) => (
-        <View style={styles.sidebarSection}>
-            <Text style={styles.sidebarHeader}>{title}</Text>
-            {items.map((item, index) => (
-                <TouchableOpacity key={index} style={styles.sidebarItem}>
-                    <Text style={styles.sidebarItemText}>{item}</Text>
-                </TouchableOpacity>
-            ))}
-        </View>
-    );
-
     renderProductCard = (product, index) => {
         const ProductCard = () => {
             // Extract product data from API response
@@ -343,27 +332,6 @@ class ItemSection extends React.Component {
             <SafeAreaView style={styles.container}>
                 <ScrollView>
                     <View style={styles.contentContainer}>
-                        {/* Left Sidebar */}
-                        <View style={styles.sidebar}>
-                            {this.renderSidebarItem('Offers', [
-                                'Member Exclusive Prices',
-                                'Sweatshirts starting ₹799'
-                            ])}
-
-                            {this.renderSidebarItem('New In', [
-                                'Women\'s Clothing | New Arrivals'
-                            ])}
-
-                            {this.renderSidebarItem('Collection', [
-                                'Tops',
-                                'Pants',
-                                'Dresses & Jumpsuits',
-                                'Outerwear & Jackets',
-                                'Pullovers',
-                                'Shorts & Skirts'
-                            ])}
-                        </View>
-
                         {/* Main Product Content */}
                         <View style={styles.mainContent}>
                             {/* Header section */}
@@ -407,7 +375,7 @@ class ItemSection extends React.Component {
 
                             {/* Loading State or Product Grid */}
                             {loading ? (
-                                <ProductGridSkeleton count={15} />
+                                <ProductGridSkeleton count={20} />
                             ) : (
                                 <>
                                     {/* Product Grid */}
@@ -416,12 +384,38 @@ class ItemSection extends React.Component {
                                             paginatedProducts.map((product, index) =>
                                                 this.renderProductCard(product, index)
                                             )
-                                        ) : (
-                                            <View style={styles.noProductsContainer}>
-                                                <Text style={styles.noProductsText}>No products found</Text>
-                                            </View>
-                                        )}
+                                        ) : null}
                                     </View>
+
+                                    {/* Empty State */}
+                                    {paginatedProducts.length === 0 && !loading && (
+                                        <View style={styles.emptyStateContainer}>
+                                            <View style={styles.emptyStateIcon}>
+                                                <Text style={styles.emptyIconText}>📦</Text>
+                                            </View>
+                                            <Text style={styles.emptyStateTitle}>No Products Found</Text>
+                                            <Text style={styles.emptyStateSubtitle}>
+                                                {this.state.selectedSize || this.state.selectedColor || this.state.selectedMaterial
+                                                    ? "We couldn't find any products matching your selected filters."
+                                                    : "This collection is currently empty. Check back soon for new arrivals!"}
+                                            </Text>
+                                            {(this.state.selectedSize || this.state.selectedColor || this.state.selectedMaterial) && (
+                                                <TouchableOpacity
+                                                    style={styles.clearFiltersButton}
+                                                    onPress={() => {
+                                                        this.setState({
+                                                            selectedSize: null,
+                                                            selectedColor: null,
+                                                            selectedMaterial: null,
+                                                            selectedSortBy: 'featured'
+                                                        }, () => this.applyFilters());
+                                                    }}
+                                                >
+                                                    <Text style={styles.clearFiltersText}>Clear All Filters</Text>
+                                                </TouchableOpacity>
+                                            )}
+                                        </View>
+                                    )}
 
                                     {/* Pagination - Only show if there are products and multiple pages */}
                                     {productCount > itemsPerPage && (
@@ -484,31 +478,11 @@ const styles = StyleSheet.create({
     },
     contentContainer: {
         flexDirection: 'row',
-        paddingHorizontal: 20,
+        paddingHorizontal: 50,
         paddingVertical: 30,
     },
-    sidebar: {
-        width: isMobile() ? 0 : '20%',
-        display: isMobile() ? 'none' : 'flex',
-        paddingRight: 30,
-    },
-    sidebarSection: {
-        marginBottom: 25,
-    },
-    sidebarHeader: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginBottom: 10,
-    },
-    sidebarItem: {
-        marginBottom: 8,
-    },
-    sidebarItemText: {
-        fontSize: 14,
-        color: '#666',
-    },
     mainContent: {
-        width: isMobile() ? '100%' : '80%',
+        width: '100%',
     },
     categoryHeader: {
         marginBottom: 30,
@@ -607,33 +581,72 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: '#000',
     },
-    noProductsContainer: {
+    emptyStateContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        paddingVertical: 50,
+        paddingVertical: 80,
+        paddingHorizontal: 40,
+        minHeight: 400,
     },
-    noProductsText: {
+    emptyStateIcon: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#F5F5F5',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 24,
+    },
+    emptyIconText: {
+        fontSize: 48,
+    },
+    emptyStateTitle: {
+        fontSize: 24,
+        fontWeight: '600',
+        color: '#2C2C2C',
+        marginBottom: 12,
+        textAlign: 'center',
+    },
+    emptyStateSubtitle: {
         fontSize: 16,
         color: '#666',
+        textAlign: 'center',
+        lineHeight: 24,
+        maxWidth: 450,
+        marginBottom: 24,
+    },
+    clearFiltersButton: {
+        paddingHorizontal: 24,
+        paddingVertical: 12,
+        backgroundColor: '#2C2C2C',
+        borderRadius: 4,
+        marginTop: 8,
+    },
+    clearFiltersText: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        fontWeight: '500',
+        letterSpacing: 0.5,
+        textTransform: 'uppercase',
     },
     productGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        marginHorizontal: -10,  // Negative margin for gap
-        gap: 20,  // Space between cards
+        marginHorizontal: -10,
+        gap: 15,
     },
     productCard: {
-        width: isMobile() ? '48%' : '32%',  // 3 columns on desktop, 2 on mobile
-        marginBottom: 30,
+        width: isMobile() ? '48%' : '23%',  // 4 columns on desktop, 2 on mobile
+        marginBottom: 25,
         backgroundColor: '#fff',
         overflow: 'visible',
     },
     productImageContainer: {
         position: 'relative',
         width: '100%',
-        height: isMobile() ? 320 : 450,  // Taller for 3-column layout
-        marginBottom: 10,
+        height: isMobile() ? 280 : 320,  // Reduced height
+        marginBottom: 8,
         backgroundColor: '#f9f9f9',
         overflow: 'hidden',
     },
