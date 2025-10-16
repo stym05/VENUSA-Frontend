@@ -14,7 +14,7 @@ import {
 import { CheckBox } from 'react-native-elements';
 import { Picker } from '@react-native-picker/picker';
 import { useRazorpay, RazorpayOrderOptions } from "react-razorpay";
-import { createAddress, getUserAddress, getCartItem, createOrderAPI } from '../apis';
+import { createAddress, getUserAddress, getCartItem, createOrderAPI, createRazorpayOrder, verifyRazorpayPayment, getRazorpayKey } from '../apis';
 import { useSelector } from 'react-redux';
 import Store from '../store';
 
@@ -153,12 +153,12 @@ const CheckoutScreen = (props) => {
 
             const response = await createOrderAPI(orderPayload);
 
-            if (response.success) {
-                console.log('Order created:', response.order);
+            if (response.success && response.data) {
+                console.log('Order created:', response.data);
                 // Proceed to payment
-                handlePayment(response.order);
+                handlePayment(response.data);
             } else {
-                alert('Failed to create order');
+                alert('Failed to create order: ' + (response.message || 'Unknown error'));
             }
         } catch (error) {
             console.error("Error creating order:", error);
@@ -166,33 +166,74 @@ const CheckoutScreen = (props) => {
         }
     }
 
-    const handlePayment = async () => {
+    const handlePayment = async (order) => {
         try {
+            // Get Razorpay key from backend
+            const keyResponse = await getRazorpayKey();
+            if (!keyResponse.success) {
+                alert('Failed to initialize payment');
+                return;
+            }
+
+            // Create Razorpay order
+            const razorpayOrderData = {
+                amount: Math.round(order.totalAmount * 100), // Convert to paise
+                order_id: order.orderId
+            };
+
+            const razorpayOrderResponse = await createRazorpayOrder(razorpayOrderData);
+            if (!razorpayOrderResponse.success) {
+                alert('Failed to create payment order');
+                return;
+            }
+
             const options = {
-                key: "rzp_test_EqSp950wLrSSjT",
-                amount: 50000, // Amount in paise
-                currency: "INR",
-                name: "Test Company",
-                description: "Test Transaction",
-                // order_id: "order_9A33XWu170gUtm", // Generate order_id on server
-                handler: (response) => {
-                    console.log(response);
-                    alert("Payment Successful!");
+                key: keyResponse.key_id,
+                amount: razorpayOrderResponse.data.amount,
+                currency: razorpayOrderResponse.data.currency,
+                name: "VENUSA",
+                description: `Order #${order.orderNumber}`,
+                order_id: razorpayOrderResponse.data.razorpay_order_id,
+                handler: async (response) => {
+                    console.log("Payment response:", response);
+
+                    // Verify payment
+                    const verifyData = {
+                        razorpay_order_id: response.razorpay_order_id,
+                        razorpay_payment_id: response.razorpay_payment_id,
+                        razorpay_signature: response.razorpay_signature,
+                        order_id: order.orderId
+                    };
+
+                    const verifyResponse = await verifyRazorpayPayment(verifyData);
+                    if (verifyResponse.success) {
+                        alert("Payment Successful! Order confirmed.");
+                        // Navigate to order confirmation page
+                        props.navigation.navigate('Dashboard');
+                    } else {
+                        alert("Payment verification failed. Please contact support.");
+                    }
                 },
                 prefill: {
-                    name: "John Doe",
-                    email: "john.doe@example.com",
-                    contact: "9999999999",
+                    name: `${firstName} ${lastName}`,
+                    email: email,
+                    contact: phone,
                 },
                 theme: {
-                    color: "#F37254",
+                    color: "#1A1A1A",
                 },
+                modal: {
+                    ondismiss: function() {
+                        console.log('Payment cancelled by user');
+                    }
+                }
             };
 
             const razorpayInstance = new Razorpay(options);
             razorpayInstance.open();
         } catch (error) {
             console.error("Error during payment:", error);
+            alert("Payment failed. Please try again.");
         }
     };
 

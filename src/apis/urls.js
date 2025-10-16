@@ -12,10 +12,11 @@ export const URL = {
     CREATE_SUBSCRIBER: "/api/subscriber/create",
 
     // Auth
-    GENRATE_OTP: "/api/auth/send-otp/",
-    VALIDATE_OTP: "/api/auth/verify-otp/",
-    SIGNUP: "/api/auth/signup",
-    SEND_OTP_MOB_NUM: "/api/auth/send-otp-mobile/",
+    GENRATE_OTP: "/apis/auth/send-otp/",
+    VALIDATE_OTP: "/apis/auth/verify-otp/",
+    SIGNUP: "/apis/auth/signup/",
+    LOGIN: "/apis/auth/login/",
+    SEND_OTP_MOB_NUM: "/apis/auth/send-otp-mobile/",
 
     // Cart
     GET_CART_ITEMS: "/api/transactions/cart",
@@ -44,4 +45,9 @@ export const URL = {
     GET_CUSTOMER_ADDRESS: "/api/addresses/customer",
     CREATE_ADDRESS: "/api/addresses",
     CREATE_PRE_ORDER: "/api/order/createPreOrder",
+
+    // Payment (Razorpay)
+    CREATE_RAZORPAY_ORDER: "/api/transactions/payment/create-razorpay-order/",
+    VERIFY_RAZORPAY_PAYMENT: "/api/transactions/payment/verify-payment/",
+    GET_RAZORPAY_KEY: "/api/transactions/payment/razorpay-key/",
 }

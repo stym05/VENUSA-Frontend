@@ -14,8 +14,10 @@ import {
 import Item from "./item";
 import { isMobile } from "../../utils";
 import Footer from "../../components/footer";
-import { getProductBySubCategory } from "../../apis";
+import { getProductBySubCategory, AddToWishList, removeFromWishList, getWishList } from "../../apis";
 import { ProductGridSkeleton } from "../../components/SkeletonLoader/index";
+import Store from "../../store";
+import Toast from "react-native-toast-message";
 
 class ItemSection extends React.Component {
     constructor(props) {
@@ -58,7 +60,9 @@ class ItemSection extends React.Component {
             productCount: 0,
             currentPage: 1,
             itemsPerPage: 20,  // 4 columns × 5 rows
-            openDropdown: null  // Track which dropdown is open
+            openDropdown: null,  // Track which dropdown is open
+            wishlistItems: [],  // Store wishlist product IDs
+            wishlistLoading: false
         };
     }
 
@@ -107,6 +111,9 @@ class ItemSection extends React.Component {
                     availableMaterials,
                     loading: false
                 }, () => this.applyFilters());
+
+                // Load wishlist
+                await this.loadWishlist();
             } else if (response && response.error) {
                 console.log("API Error:", response.error);
                 this.setState({ loading: false });
@@ -116,6 +123,22 @@ class ItemSection extends React.Component {
         } catch (err) {
             console.log("Error fetching products: ", err);
             this.setState({ loading: false });
+        }
+    };
+
+    loadWishlist = async () => {
+        try {
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id || userData?.userId;
+            if (!userId) return;
+
+            const response = await getWishList(userId);
+            if (response && response.success && response.data) {
+                const wishlistProductIds = response.data.map(item => item.product.productId);
+                this.setState({ wishlistItems: wishlistProductIds });
+            }
+        } catch (err) {
+            console.log("Error loading wishlist:", err);
         }
     };
 
@@ -174,6 +197,69 @@ class ItemSection extends React.Component {
         this.setState(prevState => ({
             openDropdown: prevState.openDropdown === dropdownName ? null : dropdownName
         }));
+    };
+
+    handleToggleWishlist = async (productId, e) => {
+        e.stopPropagation(); // Prevent navigation to product detail
+
+        try {
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id || userData?.userId;
+            if (!userId) {
+                Toast.show({
+                    text1: "Please login to add to wishlist",
+                    type: "error",
+                    visibilityTime: 3000
+                });
+                return;
+            }
+
+            const { wishlistItems } = this.state;
+            const isInWishlist = wishlistItems.includes(productId);
+
+            if (isInWishlist) {
+                // Remove from wishlist
+                const payload = {
+                    user: userId,
+                    product: productId
+                };
+                const response = await removeFromWishList(payload);
+                if (response && response.success) {
+                    this.setState({
+                        wishlistItems: wishlistItems.filter(id => id !== productId)
+                    });
+                    Toast.show({
+                        text1: "Removed from wishlist",
+                        type: "success",
+                        visibilityTime: 2000
+                    });
+                }
+            } else {
+                // Add to wishlist
+                const payload = {
+                    user: userId,
+                    product: productId
+                };
+                const response = await AddToWishList(payload);
+                if (response && response.success) {
+                    this.setState({
+                        wishlistItems: [...wishlistItems, productId]
+                    });
+                    Toast.show({
+                        text1: "Added to wishlist!",
+                        type: "success",
+                        visibilityTime: 2000
+                    });
+                }
+            }
+        } catch (err) {
+            console.log("Error toggling wishlist:", err);
+            Toast.show({
+                text1: "Something went wrong",
+                type: "error",
+                visibilityTime: 3000
+            });
+        }
     };
 
     renderFilterDropdown = (label, stateKey, options, displayFn = (val) => val, valueFn = (val) => val) => {
@@ -268,6 +354,9 @@ class ItemSection extends React.Component {
             // Check if product has discount
             const hasDiscount = productDiscount > 0 || productDiscountPerc > 0;
 
+            // Check if product is in wishlist
+            const isInWishlist = this.state.wishlistItems.includes(productId);
+
             return (
                 <TouchableOpacity
                     key={productId || index}
@@ -292,8 +381,13 @@ class ItemSection extends React.Component {
                             </View>
                         )}
                         {/* Wishlist heart at bottom-right */}
-                        <TouchableOpacity style={styles.wishlistButton}>
-                            <Text style={styles.wishlistIcon}>♡</Text>
+                        <TouchableOpacity
+                            style={styles.wishlistButton}
+                            onPress={(e) => this.handleToggleWishlist(productId, e)}
+                        >
+                            <Text style={styles.wishlistIcon}>
+                                {isInWishlist ? '♥' : '♡'}
+                            </Text>
                         </TouchableOpacity>
                     </View>
                     <View style={styles.productInfo}>

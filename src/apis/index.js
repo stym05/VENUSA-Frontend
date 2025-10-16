@@ -210,6 +210,22 @@ export const signupUser = async (data) => {
     }
 };
 
+export const loginUser = async (data) => {
+    try {
+        const response = await fetch(DOMAIN + URL.LOGIN, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in loginUser", err);
+        return err;
+    }
+};
+
 export const sendOTPForMobile = async (data) => {
     try {
         const response = await fetch(DOMAIN + URL.SEND_OTP_MOB_NUM, {
@@ -368,6 +384,52 @@ export const createOrderAPI = async (data) => {
         return await response.json();
     } catch (err) {
         console.log("error in createOrderAPI", err);
+        return err;
+    }
+}
+
+// Payment APIs
+export const createRazorpayOrder = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.CREATE_RAZORPAY_ORDER, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in createRazorpayOrder", err);
+        return err;
+    }
+}
+
+export const verifyRazorpayPayment = async (data) => {
+    try {
+        const headers = await setAuthorizationHeader();
+        const response = await fetch(DOMAIN + URL.VERIFY_RAZORPAY_PAYMENT, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data),
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in verifyRazorpayPayment", err);
+        return err;
+    }
+}
+
+export const getRazorpayKey = async () => {
+    try {
+        const response = await fetch(DOMAIN + URL.GET_RAZORPAY_KEY, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        return await response.json();
+    } catch (err) {
+        console.log("error in getRazorpayKey", err);
         return err;
     }
 }

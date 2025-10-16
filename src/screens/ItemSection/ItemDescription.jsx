@@ -12,7 +12,7 @@ import {
     Platform
 } from "react-native";
 import Footer from "../../components/footer";
-import { addToCart, getProductById } from "../../apis";
+import { addToCart, getProductById, AddToWishList, removeFromWishList, getWishList } from "../../apis";
 import Store from "../../store";
 import Toast from "react-native-toast-message";
 
@@ -58,7 +58,9 @@ class ItemDescription extends React.Component {
             selectedColor: null,
             materials: [],
             keyFeatures: [],
-            stocks: []
+            stocks: [],
+            isInWishlist: false,
+            wishlistLoading: false
         };
     }
 
@@ -125,12 +127,31 @@ class ItemDescription extends React.Component {
                     stocks: response.stocks || [],
                     isLoading: false
                 });
+
+                // Check if product is in wishlist
+                await this.checkWishlistStatus();
             } else {
                 this.setState({ isLoading: false });
             }
         } catch (err) {
             console.log("ItemDescription error:", err);
             this.setState({ isLoading: false });
+        }
+    }
+
+    checkWishlistStatus = async () => {
+        try {
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id || userData?.userId;
+            if (!userId) return;
+
+            const response = await getWishList(userId);
+            if (response && response.success && response.data) {
+                const isInWishlist = response.data.some(item => item.product.productId === this.state.productId);
+                this.setState({ isInWishlist });
+            }
+        } catch (err) {
+            console.log("Error checking wishlist:", err);
         }
     }
 
@@ -161,7 +182,8 @@ class ItemDescription extends React.Component {
                 return;
             }
 
-            const userId = Store.getState().user.userData._id;
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id || userData?.userId;
             const payload = {
                 userId,
                 productId,
@@ -193,6 +215,81 @@ class ItemDescription extends React.Component {
         }
     }
 
+    handleToggleWishlist = async () => {
+        try {
+            const { productId, selectedSize, selectedColor, isInWishlist } = this.state;
+            const userData = Store.getState().user.userData;
+            const userId = userData?._id || userData?.userId;
+
+            if (!userId) {
+                Toast.show({
+                    text1: "Please login to add to wishlist",
+                    type: "error",
+                    visibilityTime: 3000
+                });
+                return;
+            }
+
+            this.setState({ wishlistLoading: true });
+
+            if (isInWishlist) {
+                // Remove from wishlist
+                const payload = {
+                    user: userId,
+                    product: productId
+                };
+                const response = await removeFromWishList(payload);
+                if (response && response.success) {
+                    this.setState({ isInWishlist: false, wishlistLoading: false });
+                    Toast.show({
+                        text1: "Removed from wishlist",
+                        type: "success",
+                        visibilityTime: 2000
+                    });
+                } else {
+                    this.setState({ wishlistLoading: false });
+                    Toast.show({
+                        text1: "Failed to remove from wishlist",
+                        type: "error",
+                        visibilityTime: 3000
+                    });
+                }
+            } else {
+                // Add to wishlist
+                const payload = {
+                    user: userId,
+                    product: productId,
+                    size: selectedSize || null,
+                    color: selectedColor || null
+                };
+                const response = await AddToWishList(payload);
+                if (response && response.success) {
+                    this.setState({ isInWishlist: true, wishlistLoading: false });
+                    Toast.show({
+                        text1: "Added to wishlist!",
+                        type: "success",
+                        visibilityTime: 2000
+                    });
+                } else {
+                    this.setState({ wishlistLoading: false });
+                    Toast.show({
+                        text1: "Failed to add to wishlist",
+                        type: "error",
+                        visibilityTime: 3000
+                    });
+                }
+            }
+        } catch (err) {
+            console.log("Error toggling wishlist:", err);
+            this.setState({ wishlistLoading: false });
+            Toast.show({
+                text1: "Something went wrong",
+                type: "error",
+                visibilityTime: 3000
+            });
+        }
+    }
+
     render() {
         const {
             isLoading,
@@ -208,7 +305,9 @@ class ItemDescription extends React.Component {
             selectedColor,
             materials,
             keyFeatures,
-            productData
+            productData,
+            isInWishlist,
+            wishlistLoading
         } = this.state;
 
         const hasDiscount = price > discountedPrice;
@@ -376,14 +475,25 @@ class ItemDescription extends React.Component {
                                 </View>
                             )}
 
-                            {/* Add to Cart Button */}
-                            <TouchableOpacity
-                                style={styles.addToCartButton}
-                                onPress={this.handleAddToCart}
-                                disabled={!selectedSize || !selectedColor}
-                            >
-                                <Text style={styles.addToCartText}>Add to Cart</Text>
-                            </TouchableOpacity>
+                            {/* Action Buttons */}
+                            <View style={styles.actionButtonsContainer}>
+                                <TouchableOpacity
+                                    style={styles.wishlistButtonLarge}
+                                    onPress={this.handleToggleWishlist}
+                                    disabled={wishlistLoading}
+                                >
+                                    <Text style={styles.wishlistIconLarge}>
+                                        {isInWishlist ? '♥' : '♡'}
+                                    </Text>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={[styles.addToCartButton, (!selectedSize || !selectedColor) && styles.disabledButton]}
+                                    onPress={this.handleAddToCart}
+                                    disabled={!selectedSize || !selectedColor}
+                                >
+                                    <Text style={styles.addToCartText}>Add to Cart</Text>
+                                </TouchableOpacity>
+                            </View>
 
                             {/* Additional Info */}
                             <View style={styles.additionalInfo}>
@@ -634,12 +744,35 @@ const styles = StyleSheet.create({
     selectedSizeText: {
         color: '#FFFFFF',
     },
+    actionButtonsContainer: {
+        flexDirection: 'row',
+        gap: 12,
+        marginTop: 10,
+        marginBottom: 24,
+    },
+    wishlistButtonLarge: {
+        backgroundColor: '#FFFFFF',
+        borderWidth: 2,
+        borderColor: '#2C2C2C',
+        paddingVertical: 12,
+        paddingHorizontal: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+        minWidth: 60,
+    },
+    wishlistIconLarge: {
+        fontSize: 22,
+        color: '#2C2C2C',
+    },
     addToCartButton: {
         backgroundColor: '#2C2C2C',
         paddingVertical: 14,
         alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 24,
+        flex: 1,
+    },
+    disabledButton: {
+        backgroundColor: '#999',
+        opacity: 0.6,
     },
     addToCartText: {
         fontFamily: 'Roboto',
