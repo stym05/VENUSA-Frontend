@@ -54,7 +54,7 @@ class ShopCategories extends Component {
         }
     }
 
-    componentDidMount = async () => {
+    loadCategoryData = async () => {
         try {
             let {
                 categoryId,
@@ -107,9 +107,40 @@ class ShopCategories extends Component {
             console.log("error in shopCategories is = ", err);
             this.setState({ isloading: false });
         }
+    }
 
+    componentDidMount = async () => {
+        await this.loadCategoryData();
         // Listen for orientation changes
         this.dimensionsSubscription = Dimensions.addEventListener('change', this.handleOrientationChange);
+    }
+
+    componentDidUpdate(prevProps) {
+        // Check if navigation params changed
+        const prevParams = prevProps.route?.params || {};
+        const currentParams = this.props.route?.params || {};
+
+        const prevCategoryId = prevParams.categoryId || "";
+        const prevType = prevParams.type || "";
+        const currentCategoryId = currentParams.categoryId || "";
+        const currentType = currentParams.type || "";
+
+        // If category changed, reload data
+        if (prevCategoryId !== currentCategoryId || prevType !== currentType) {
+            console.log("Category params changed, reloading data...");
+            this.setState(
+                {
+                    categoryId: currentCategoryId,
+                    type: currentType,
+                    subCategory: [],
+                    categoryImage: null
+                },
+                () => {
+                    // Reload data after state is updated
+                    this.loadCategoryData();
+                }
+            );
+        }
     }
 
     componentWillUnmount() {

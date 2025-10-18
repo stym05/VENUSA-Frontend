@@ -144,13 +144,25 @@ class Cart extends Component {
                             <View style={styles.cartItemsContainer}>
                                 {cartProducts.map((item, index) => (
                                     <View key={index} style={styles.cartItem}>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => this.props.navigation.navigate('ItemDescription', {
+                                                productId: item.product.productId,
+                                                productName: item.product.name
+                                            })}
+                                        >
                                             <Image source={{ uri: item.product.images[0] }} style={styles.image} />
                                         </TouchableOpacity>
                                         <View style={styles.cartItemDetails}>
                                             <View style={styles.cartItemHeader}>
                                                 <View style={styles.cartItemInfo}>
-                                                    <Text style={styles.text}>{item.product.name}</Text>
+                                                    <TouchableOpacity
+                                                        onPress={() => this.props.navigation.navigate('ItemDescription', {
+                                                            productId: item.product.productId,
+                                                            productName: item.product.name
+                                                        })}
+                                                    >
+                                                        <Text style={styles.text}>{item.product.name}</Text>
+                                                    </TouchableOpacity>
                                                     <Text style={styles.text2}>Size: {item.size}</Text>
                                                     <Text style={styles.text2}>Color: {item.color}</Text>
                                                     <View style={styles.quantityContainer}>

@@ -66,7 +66,7 @@ class ItemSection extends React.Component {
         };
     }
 
-    componentDidMount = async () => {
+    loadProducts = async () => {
         try {
             const { subCategoryId } = this.state;
             this.setState({ loading: true });
@@ -125,6 +125,43 @@ class ItemSection extends React.Component {
             this.setState({ loading: false });
         }
     };
+
+    componentDidMount = async () => {
+        await this.loadProducts();
+    };
+
+    componentDidUpdate(prevProps) {
+        // Check if navigation params changed
+        const prevParams = prevProps.route?.params || {};
+        const currentParams = this.props.route?.params || {};
+
+        const prevSubCategoryId = prevParams.subCategoryId || "";
+        const prevProductName = prevParams.productName || "";
+        const currentSubCategoryId = currentParams.subCategoryId || "";
+        const currentProductName = currentParams.productName || "";
+
+        // If subcategory changed, reload products
+        if (prevSubCategoryId !== currentSubCategoryId || prevProductName !== currentProductName) {
+            console.log("SubCategory params changed, reloading products...");
+            this.setState(
+                {
+                    subCategoryId: currentSubCategoryId,
+                    productName: currentProductName,
+                    productarray: [],
+                    filteredProducts: [],
+                    selectedSortBy: 'featured',
+                    selectedSize: null,
+                    selectedColor: null,
+                    selectedMaterial: null,
+                    currentPage: 1
+                },
+                () => {
+                    // Reload products after state is updated
+                    this.loadProducts();
+                }
+            );
+        }
+    }
 
     loadWishlist = async () => {
         try {

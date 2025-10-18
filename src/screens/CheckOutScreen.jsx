@@ -542,17 +542,30 @@ const CheckoutScreen = (props) => {
 
                                     return (
                                         <View key={item._id || index} style={styles.cartItem}>
-                                            <View style={styles.productImageContainer}>
+                                            <TouchableOpacity
+                                                style={styles.productImageContainer}
+                                                onPress={() => props.navigation.navigate('ItemDescription', {
+                                                    productId: product.productId || product._id,
+                                                    productName: product.name
+                                                })}
+                                            >
                                                 <Image
                                                     source={{ uri: product.images?.[0] || 'https://via.placeholder.com/80' }}
                                                     style={styles.productImage}
                                                 />
-                                            </View>
+                                            </TouchableOpacity>
 
                                             <View style={styles.productDetails}>
                                                 <View style={styles.productInfoContainer}>
                                                     <View>
-                                                        <Text style={styles.productName}>{product.name || 'Unknown Product'}</Text>
+                                                        <TouchableOpacity
+                                                            onPress={() => props.navigation.navigate('ItemDescription', {
+                                                                productId: product.productId || product._id,
+                                                                productName: product.name
+                                                            })}
+                                                        >
+                                                            <Text style={styles.productName}>{product.name || 'Unknown Product'}</Text>
+                                                        </TouchableOpacity>
                                                         {item.size && <Text style={styles.productSize}>Size: {item.size}</Text>}
                                                         {item.color && <Text style={styles.productSize}>Color: {item.color}</Text>}
                                                     </View>

@@ -143,13 +143,25 @@ class WishList extends React.Component {
                             <View style={styles.listContainer}>
                                 {Array.isArray(cartProducts) && cartProducts.map((item) => (
                                     <View key={item._id} style={styles.itemRow}>
-                                        <TouchableOpacity>
+                                        <TouchableOpacity
+                                            onPress={() => this.props.navigation.navigate('ItemDescription', {
+                                                productId: item?.product?.productId || item?.product?._id,
+                                                productName: item?.product?.name
+                                            })}
+                                        >
                                             <Image source={{ uri: item?.product?.images[0] }} style={styles.image} />
                                         </TouchableOpacity>
                                         <View style={styles.itemDetails}>
                                             <View style={styles.itemHeader}>
                                                 <View style={styles.itemInfo}>
-                                                    <Text style={styles.text}>{item?.product?.name}</Text>
+                                                    <TouchableOpacity
+                                                        onPress={() => this.props.navigation.navigate('ItemDescription', {
+                                                            productId: item?.product?.productId || item?.product?._id,
+                                                            productName: item?.product?.name
+                                                        })}
+                                                    >
+                                                        <Text style={styles.text}>{item?.product?.name}</Text>
+                                                    </TouchableOpacity>
                                                     <Text style={styles.text2}>Size: {item?.product?.stock?.[0]?.size || "N/A"}</Text>
                                                     <Text style={styles.text}>₹{item?.product?.price}</Text>
                                                 </View>

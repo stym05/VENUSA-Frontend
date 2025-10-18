@@ -16,7 +16,7 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { isMobile } from "../../utils/index.js";
 import { useNavigation } from '@react-navigation/native';
 import Store from "../../store/index.js";
-import { getAllCategories } from '../../apis/index.js';
+import { getAllCategories, getSubCategorieById } from '../../apis/index.js';
 
 const Header = (props) => {
   const navigation = useNavigation();
@@ -28,6 +28,7 @@ const Header = (props) => {
   const [profileDropdownVisible, setProfileDropdownVisible] = useState(false);
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [categories, setCategories] = useState({});
+  const [subCategories, setSubCategories] = useState({ mens: [], womens: [], sale: [] });
   const [isLoading, setIsLoading] = useState(false);
 
   // Animated values for smooth transitions
@@ -60,9 +61,9 @@ const Header = (props) => {
     }).start();
   };
 
-  // Fetch categories on component mount
+  // Fetch categories and subcategories on component mount
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchCategoriesAndSubcategories = async () => {
       try {
         setIsLoading(true);
         const allCategoriesData = await getAllCategories();
@@ -74,12 +75,62 @@ const Header = (props) => {
           data.forEach((item) => {
             categoriesObj[item.name] = {
               id: item._id,
+              categoryId: item.categoryId,
               categoryImage: item.image,
               category: item.name,
             }
           });
 
           setCategories(categoriesObj);
+
+          // Fetch subcategories for Mens, Womens, and Sale
+          const fetchSubcategories = async () => {
+            const mensCategory = categoriesObj["Mens"] || categoriesObj["mens"];
+            const womensCategory = categoriesObj["Womens"] || categoriesObj["womens"];
+            const saleCategory = categoriesObj["Sale"] || categoriesObj["sale"];
+
+            let subCategoriesData = { mens: [], womens: [], sale: [] };
+
+            // Fetch Men's subcategories
+            if (mensCategory?.categoryId) {
+              try {
+                const mensSubCats = await getSubCategorieById(mensCategory.categoryId);
+                if (mensSubCats && mensSubCats.success) {
+                  subCategoriesData.mens = mensSubCats.subCategory || [];
+                }
+              } catch (err) {
+                console.log("Error fetching men's subcategories:", err);
+              }
+            }
+
+            // Fetch Women's subcategories
+            if (womensCategory?.categoryId) {
+              try {
+                const womensSubCats = await getSubCategorieById(womensCategory.categoryId);
+                if (womensSubCats && womensSubCats.success) {
+                  subCategoriesData.womens = womensSubCats.subCategory || [];
+                }
+              } catch (err) {
+                console.log("Error fetching women's subcategories:", err);
+              }
+            }
+
+            // Fetch Sale subcategories
+            if (saleCategory?.categoryId) {
+              try {
+                const saleSubCats = await getSubCategorieById(saleCategory.categoryId);
+                if (saleSubCats && saleSubCats.success) {
+                  subCategoriesData.sale = saleSubCats.subCategory || [];
+                }
+              } catch (err) {
+                console.log("Error fetching sale subcategories:", err);
+              }
+            }
+
+            setSubCategories(subCategoriesData);
+          };
+
+          await fetchSubcategories();
         }
       } catch (err) {
         console.log("Error fetching categories:", err);
@@ -88,7 +139,7 @@ const Header = (props) => {
       }
     };
 
-    fetchCategories();
+    fetchCategoriesAndSubcategories();
   }, []);
 
   // Effect to manage men dropdown visibility
@@ -198,24 +249,36 @@ const Header = (props) => {
   // Handle navigation to shop categories
   const navigateToCategory = (categoryType) => {
     // Determine which category to use based on categoryType
-    const categoryKey = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
-    const category = categories[categoryKey];
+    const categoryKeyLower = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
+    const categoryKeyCapital = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
+    const type = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
 
-    console.log("Navigating to:", categoryKey, category);
+    // Try to find the category with either lowercase or capitalized name
+    const category = categories[categoryKeyCapital] || categories[categoryKeyLower];
 
-    if (category || categoryType === "sale") {
-      // Force navigation with key to ensure screen refreshes
-      navigation.navigate("ShopCategories", {
-        categorie: category || { category: "sale" },
-        key: Date.now() // Add a unique key to force refresh
-      });
-    } else {
-      // Fallback if category not loaded yet
-      navigation.navigate("ShopCategories", {
-        category: categoryKey,
-        key: Date.now() // Add a unique key to force refresh
-      });
-    }
+    console.log("Navigating to:", categoryKeyCapital, category);
+
+    // Navigate with categoryId and type, matching Dashboard navigation
+    navigation.navigate("ShopCategories", {
+      categoryId: category?.categoryId || "",
+      type: type
+    });
+
+    // Close dropdowns
+    setMenDropdownVisible(false);
+    setWomenDropdownVisible(false);
+    setSaleDropdownVisible(false);
+    setProfileDropdownVisible(false);
+  };
+
+  // Handle navigation to subcategory/item section
+  const navigateToSubCategory = (subCategoryId, subCategoryName) => {
+    console.log("Navigating to subcategory:", subCategoryId, subCategoryName);
+
+    navigation.navigate("ItemSection", {
+      subCategoryId: subCategoryId,
+      productName: subCategoryName
+    });
 
     // Close dropdowns
     setMenDropdownVisible(false);
@@ -278,6 +341,16 @@ const Header = (props) => {
       ],
     };
 
+    // Get subcategories for the category
+    let subCategoryList = [];
+    if (category === "men") {
+      subCategoryList = subCategories.mens || [];
+    } else if (category === "women") {
+      subCategoryList = subCategories.womens || [];
+    } else if (category === "sale") {
+      subCategoryList = subCategories.sale || [];
+    }
+
     return (
       <Animated.View
         style={[
@@ -298,20 +371,44 @@ const Header = (props) => {
           else setIsHoveringSaleDropdown(false);
         }}
       >
+        {/* "View All" option to navigate to main category */}
         <TouchableOpacity onPress={() => navigateToCategory(category)}>
-          <Text style={styles.dropdownItem}>
-            {category === "men" ? "T-Shirts" :
-              category === "women" ? "Tops" :
-                "Men's Sale"}
+          <Text style={[styles.dropdownItem, styles.viewAllItem]}>
+            View All {category === "men" ? "Men's" : category === "women" ? "Women's" : "Sale"}
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigateToCategory(category)}>
-          <Text style={styles.dropdownItem}>
-            {category === "men" ? "Pants" :
-              category === "women" ? "Dresses" :
-                "Women's Sale"}
-          </Text>
-        </TouchableOpacity>
+
+        {/* Render subcategories from API */}
+        {subCategoryList.length > 0 ? (
+          subCategoryList.slice(0, 6).map((subCat, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => navigateToSubCategory(subCat.subCategoryId, subCat.name)}
+            >
+              <Text style={styles.dropdownItem}>
+                {subCat.name}
+              </Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          // Fallback to default items if no subcategories loaded
+          <>
+            <TouchableOpacity onPress={() => navigateToCategory(category)}>
+              <Text style={styles.dropdownItem}>
+                {category === "men" ? "T-Shirts" :
+                  category === "women" ? "Tops" :
+                    "View All"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigateToCategory(category)}>
+              <Text style={styles.dropdownItem}>
+                {category === "men" ? "Pants" :
+                  category === "women" ? "Dresses" :
+                    "View All"}
+              </Text>
+            </TouchableOpacity>
+          </>
+        )}
       </Animated.View>
     );
   };
@@ -552,6 +649,13 @@ const styles = StyleSheet.create({
     fontFamily: "Jura",
     borderRadius: 4,
     marginVertical: 2,
+  },
+  viewAllItem: {
+    fontWeight: "bold",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+    paddingBottom: 10,
+    marginBottom: 5,
   },
   saleText: {
     color: "#b42124",

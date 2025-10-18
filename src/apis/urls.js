@@ -16,7 +16,7 @@ export const URL = {
     VALIDATE_OTP: "/apis/auth/verify-otp/",
     SIGNUP: "/apis/auth/signup/",
     LOGIN: "/apis/auth/login/",
-    SEND_OTP_MOB_NUM: "/apis/auth/send-otp-mobile/",
+    SEND_OTP_MOB_NUM: "/apis/auth/send-otp/",
 
     // Cart
     GET_CART_ITEMS: "/api/transactions/cart",

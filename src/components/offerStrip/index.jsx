@@ -45,32 +45,22 @@ const OfferStrip = () => {
 
     const navigateToCategory = (categoryType) => {
         // Determine which category to use based on categoryType
-        const categoryKey = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
-        const category = categories[categoryKey];
+        // Try both lowercase and capitalized versions to match API response
+        const categoryKeyLower = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
+        const categoryKeyCapital = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
+        const type = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
 
-        console.log("Navigating to:", categoryKey, category);
+        // Try to find the category with either lowercase or capitalized name
+        const category = categories[categoryKeyCapital] || categories[categoryKeyLower];
 
-        if (category || categoryType === "sale") {
-            // Force navigation with key to ensure screen refreshes
-            navigation.navigate("ShopCategories", {
-                categorie: category || { category: "sale" },
-                key: Date.now() // Add a unique key to force refresh
-            });
-        } else {
-            // Fallback if category not loaded yet
-            navigation.navigate("ShopCategories", {
-                category: categoryKey,
-                key: Date.now() // Add a unique key to force refresh
-            });
-        }
-    }
+        console.log("Navigating to:", categoryKeyCapital, category);
+        console.log("Available categories:", Object.keys(categories));
 
-    const navigateToWomenScreen = () => {
-        console.log("navigation to Women screen");
-    }
-
-    const navigateToMenScreen = () => {
-        console.log("navigation to Men screen");
+        // Navigate with categoryId and type, matching Dashboard navigation
+        navigation.navigate("ShopCategories", {
+            categoryId: category?.id || "",
+            type: type
+        });
     }
 
     return (

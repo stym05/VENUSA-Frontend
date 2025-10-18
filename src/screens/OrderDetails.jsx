@@ -11,12 +11,13 @@ import {
     ActivityIndicator,
 } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome5, Feather } from '@expo/vector-icons';
-import { useRoute } from '@react-navigation/native';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { getOrderDetails } from '../apis/index.js';
 import Store from '../store';
 
 const OrderDetails = () => {
     const route = useRoute();
+    const navigation = useNavigation();
     const { orderId } = route.params || {};
     const [orderData, setOrderData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -108,19 +109,31 @@ const OrderDetails = () => {
                 <View style={styles.mainContent}>
                     {/* Side Menu */}
                     <View style={styles.sideMenu}>
-                        <TouchableOpacity style={styles.sideMenuItemActive}>
+                        <TouchableOpacity
+                            style={styles.sideMenuItemActive}
+                            onPress={() => navigation.navigate('OrderHistory')}
+                        >
                             <Ionicons name="document-text-outline" size={20} color="#fff" />
                             <Text style={styles.sideMenuTextActive}>Order History</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.sideMenuItem}>
+                        <TouchableOpacity
+                            style={styles.sideMenuItem}
+                            onPress={() => navigation.navigate('Cart')}
+                        >
                             <Ionicons name="cart-outline" size={20} color="#333" />
                             <Text style={styles.sideMenuText}>Shopping Cart</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.sideMenuItem}>
+                        <TouchableOpacity
+                            style={styles.sideMenuItem}
+                            onPress={() => navigation.navigate('WishList')}
+                        >
                             <Ionicons name="heart-outline" size={20} color="#333" />
                             <Text style={styles.sideMenuText}>Wishlist</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.sideMenuItem}>
+                        <TouchableOpacity
+                            style={styles.sideMenuItem}
+                            onPress={() => navigation.navigate('Address')}
+                        >
                             <Ionicons name="card-outline" size={20} color="#333" />
                             <Text style={styles.sideMenuText}>Cards & Address</Text>
                         </TouchableOpacity>
@@ -130,7 +143,10 @@ const OrderDetails = () => {
                     <View style={styles.orderDetails}>
                         {/* Back button and rating */}
                         <View style={styles.actionBar}>
-                            <TouchableOpacity style={styles.backButton}>
+                            <TouchableOpacity
+                                style={styles.backButton}
+                                onPress={() => navigation.goBack()}
+                            >
                                 <Ionicons name="arrow-back" size={18} color="#333" />
                                 <Text style={styles.backButtonText}>All Orders</Text>
                             </TouchableOpacity>
@@ -268,7 +284,13 @@ const OrderDetails = () => {
 
                                     return (
                                         <View key={index} style={styles.productItem}>
-                                            <View style={styles.productDetails}>
+                                            <TouchableOpacity
+                                                style={styles.productDetails}
+                                                onPress={() => navigation.navigate('ItemDescription', {
+                                                    productId: product.productId || product._id,
+                                                    productName: product.name
+                                                })}
+                                            >
                                                 <Image
                                                     source={{ uri: product.images?.[0] || 'https://via.placeholder.com/60x80/e8f4ff/333' }}
                                                     style={styles.productImage}
@@ -279,7 +301,7 @@ const OrderDetails = () => {
                                                     {item.size && <Text style={styles.productMeta}>Size: {item.size}</Text>}
                                                     {item.color && <Text style={styles.productMeta}>Color: {item.color}</Text>}
                                                 </View>
-                                            </View>
+                                            </TouchableOpacity>
                                             <Text style={styles.productPrice}>₹{price.toFixed(2)}</Text>
                                             <Text style={styles.productQuantity}>x{quantity}</Text>
                                             <Text style={styles.productSubtotal}>₹{subtotal.toFixed(2)}</Text>

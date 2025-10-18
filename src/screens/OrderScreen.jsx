@@ -69,13 +69,19 @@ const OrderHistory = () => {
         }
     };
 
-    // Sidebar items
+    // Sidebar items with navigation routes
     const sidebarItems = [
-        { icon: 'time-outline', text: 'Order History', active: true },
-        { icon: 'cart-outline', text: 'Shopping Cart' },
-        { icon: 'heart-outline', text: 'Wishlist' },
-        { icon: 'card-outline', text: 'Cards & Address' },
+        { icon: 'time-outline', text: 'Order History', active: true, route: 'OrderHistory' },
+        { icon: 'cart-outline', text: 'Shopping Cart', route: 'Cart' },
+        { icon: 'heart-outline', text: 'Wishlist', route: 'WishList' },
+        { icon: 'card-outline', text: 'Cards & Address', route: 'Address' },
     ];
+
+    const handleSidebarNavigation = (route) => {
+        if (route && route !== 'OrderHistory') {
+            navigation.navigate(route);
+        }
+    };
 
     // Pagination items
     const paginationItems = [
@@ -119,6 +125,7 @@ const OrderHistory = () => {
                                     styles.sidebarItem,
                                     item.active && styles.sidebarItemActive
                                 ]}
+                                onPress={() => handleSidebarNavigation(item.route)}
                             >
                                 <Ionicons
                                     name={item.icon}
