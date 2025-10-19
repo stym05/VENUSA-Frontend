@@ -97,21 +97,31 @@ class ItemDescription extends React.Component {
                 const availableSizes = Array.from(sizesSet).sort((a, b) => a - b);
                 const availableColors = Array.from(colorsMap.keys());
 
-                // Calculate discounted price
+                // Get price and discounted price from API
                 const price = parseFloat(response.price || 0);
-                const discount = parseFloat(response.discount || 0);
+                const apiDiscountField = parseFloat(response.discount || 0); // API's discount field = final price
                 const discountPerc = parseFloat(response.discountPerc || 0);
+                console.log("------------price------------", price);
+                console.log("------------discount field (final price)------------", apiDiscountField);
+                console.log("------------discount percentage------------", discountPerc);
 
+                // Use the discount field as final price if it exists and is valid
+                // Otherwise calculate from discount percentage, or fallback to original price
                 let discountedPrice = price;
-                if (discount > 0) {
-                    discountedPrice = price - discount;
+                if (apiDiscountField > 0 && apiDiscountField < price) {
+                    discountedPrice = apiDiscountField;
                 } else if (discountPerc > 0) {
-                    discountedPrice = price * (1 - discountPerc / 100);
+                    discountedPrice = price - (price * discountPerc / 100);
                 }
 
                 // Extract materials and features
-                const materials = response.materials ? response.materials.map(m => m.material) : [];
-                const keyFeatures = response.keyFeatures ? response.keyFeatures.map(f => f.feature) : [];
+                // Handle both array of strings and array of objects
+                const materials = response.materials ? response.materials.map(m =>
+                    typeof m === 'string' ? m : (m.material || m)
+                ) : [];
+                const keyFeatures = response.keyFeatures ? response.keyFeatures.map(f =>
+                    typeof f === 'string' ? f : (f.feature || f)
+                ) : [];
 
                 this.setState({
                     productData: response,
@@ -182,17 +192,34 @@ class ItemDescription extends React.Component {
                 return;
             }
 
+            // Check if user is logged in
             const userData = Store.getState().user.userData;
             const userId = userData?._id || userData?.userId;
+
+            if (!userId) {
+                Toast.show({
+                    text1: "Please login to add items to cart",
+                    type: "error",
+                    visibilityTime: 3000
+                });
+                // Optionally navigate to login
+                // this.props.navigation.navigate('Login');
+                return;
+            }
+
             const payload = {
-                userId,
-                productId,
+                user_id: userId,
+                product_id: productId,
+                quantity: 1,
                 size: selectedSize,
                 color: selectedColor
             };
 
+            console.log("Adding to cart with payload:", payload);
             const response = await addToCart(payload);
-            if (response.success) {
+            console.log("Add to cart response:", response);
+
+            if (response && response.success) {
                 Toast.show({
                     text1: "Added to cart successfully!",
                     type: "success",
@@ -200,7 +227,7 @@ class ItemDescription extends React.Component {
                 });
             } else {
                 Toast.show({
-                    text1: "Failed to add to cart",
+                    text1: response?.message || "Failed to add to cart",
                     type: "error",
                     visibilityTime: 3000
                 });
@@ -208,7 +235,7 @@ class ItemDescription extends React.Component {
         } catch (err) {
             console.log("Error adding to cart:", err);
             Toast.show({
-                text1: "Something went wrong",
+                text1: "Something went wrong. Please try again.",
                 type: "error",
                 visibilityTime: 3000
             });
@@ -297,6 +324,7 @@ class ItemDescription extends React.Component {
             activeImageIndex,
             productName,
             price,
+            discount,
             discountedPrice,
             description,
             availableSizes,
@@ -435,7 +463,12 @@ class ItemDescription extends React.Component {
                                                     { backgroundColor: color },
                                                     selectedColor === color && styles.selectedColorButton
                                                 ]}
-                                                onPress={() => this.setState({ selectedColor: color })}
+                                                onPress={() => {
+                                                    // Toggle color selection - unselect if same color clicked
+                                                    this.setState({
+                                                        selectedColor: selectedColor === color ? null : color
+                                                    });
+                                                }}
                                             />
                                         ))}
                                     </View>
@@ -461,7 +494,12 @@ class ItemDescription extends React.Component {
                                                     styles.sizeButton,
                                                     selectedSize === size && styles.selectedSizeButton
                                                 ]}
-                                                onPress={() => this.setState({ selectedSize: size })}
+                                                onPress={() => {
+                                                    // Toggle size selection - unselect if same size clicked
+                                                    this.setState({
+                                                        selectedSize: selectedSize === size ? null : size
+                                                    });
+                                                }}
                                             >
                                                 <Text style={[
                                                     styles.sizeButtonText,
@@ -489,7 +527,7 @@ class ItemDescription extends React.Component {
                                 <TouchableOpacity
                                     style={[styles.addToCartButton, (!selectedSize || !selectedColor) && styles.disabledButton]}
                                     onPress={this.handleAddToCart}
-                                    disabled={!selectedSize || !selectedColor}
+                                    activeOpacity={(!selectedSize || !selectedColor) ? 1 : 0.7}
                                 >
                                     <Text style={styles.addToCartText}>Add to Cart</Text>
                                 </TouchableOpacity>

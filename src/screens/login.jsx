@@ -503,9 +503,15 @@ export default class Login extends Component {
                       placeholder="Enter your phone number"
                       placeholderTextColor="#9CA3AF"
                       value={formData.email}
-                      onChangeText={(value) => this.handleInputChange('email', value)}
+                      onChangeText={(value) => {
+                        const cleanedValue = value.replace(/[^0-9]/g, '');
+                        if (cleanedValue.length <= 12) {
+                          this.handleInputChange('email', cleanedValue);
+                        }
+                      }}
                       keyboardType="phone-pad"
                       autoCapitalize="none"
+                      maxLength={12}
                     />
                   </View>
 
@@ -657,11 +663,12 @@ export default class Login extends Component {
                       value={formData.phone}
                       onChangeText={(value) => {
                         const cleanedValue = value.replace(/[^0-9]/g, '');
-                        if (cleanedValue.length <= 10) {
+                        if (cleanedValue.length <= 12) {
                           this.handleInputChange('phone', cleanedValue);
                         }
                       }}
                       keyboardType="phone-pad"
+                      maxLength={12}
                     />
                   </View>
 

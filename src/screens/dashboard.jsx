@@ -66,7 +66,36 @@ export default class Dashboard extends Component {
           if (category.subcategories && category.subcategories.length > 0) {
             category.subcategories.forEach((subcat) => {
               if (subcat.products && subcat.products.length > 0) {
-                allProducts = [...allProducts, ...subcat.products];
+                // Map products to ensure proper price structure
+                const mappedProducts = subcat.products.map(product => {
+                  const price = parseFloat(product.price || 0);
+                  const apiDiscountField = parseFloat(product.discount || 0); // API's discount field = final price
+                  const discountPerc = parseFloat(product.discountPerc || 0);
+
+                  // Use the discount field as the final price if it exists and is valid
+                  // Otherwise calculate from discount percentage
+                  let finalPrice = price;
+                  if (apiDiscountField > 0 && apiDiscountField < price) {
+                    finalPrice = apiDiscountField;
+                  } else if (discountPerc > 0) {
+                    finalPrice = price - (price * discountPerc / 100);
+                  }
+
+                  // Handle tags - convert objects to strings if needed
+                  const tags = product.tags ? product.tags.map(t =>
+                    typeof t === 'string' ? t : (t.tag || t.name || t)
+                  ) : [];
+
+                  return {
+                    ...product,
+                    price,
+                    discountedPrice: finalPrice, // This is the final price to display
+                    discountPerc,
+                    hasDiscount: finalPrice < price,
+                    tags
+                  };
+                });
+                allProducts = [...allProducts, ...mappedProducts];
               }
             });
           }
@@ -275,15 +304,16 @@ export default class Dashboard extends Component {
                           <TouchableOpacity
                             key={productIndex}
                             style={styles(theme).productCard}
-                            onPress={() => this.props.navigation.navigate("ProductDetail", {
-                              productId: product.productId
+                            onPress={() => this.props.navigation.navigate("ItemDescription", {
+                              productId: product.productId,
+                              productName: product.productName
                             })}
                           >
                             {/* Product Image */}
                             <View style={styles(theme).productImageContainer}>
                               {product.images && product.images.length > 0 ? (
                                 <Image
-                                  source={{ uri: product.images[0].image }}
+                                  source={{ uri: product.images[0]?.image || product.images[0] }}
                                   style={styles(theme).productImage}
                                   contentFit="cover"
                                 />
@@ -294,10 +324,10 @@ export default class Dashboard extends Component {
                               )}
 
                               {/* Discount Badge */}
-                              {parseFloat(product.discountPerc) > 0 && (
+                              {product.hasDiscount && (
                                 <View style={styles(theme).discountBadge}>
                                   <Text style={styles(theme).discountText}>
-                                    -{product.discountPerc}%
+                                    -{Math.round(product.discountPerc)}%
                                   </Text>
                                 </View>
                               )}
@@ -322,11 +352,11 @@ export default class Dashboard extends Component {
                               {/* Price Section */}
                               <View style={styles(theme).priceContainer}>
                                 <Text style={styles(theme).currentPrice}>
-                                  ₹{parseFloat(product.discountedPrice).toFixed(2)}
+                                  ₹{Math.round(product.discountedPrice).toLocaleString('en-IN')}
                                 </Text>
-                                {parseFloat(product.discount) > 0 && (
+                                {product.hasDiscount && (
                                   <Text style={styles(theme).originalPrice}>
-                                    ₹{parseFloat(product.price).toFixed(2)}
+                                    ₹{Math.round(product.price).toLocaleString('en-IN')}
                                   </Text>
                                 )}
                               </View>
