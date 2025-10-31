@@ -8,7 +8,10 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Modal
+  Modal,
+  Animated,
+  Easing,
+  Platform
 } from 'react-native';
 import Header from '../components/header';
 import Store from '../store';
@@ -37,6 +40,8 @@ export default class Login extends Component {
         lastName: '',
         phone: '',
         confirmPassword: '',
+        dateOfBirth: '',
+        gender: '',
         rememberMe: false,
         subscribeUpdates: false,
         agreeTerms: false
@@ -46,6 +51,99 @@ export default class Login extends Component {
       signupOTP: '',
       loginOTP: '',
       otpSent: false
+    }
+
+    // Animation values
+    this.fadeAnim = new Animated.Value(0);
+    this.slideAnim = new Animated.Value(50);
+    this.scaleAnim = new Animated.Value(0.95);
+    this.formContentAnim = new Animated.Value(0);
+    this.modalScaleAnim = new Animated.Value(0.9);
+    this.modalFadeAnim = new Animated.Value(0);
+    this.shimmerAnim = new Animated.Value(0);
+  }
+
+  componentDidMount() {
+    // Entrance animation sequence
+    Animated.parallel([
+      Animated.timing(this.fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.spring(this.slideAnim, {
+        toValue: 0,
+        tension: 40,
+        friction: 10,
+        useNativeDriver: true,
+      }),
+      Animated.spring(this.scaleAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Animate form content after card appears
+      Animated.timing(this.formContentAnim, {
+        toValue: 1,
+        duration: 600,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    });
+
+    // Continuous shimmer animation for top border
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(this.shimmerAnim, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+        Animated.timing(this.shimmerAnim, {
+          toValue: 0,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // Animate when switching tabs
+    if (prevState.isSignIn !== this.state.isSignIn) {
+      this.formContentAnim.setValue(0);
+      Animated.timing(this.formContentAnim, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }).start();
+    }
+
+    // Animate modal entrance/exit
+    if (prevState.showOTPModal !== this.state.showOTPModal) {
+      if (this.state.showOTPModal) {
+        this.modalScaleAnim.setValue(0.9);
+        this.modalFadeAnim.setValue(0);
+        Animated.parallel([
+          Animated.spring(this.modalScaleAnim, {
+            toValue: 1,
+            tension: 50,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.timing(this.modalFadeAnim, {
+            toValue: 1,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
     }
   }
 
@@ -358,7 +456,9 @@ export default class Login extends Component {
         firstName: formData.firstName,
         lastName: formData.lastName,
         email: formData.email,
-        password: formData.password
+        password: formData.password,
+        dateOfBirth: formData.dateOfBirth,
+        gender: formData.gender
       };
 
       const signupResponse = await signupUser(signupPayload);
@@ -430,12 +530,38 @@ export default class Login extends Component {
 
   render() {
     const { theme, formData, isSignIn, isLoading, loginMethod, otpSent, loginOTP, showOTPModal, signupOTP } = this.state;
+
+    const shimmerTranslate = this.shimmerAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [-300, 300],
+    });
+
     return (
       <SafeAreaView style={styles(theme).container}>
         <ScrollView style={styles(theme).subContainer}>
           <View style={styles(theme).mainContainer}>
             {/* Account Form Card */}
-            <View style={styles(theme).formCard}>
+            <Animated.View
+              style={[
+                styles(theme).formCard,
+                {
+                  opacity: this.fadeAnim,
+                  transform: [
+                    { translateY: this.slideAnim },
+                    { scale: this.scaleAnim },
+                  ],
+                },
+              ]}
+            >
+              {/* Shimmer effect on top border */}
+              <Animated.View
+                style={[
+                  styles(theme).shimmerEffect,
+                  {
+                    transform: [{ translateX: shimmerTranslate }],
+                  },
+                ]}
+              />
               {/* Tab Buttons */}
               <View style={styles(theme).tabContainer}>
                 <TouchableOpacity
@@ -465,6 +591,19 @@ export default class Login extends Component {
               </View>
 
               {/* Form Content */}
+              <Animated.View
+                style={{
+                  opacity: this.formContentAnim,
+                  transform: [
+                    {
+                      translateY: this.formContentAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [20, 0],
+                      }),
+                    },
+                  ],
+                }}
+              >
               {isSignIn ? (
                 <View>
                   {/* Login Method Toggle */}
@@ -686,6 +825,75 @@ export default class Login extends Component {
                     />
                   </View>
 
+                  {/* Date of Birth and Gender Grid */}
+                  <View style={styles(theme).gridContainer}>
+                    <View style={[styles(theme).inputContainer, styles(theme).halfWidth]}>
+                      <Text style={styles(theme).label}>Date of Birth</Text>
+                      <TextInput
+                        style={styles(theme).input}
+                        placeholder="DD/MM/YYYY"
+                        placeholderTextColor="#9CA3AF"
+                        value={formData.dateOfBirth}
+                        onChangeText={(value) => {
+                          // Format as DD/MM/YYYY
+                          let cleaned = value.replace(/[^0-9]/g, '');
+                          if (cleaned.length >= 2) {
+                            cleaned = cleaned.substring(0, 2) + '/' + cleaned.substring(2);
+                          }
+                          if (cleaned.length >= 5) {
+                            cleaned = cleaned.substring(0, 5) + '/' + cleaned.substring(5);
+                          }
+                          if (cleaned.length <= 10) {
+                            this.handleInputChange('dateOfBirth', cleaned);
+                          }
+                        }}
+                        keyboardType="numeric"
+                        maxLength={10}
+                      />
+                    </View>
+                    <View style={[styles(theme).inputContainer, styles(theme).halfWidth]}>
+                      <Text style={styles(theme).label}>Gender</Text>
+                      <View style={styles(theme).genderContainer}>
+                        <TouchableOpacity
+                          style={[
+                            styles(theme).genderButton,
+                            formData.gender === 'Male' && styles(theme).genderButtonActive
+                          ]}
+                          onPress={() => this.handleInputChange('gender', 'Male')}
+                        >
+                          <Text style={[
+                            styles(theme).genderText,
+                            formData.gender === 'Male' && styles(theme).genderTextActive
+                          ]}>Male</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[
+                            styles(theme).genderButton,
+                            formData.gender === 'Female' && styles(theme).genderButtonActive
+                          ]}
+                          onPress={() => this.handleInputChange('gender', 'Female')}
+                        >
+                          <Text style={[
+                            styles(theme).genderText,
+                            formData.gender === 'Female' && styles(theme).genderTextActive
+                          ]}>Female</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          style={[
+                            styles(theme).genderButton,
+                            formData.gender === 'Other' && styles(theme).genderButtonActive
+                          ]}
+                          onPress={() => this.handleInputChange('gender', 'Other')}
+                        >
+                          <Text style={[
+                            styles(theme).genderText,
+                            formData.gender === 'Other' && styles(theme).genderTextActive
+                          ]}>Other</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+
                   {/* Password Grid */}
                   <View style={styles(theme).gridContainer}>
                     <View style={[styles(theme).inputContainer, styles(theme).halfWidth]}>
@@ -764,18 +972,27 @@ export default class Login extends Component {
                   </View>
                 </View>
               )}
-            </View>
+              </Animated.View>
+            </Animated.View>
           </View>
 
           {/* OTP Verification Modal */}
           <Modal
             visible={showOTPModal}
             transparent={true}
-            animationType="fade"
+            animationType="none"
             onRequestClose={() => this.setState({ showOTPModal: false })}
           >
             <View style={styles(theme).modalOverlay}>
-              <View style={styles(theme).modalContent}>
+              <Animated.View
+                style={[
+                  styles(theme).modalContent,
+                  {
+                    opacity: this.modalFadeAnim,
+                    transform: [{ scale: this.modalScaleAnim }],
+                  },
+                ]}
+              >
                 <Text style={styles(theme).modalTitle}>Verify Mobile Number</Text>
                 <Text style={styles(theme).modalSubtitle}>
                   Enter the OTP sent to {formData.phone}
@@ -820,7 +1037,7 @@ export default class Login extends Component {
                 >
                   <Text style={styles(theme).resendTextModal}>Resend OTP</Text>
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             </View>
           </Modal>
 
@@ -835,107 +1052,150 @@ export default class Login extends Component {
 const styles = (theme) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme == "dark" ? "gray" : "#fff",
+    backgroundColor: '#F8F3F0',
   },
   subContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: '#F8F3F0',
   },
   mainContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 100,
-    paddingHorizontal: isMobile() ? 20 : 0
+    marginVertical: isMobile() ? 60 : 100,
+    paddingHorizontal: isMobile() ? 20 : 40
   },
   formCard: {
-    backgroundColor: '#fff',
-    borderRadius: 8,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 0,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    padding: 32,
+    borderColor: '#E5E0DB',
+    borderTopWidth: 3,
+    borderTopColor: '#800020',
+    padding: isMobile() ? 28 : 48,
     width: '100%',
-    maxWidth: isMobile() ? 400 : 896,
+    maxWidth: isMobile() ? 400 : 920,
+    position: 'relative',
+    overflow: 'hidden',
+  },
+  shimmerEffect: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    width: 100,
   },
   tabContainer: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 32
+    gap: 0,
+    marginBottom: 40,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E0DB',
   },
   tabButton: {
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-    borderRadius: 6,
-    backgroundColor: 'transparent'
+    paddingHorizontal: isMobile() ? 20 : 32,
+    paddingVertical: 14,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
+    borderBottomWidth: 3,
+    borderBottomColor: 'transparent',
+    transition: 'all 0.3s ease',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+      },
+    }),
   },
   tabButtonActive: {
-    backgroundColor: '#1A1A1A'
+    borderBottomColor: '#800020',
+    backgroundColor: 'transparent'
   },
   tabText: {
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#6B7280'
+    fontFamily: "Jura",
+    fontSize: isMobile() ? 15 : 17,
+    fontWeight: '600',
+    color: '#9CA3AF',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   tabTextActive: {
-    color: '#fff'
+    color: '#800020'
   },
   loginMethodToggle: {
     flexDirection: 'row',
-    gap: 8,
-    marginBottom: 24,
-    backgroundColor: '#F3F4F6',
-    padding: 4,
-    borderRadius: 8,
+    gap: 0,
+    marginBottom: 28,
+    backgroundColor: 'transparent',
+    padding: 0,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#E5E0DB',
   },
   methodButton: {
     flex: 1,
-    paddingVertical: 8,
+    paddingVertical: 12,
     alignItems: 'center',
-    borderRadius: 6,
+    borderRadius: 0,
+    backgroundColor: '#FAFAFA',
+    borderRightWidth: 1,
+    borderRightColor: '#E5E0DB',
+    transition: 'all 0.3s ease',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+      },
+    }),
   },
   methodButtonActive: {
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    backgroundColor: '#800020',
+    borderRightColor: '#800020',
   },
   methodText: {
-    fontFamily: "Roboto",
+    fontFamily: "Jura",
     fontSize: 14,
-    fontWeight: '500',
-    color: '#6B7280',
+    fontWeight: '600',
+    color: '#666666',
+    letterSpacing: 0.5,
   },
   methodTextActive: {
-    color: '#1A1A1A',
+    color: '#F8F3F0',
   },
   inputContainer: {
     marginBottom: 24
   },
   label: {
-    fontFamily: "Roboto",
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#374151',
-    marginBottom: 8
+    fontFamily: "Jura",
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1A1A1A',
+    marginBottom: 10,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
   input: {
-    height: 48,
-    borderColor: '#D1D5DB',
+    height: 52,
+    borderColor: '#E5E0DB',
     borderWidth: 1,
-    borderRadius: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    borderRadius: 0,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     fontFamily: "Roboto",
-    fontSize: 16,
-    color: '#000',
-    backgroundColor: '#fff'
+    fontSize: 15,
+    color: '#1A1A1A',
+    backgroundColor: '#FAFAFA',
+    transition: 'all 0.3s ease',
+    ...Platform.select({
+      web: {
+        outlineStyle: 'none',
+        cursor: 'text',
+      },
+    }),
   },
   gridContainer: {
     flexDirection: isMobile() ? 'column' : 'row',
@@ -957,35 +1217,52 @@ const styles = (theme) => StyleSheet.create({
     alignItems: 'center'
   },
   checkbox: {
-    width: 16,
-    height: 16,
-    borderRadius: 4
+    width: 18,
+    height: 18,
+    borderRadius: 0,
+    borderWidth: 1,
+    borderColor: '#800020',
   },
   checkboxLabel: {
     fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#374151',
-    marginLeft: 8
+    fontSize: 13,
+    color: '#666666',
+    marginLeft: 10,
+    fontWeight: '400',
   },
   forgotText: {
-    fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#6B7280',
-    fontWeight: '400'
+    fontFamily: "Jura",
+    fontSize: 13,
+    color: '#800020',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
   submitButton: {
-    backgroundColor: '#1A1A1A',
-    borderRadius: 6,
-    paddingVertical: 14,
+    backgroundColor: '#800020',
+    borderRadius: 0,
+    paddingVertical: 16,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24
+    marginBottom: 24,
+    shadowColor: '#800020',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 4,
+    transition: 'all 0.3s ease',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+      },
+    }),
   },
   submitButtonText: {
-    color: '#fff',
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: '500'
+    color: '#F8F3F0',
+    fontFamily: "Jura",
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 1.5,
+    textTransform: 'uppercase',
   },
   resendButton: {
     alignItems: 'center',
@@ -993,10 +1270,11 @@ const styles = (theme) => StyleSheet.create({
     marginBottom: 24,
   },
   resendText: {
-    fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontFamily: "Jura",
+    fontSize: 13,
+    color: '#800020',
     textDecorationLine: 'underline',
+    fontWeight: '600',
   },
   checkboxGroup: {
     gap: 12,
@@ -1010,111 +1288,172 @@ const styles = (theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    flexWrap: 'wrap'
+    flexWrap: 'wrap',
+    paddingTop: 20,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E0DB',
   },
   footerText: {
     fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#6B7280'
+    fontSize: 13,
+    color: '#888888',
+    fontWeight: '300',
   },
   linkText: {
-    fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#6B7280',
-    textDecorationLine: 'underline'
+    fontFamily: "Jura",
+    fontSize: 13,
+    color: '#800020',
+    textDecorationLine: 'underline',
+    fontWeight: '600',
   },
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   modalContent: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 32,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 0,
+    padding: 40,
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 420,
+    borderWidth: 1,
+    borderColor: '#E5E0DB',
+    borderTopWidth: 3,
+    borderTopColor: '#800020',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 12 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 24,
+    elevation: 12,
   },
   modalTitle: {
-    fontFamily: "Roboto",
+    fontFamily: "Jura",
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#1A1A1A',
     marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   modalSubtitle: {
     fontFamily: "Roboto",
     fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 24,
+    color: '#666666',
+    marginBottom: 30,
     textAlign: 'center',
+    fontWeight: '300',
   },
   otpInputContainer: {
-    marginBottom: 24,
+    marginBottom: 28,
   },
   otpInput: {
-    height: 56,
-    borderColor: '#D1D5DB',
+    height: 60,
+    borderColor: '#E5E0DB',
     borderWidth: 2,
-    borderRadius: 8,
+    borderRadius: 0,
     paddingHorizontal: 16,
-    fontFamily: "Roboto",
-    fontSize: 24,
-    color: '#000',
-    backgroundColor: '#fff',
+    fontFamily: "Jura",
+    fontSize: 28,
+    color: '#1A1A1A',
+    backgroundColor: '#FAFAFA',
     textAlign: 'center',
-    letterSpacing: 8,
+    letterSpacing: 10,
+    fontWeight: '600',
   },
   modalButtons: {
     flexDirection: 'row',
     gap: 12,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   modalButtonCancel: {
     flex: 1,
-    paddingVertical: 14,
-    borderRadius: 6,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
+    paddingVertical: 15,
+    borderRadius: 0,
+    borderWidth: 1.5,
+    borderColor: '#800020',
     alignItems: 'center',
+    backgroundColor: 'transparent',
   },
   modalButtonCancelText: {
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#6B7280',
+    fontFamily: "Jura",
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#800020',
+    letterSpacing: 0.5,
   },
   modalButtonVerify: {
     flex: 2,
-    paddingVertical: 14,
-    borderRadius: 6,
-    backgroundColor: '#1A1A1A',
+    paddingVertical: 15,
+    borderRadius: 0,
+    backgroundColor: '#800020',
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#800020',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   modalButtonVerifyText: {
-    fontFamily: "Roboto",
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#fff',
+    fontFamily: "Jura",
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#F8F3F0',
+    letterSpacing: 1,
   },
   resendButtonModal: {
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: 12,
   },
   resendTextModal: {
-    fontFamily: "Roboto",
-    fontSize: 14,
-    color: '#1A1A1A',
+    fontFamily: "Jura",
+    fontSize: 13,
+    color: '#800020',
     textDecorationLine: 'underline',
+    fontWeight: '600',
+  },
+  // Gender button styles
+  genderContainer: {
+    flexDirection: 'row',
+    gap: 0,
+    marginTop: 0,
+    borderWidth: 1,
+    borderColor: '#E5E0DB',
+  },
+  genderButton: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 0,
+    borderWidth: 0,
+    borderRightWidth: 1,
+    borderRightColor: '#E5E0DB',
+    backgroundColor: '#FAFAFA',
+    alignItems: 'center',
+    justifyContent: 'center',
+    transition: 'all 0.3s ease',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer',
+      },
+    }),
+  },
+  genderButtonActive: {
+    backgroundColor: '#800020',
+    borderRightColor: '#800020',
+  },
+  genderText: {
+    fontFamily: "Jura",
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#666666',
+    letterSpacing: 0.5,
+  },
+  genderTextActive: {
+    color: '#F8F3F0',
   },
 });

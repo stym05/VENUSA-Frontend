@@ -452,7 +452,7 @@ class ItemDescription extends React.Component {
                             {availableColors.length > 0 && (
                                 <View style={styles.selectionContainer}>
                                     <Text style={styles.selectionTitle}>
-                                        Color {selectedColor && <Text style={styles.selectedValue}>({selectedColor})</Text>}
+                                        Select Color {selectedColor && <Text style={styles.selectedColorDot}>●</Text>}
                                     </Text>
                                     <View style={styles.colorOptions}>
                                         {availableColors.map((color, index) => (
@@ -469,7 +469,14 @@ class ItemDescription extends React.Component {
                                                         selectedColor: selectedColor === color ? null : color
                                                     });
                                                 }}
-                                            />
+                                                activeOpacity={0.7}
+                                            >
+                                                {selectedColor === color && (
+                                                    <View style={styles.colorCheckmark}>
+                                                        <Text style={styles.checkmarkText}>✓</Text>
+                                                    </View>
+                                                )}
+                                            </TouchableOpacity>
                                         ))}
                                     </View>
                                 </View>
@@ -728,6 +735,11 @@ const styles = StyleSheet.create({
         fontWeight: '400',
         color: '#666',
     },
+    selectedColorDot: {
+        fontWeight: '600',
+        color: '#2C2C2C',
+        fontSize: 16,
+    },
     sizeTitleRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -750,10 +762,27 @@ const styles = StyleSheet.create({
         borderRadius: 19,
         borderWidth: 2,
         borderColor: '#E0E0E0',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     selectedColorButton: {
         borderColor: '#2C2C2C',
         borderWidth: 3,
+    },
+    colorCheckmark: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 19,
+    },
+    checkmarkText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 0, height: 0 },
+        textShadowRadius: 3,
     },
     sizeOptions: {
         flexDirection: 'row',

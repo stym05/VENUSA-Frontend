@@ -18,11 +18,14 @@ import MovingTextStrip from '../components/MovingTextStrip/index.jsx';
 import Video, { VideoRef } from 'react-native-video';
 import { isMobile } from '../utils/index.js';
 import { Image, ImageBackground } from 'expo-image';
-import { getAllCategories, getDashboardData } from '../apis/index.js';
+import { getAllCategories, getDashboardData, createSubsciber } from '../apis/index.js';
 import Modal from "react-native-modal";
 import Entypo from '@expo/vector-icons/Entypo';
 import TrendingScrollBanner from './trendingScroller.jsx';
 import { DashboardProductSkeleton } from '../components/SkeletonLoader/index.jsx';
+import ProgressModal from '../components/ProgressModal/index.jsx';
+import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class Dashboard extends Component {
 
@@ -37,6 +40,7 @@ export default class Dashboard extends Component {
       allCategoriesData: [],
       categorie: {},
       isModalVisible: true,
+      showProgressModal: false,
       dashboardVideo: '',
       featuredProducts: [],
       newArrivals: [],
@@ -46,6 +50,12 @@ export default class Dashboard extends Component {
 
   componentDidMount = async () => {
     try {
+      // Check if user has seen the progress modal before
+      const hasSeenModal = await AsyncStorage.getItem('hasSeenProgressModal');
+      if (!hasSeenModal) {
+        this.setState({ showProgressModal: true });
+      }
+
       this.setState({ isLoading: true });
       const dashboardResponse = await getDashboardData();
       console.log("Dashboard data: ", dashboardResponse);
@@ -127,11 +137,71 @@ export default class Dashboard extends Component {
     return <Text>loading...</Text>
   }
 
+  handleCloseProgressModal = async () => {
+    this.setState({ showProgressModal: false });
+    // Mark that user has seen the modal
+    await AsyncStorage.setItem('hasSeenProgressModal', 'true');
+  }
+
+  handleNotifyMe = async () => {
+    try {
+      const userEmail = Store.getState().user.email;
+
+      if (!userEmail) {
+        Toast.show({
+          text1: "Email Required",
+          text2: "Please login to get notifications",
+          type: "info",
+          visibilityTime: 3000,
+          position: 'top',
+        });
+        return;
+      }
+
+      // Subscribe user for notifications
+      const response = await createSubsciber({ email: userEmail });
+
+      if (response && response.success) {
+        Toast.show({
+          text1: "Success!",
+          text2: "We'll notify you when we're ready!",
+          type: "success",
+          visibilityTime: 3000,
+          position: 'top',
+        });
+      } else {
+        Toast.show({
+          text1: "Already Subscribed",
+          text2: "You're already on our notification list!",
+          type: "info",
+          visibilityTime: 3000,
+          position: 'top',
+        });
+      }
+    } catch (err) {
+      console.log("Error subscribing:", err);
+      Toast.show({
+        text1: "Subscribed",
+        text2: "We'll notify you when we launch!",
+        type: "success",
+        visibilityTime: 3000,
+        position: 'top',
+      });
+    }
+  }
+
 
   render() {
-    const { isLoading, theme, categorie, isModalVisible } = this.state;
+    const { isLoading, theme, categorie, isModalVisible, showProgressModal } = this.state;
     return (
       <SafeAreaView style={styles(theme).container}>
+        {/* Progress Modal */}
+        <ProgressModal
+          isVisible={showProgressModal}
+          onClose={this.handleCloseProgressModal}
+          onNotifyMe={this.handleNotifyMe}
+        />
+
         <ScrollView>
           <View style={styles(theme).subContainer}>
             {/* <Modal isVisible={isModalVisible}>
@@ -230,17 +300,27 @@ export default class Dashboard extends Component {
                 </View>
                 <View style={{ marginTop: 30, display: 'flex', flexDirection: 'row' }}>
                   {console.log("-------------categorie--------", categorie)}
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categoryId: categorie.Mens?.categoryId || "",
-                    type: "Mens"
-                  })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
+                  <TouchableOpacity onPress={() => {
+                    // Try different possible keys for Men's category
+                    const menCategory = categorie.Men || categorie.Mens || categorie.mens;
+                    console.log("Navigating to Men:", menCategory);
+                    this.props.navigation.navigate("ShopCategories", {
+                      categoryId: menCategory?.categoryId || "",
+                      type: "Men"
+                    });
+                  }} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30, marginRight: isMobile() ? 20 : 50 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP MEN</Text>
                   </TouchableOpacity>
 
-                  <TouchableOpacity onPress={() => this.props.navigation.navigate("ShopCategories", {
-                    categoryId: categorie.Womens?.categoryId || "",
-                    type: "Womens"
-                  })} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
+                  <TouchableOpacity onPress={() => {
+                    // Try different possible keys for Women's category
+                    const womenCategory = categorie.Women || categorie.Womens || categorie.womens;
+                    console.log("Navigating to Women:", womenCategory);
+                    this.props.navigation.navigate("ShopCategories", {
+                      categoryId: womenCategory?.categoryId || "",
+                      type: "Women"
+                    });
+                  }} style={{ backgroundColor: '#F8F3F0', paddingVertical: isMobile() ? 10 : 20, paddingHorizontal: isMobile() ? 15 : 30 }}>
                     <Text style={{ fontSize: isMobile() ? 16 : 20, color: '#000000', fontWeight: '500' }}>SHOP WOMEN</Text>
                   </TouchableOpacity>
                 </View>

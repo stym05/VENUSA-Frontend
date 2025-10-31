@@ -71,20 +71,33 @@ class ShopCategories extends Component {
                 // If categoryId is empty but we have type, find the ID
                 if (!categoryId && type) {
                     console.log("categoryId empty, fetching categories based on type:", type);
-                    const category = categoriesResponse.categories.find(cat => cat.name === type);
+                    // Try to find category by name (case-insensitive match)
+                    const category = categoriesResponse.categories.find(cat =>
+                        cat.name.toLowerCase() === type.toLowerCase() ||
+                        cat.name === type ||
+                        cat.name === type + "s" ||
+                        cat.name.toLowerCase() === type.toLowerCase() + "s"
+                    );
                     if (category) {
                         categoryId = category.categoryId;
                         this.setState({
                             categoryId,
-                            categoryImage: category.image
+                            categoryImage: category.image,
+                            type: category.name // Update type to match actual category name
                         });
                         console.log("Found categoryId for type", type, ":", categoryId);
+                    } else {
+                        console.log("No category found for type:", type);
+                        console.log("Available categories:", categoriesResponse.categories.map(c => c.name));
                     }
                 } else {
                     // We have categoryId, find the category to get its image
                     const category = categoriesResponse.categories.find(cat => cat.categoryId === categoryId);
                     if (category) {
-                        this.setState({ categoryImage: category.image });
+                        this.setState({
+                            categoryImage: category.image,
+                            type: category.name // Update type to match actual category name
+                        });
                         console.log("Found category image:", category.image);
                     }
                 }
@@ -282,7 +295,7 @@ class ShopCategories extends Component {
                                 />
                                 <View style={styles.bannerOverlay}>
                                     <Text style={styles.bannerTitle}>
-                                        {type === "Mens" ? "Men's" : "Women's"}
+                                        {(type === "Men" || type === "Mens") ? "Men's" : (type === "Women" || type === "Womens") ? "Women's" : type}
                                     </Text>
                                     <Text style={styles.bannerSubtitle}>
                                         Collection

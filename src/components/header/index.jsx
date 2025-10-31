@@ -85,8 +85,8 @@ const Header = (props) => {
 
           // Fetch subcategories for Mens, Womens, and Sale
           const fetchSubcategories = async () => {
-            const mensCategory = categoriesObj["Mens"] || categoriesObj["mens"];
-            const womensCategory = categoriesObj["Womens"] || categoriesObj["womens"];
+            const mensCategory = categoriesObj["Men"] || categoriesObj["Mens"] || categoriesObj["mens"];
+            const womensCategory = categoriesObj["Women"] || categoriesObj["Womens"] || categoriesObj["womens"];
             const saleCategory = categoriesObj["Sale"] || categoriesObj["sale"];
 
             let subCategoriesData = { mens: [], womens: [], sale: [] };
@@ -249,14 +249,15 @@ const Header = (props) => {
   // Handle navigation to shop categories
   const navigateToCategory = (categoryType) => {
     // Determine which category to use based on categoryType
-    const categoryKeyLower = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
-    const categoryKeyCapital = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
-    const type = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
+    const type = categoryType === "men" ? "Men" : categoryType === "women" ? "Women" : "Sale";
 
-    // Try to find the category with either lowercase or capitalized name
-    const category = categories[categoryKeyCapital] || categories[categoryKeyLower];
+    // Try to find the category with different possible name variations
+    const category = categories[type] ||
+                     categories[type + "s"] ||
+                     categories[type.toLowerCase()] ||
+                     categories[type.toLowerCase() + "s"];
 
-    console.log("Navigating to:", categoryKeyCapital, category);
+    console.log("Navigating to:", type, category);
 
     // Navigate with categoryId and type, matching Dashboard navigation
     navigation.navigate("ShopCategories", {
@@ -371,42 +372,58 @@ const Header = (props) => {
           else setIsHoveringSaleDropdown(false);
         }}
       >
-        {/* "View All" option to navigate to main category */}
-        <TouchableOpacity onPress={() => navigateToCategory(category)}>
-          <Text style={[styles.dropdownItem, styles.viewAllItem]}>
-            View All {category === "men" ? "Men's" : category === "women" ? "Women's" : "Sale"}
-          </Text>
-        </TouchableOpacity>
-
         {/* Render subcategories from API */}
         {subCategoryList.length > 0 ? (
-          subCategoryList.slice(0, 6).map((subCat, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => navigateToSubCategory(subCat.subCategoryId, subCat.name)}
-            >
-              <Text style={styles.dropdownItem}>
-                {subCat.name}
-              </Text>
-            </TouchableOpacity>
-          ))
-        ) : (
-          // Fallback to default items if no subcategories loaded
           <>
+            {/* "View All" option to navigate to main category */}
             <TouchableOpacity onPress={() => navigateToCategory(category)}>
-              <Text style={styles.dropdownItem}>
-                {category === "men" ? "T-Shirts" :
-                  category === "women" ? "Tops" :
-                    "View All"}
+              <Text style={[styles.dropdownItem, styles.viewAllItem]}>
+                View All {category === "men" ? "Men's" : category === "women" ? "Women's" : "Sale"}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => navigateToCategory(category)}>
-              <Text style={styles.dropdownItem}>
-                {category === "men" ? "Pants" :
-                  category === "women" ? "Dresses" :
-                    "View All"}
-              </Text>
-            </TouchableOpacity>
+
+            {subCategoryList.slice(0, 6).map((subCat, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => navigateToSubCategory(subCat.subCategoryId, subCat.name)}
+              >
+                <Text style={styles.dropdownItem}>
+                  {subCat.name}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </>
+        ) : (
+          // Fallback message if no subcategories loaded
+          <>
+            {category === "sale" ? (
+              <View style={styles.emptyDropdownContainer}>
+                <Text style={styles.emptyDropdownText}>Sale Coming Soon</Text>
+                <Text style={styles.emptyDropdownSubtext}>
+                  Stay tuned for exciting deals!
+                </Text>
+              </View>
+            ) : (
+              <>
+                {/* "View All" option for Men/Women even when no subcategories */}
+                <TouchableOpacity onPress={() => navigateToCategory(category)}>
+                  <Text style={[styles.dropdownItem, styles.viewAllItem]}>
+                    View All {category === "men" ? "Men's" : "Women's"}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigateToCategory(category)}>
+                  <Text style={styles.dropdownItem}>
+                    {category === "men" ? "T-Shirts" : "Tops"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigateToCategory(category)}>
+                  <Text style={styles.dropdownItem}>
+                    {category === "men" ? "Pants" : "Dresses"}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
           </>
         )}
       </Animated.View>
@@ -702,6 +719,25 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#333",
     fontFamily: "Jura",
+  },
+  emptyDropdownContainer: {
+    padding: 20,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  emptyDropdownText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#333",
+    fontFamily: "Jura",
+    marginBottom: 8,
+    textAlign: "center",
+  },
+  emptyDropdownSubtext: {
+    fontSize: 14,
+    color: "#666",
+    fontFamily: "Jura",
+    textAlign: "center",
   },
 });
 

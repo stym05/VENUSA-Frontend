@@ -26,6 +26,7 @@ const OfferStrip = () => {
                     data.forEach((item) => {
                         categoriesObj[item.name] = {
                             id: item._id,
+                            categoryId: item.categoryId,
                             categoryImage: item.image,
                             category: item.name,
                         }
@@ -44,21 +45,27 @@ const OfferStrip = () => {
     }, []);
 
     const navigateToCategory = (categoryType) => {
-        // Determine which category to use based on categoryType
-        // Try both lowercase and capitalized versions to match API response
-        const categoryKeyLower = categoryType === "men" ? "mens" : categoryType === "women" ? "womens" : "sale";
-        const categoryKeyCapital = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
-        const type = categoryType === "men" ? "Mens" : categoryType === "women" ? "Womens" : "Sale";
+        // Try different possible keys for the category
+        let category;
+        let type;
 
-        // Try to find the category with either lowercase or capitalized name
-        const category = categories[categoryKeyCapital] || categories[categoryKeyLower];
+        if (categoryType === "men") {
+            category = categories.Men || categories.Mens || categories.mens;
+            type = "Men";
+        } else if (categoryType === "women") {
+            category = categories.Women || categories.Womens || categories.womens;
+            type = "Women";
+        } else if (categoryType === "sale") {
+            category = categories.Sale || categories.sale;
+            type = "Sale";
+        }
 
-        console.log("Navigating to:", categoryKeyCapital, category);
+        console.log("Navigating to:", type, category);
         console.log("Available categories:", Object.keys(categories));
 
-        // Navigate with categoryId and type, matching Dashboard navigation
+        // Navigate with categoryId and type, matching Dashboard and Header navigation
         navigation.navigate("ShopCategories", {
-            categoryId: category?.id || "",
+            categoryId: category?.categoryId || "",
             type: type
         });
     }
