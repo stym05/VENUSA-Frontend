@@ -299,7 +299,7 @@ class ItemSection extends React.Component {
         }
     };
 
-    renderFilterDropdown = (label, stateKey, options, displayFn = (val) => val, valueFn = (val) => val) => {
+    renderFilterDropdown = (label, stateKey, options, displayFn = (val) => val, valueFn = (val) => val, isColorFilter = false) => {
         const selectedValue = this.state[stateKey];
         const isOpen = this.state.openDropdown === stateKey;
 
@@ -310,9 +310,18 @@ class ItemSection extends React.Component {
                         style={styles.dropdownButton}
                         onPress={() => this.toggleDropdown(stateKey)}
                     >
-                        <Text style={[styles.dropdownText, selectedValue && styles.selectedText]}>
-                            {selectedValue ? displayFn(selectedValue) : label}
-                        </Text>
+                        {isColorFilter && selectedValue ? (
+                            <View style={styles.selectedColorContainer}>
+                                <View style={[styles.colorSwatch, { backgroundColor: selectedValue }]} />
+                                <Text style={[styles.dropdownText, styles.selectedText]}>
+                                    {label}
+                                </Text>
+                            </View>
+                        ) : (
+                            <Text style={[styles.dropdownText, selectedValue && styles.selectedText]}>
+                                {selectedValue ? displayFn(selectedValue) : label}
+                            </Text>
+                        )}
                         <Text style={styles.chevron}>{isOpen ? '▲' : '▼'}</Text>
                     </TouchableOpacity>
                     {isOpen && options && options.length > 0 && (
@@ -336,12 +345,19 @@ class ItemSection extends React.Component {
                                             this.setState({ [stateKey]: optionValue, openDropdown: null }, () => this.applyFilters());
                                         }}
                                     >
-                                        <Text style={[
-                                            styles.dropdownItemText,
-                                            isSelected && styles.selectedItemText
-                                        ]}>
-                                            {displayFn(option)}
-                                        </Text>
+                                        {isColorFilter ? (
+                                            <View style={styles.colorOptionContainer}>
+                                                <View style={[styles.colorSwatchLarge, { backgroundColor: option }]} />
+                                                {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                                            </View>
+                                        ) : (
+                                            <Text style={[
+                                                styles.dropdownItemText,
+                                                isSelected && styles.selectedItemText
+                                            ]}>
+                                                {displayFn(option)}
+                                            </Text>
+                                        )}
                                     </TouchableOpacity>
                                 );
                             })}
@@ -493,7 +509,9 @@ class ItemSection extends React.Component {
                                         'Color',
                                         'selectedColor',
                                         availableColors,
-                                        (color) => color
+                                        (color) => color,
+                                        (color) => color,
+                                        true // isColorFilter flag
                                     )}
                                     {this.renderFilterDropdown(
                                         'Material',
@@ -716,6 +734,47 @@ const styles = StyleSheet.create({
     selectedItemText: {
         fontWeight: '600',
         color: '#000',
+    },
+    selectedColorContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+    },
+    colorOptionContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flex: 1,
+        paddingVertical: 4,
+    },
+    colorSwatch: {
+        width: 20,
+        height: 20,
+        borderRadius: 10,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 2,
+        elevation: 2,
+    },
+    colorSwatchLarge: {
+        width: 100,
+        height: 28,
+        borderRadius: 6,
+        borderWidth: 1,
+        borderColor: '#ddd',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.15,
+        shadowRadius: 3,
+        elevation: 3,
+    },
+    checkmark: {
+        fontSize: 18,
+        color: '#000',
+        fontWeight: '700',
     },
     emptyStateContainer: {
         flex: 1,

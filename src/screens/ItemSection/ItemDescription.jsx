@@ -60,7 +60,10 @@ class ItemDescription extends React.Component {
             keyFeatures: [],
             stocks: [],
             isInWishlist: false,
-            wishlistLoading: false
+            wishlistLoading: false,
+            expandedDescription: true,
+            expandedMaterial: false,
+            expandedCareGuide: false
         };
     }
 
@@ -317,6 +320,10 @@ class ItemDescription extends React.Component {
         }
     }
 
+    toggleSection = (section) => {
+        this.setState({ [section]: !this.state[section] });
+    }
+
     render() {
         const {
             isLoading,
@@ -335,7 +342,10 @@ class ItemDescription extends React.Component {
             keyFeatures,
             productData,
             isInWishlist,
-            wishlistLoading
+            wishlistLoading,
+            expandedDescription,
+            expandedMaterial,
+            expandedCareGuide
         } = this.state;
 
         const hasDiscount = price > discountedPrice;
@@ -424,29 +434,78 @@ class ItemDescription extends React.Component {
                                 <Text style={styles.reviewCount}>(Reviews coming soon)</Text>
                             </View>
 
-                            {/* Description */}
-                            <View style={styles.descriptionContainer}>
-                                <Text style={styles.sectionTitle}>Description</Text>
-                                <Text style={styles.description}>{description}</Text>
+                            {/* Collapsible Description */}
+                            <View style={styles.collapsibleSection}>
+                                <TouchableOpacity
+                                    style={styles.collapsibleHeader}
+                                    onPress={() => this.toggleSection('expandedDescription')}
+                                >
+                                    <Text style={styles.collapsibleTitle}>Description</Text>
+                                    <Text style={styles.collapseIcon}>{expandedDescription ? '▼' : '▶'}</Text>
+                                </TouchableOpacity>
+                                {expandedDescription && (
+                                    <View style={styles.collapsibleContent}>
+                                        <Text style={styles.description}>{description}</Text>
+                                    </View>
+                                )}
                             </View>
 
-                            {/* Materials */}
-                            {materials.length > 0 && (
-                                <View style={styles.materialsContainer}>
-                                    <Text style={styles.sectionTitle}>Materials</Text>
-                                    <Text style={styles.materialsText}>{materials.join(', ')}</Text>
-                                </View>
-                            )}
+                            {/* Collapsible Material */}
+                            <View style={styles.collapsibleSection}>
+                                <TouchableOpacity
+                                    style={styles.collapsibleHeader}
+                                    onPress={() => this.toggleSection('expandedMaterial')}
+                                >
+                                    <Text style={styles.collapsibleTitle}>Material</Text>
+                                    <Text style={styles.collapseIcon}>{expandedMaterial ? '▼' : '▶'}</Text>
+                                </TouchableOpacity>
+                                {expandedMaterial && materials.length > 0 && (
+                                    <View style={styles.collapsibleContent}>
+                                        <Text style={styles.materialsText}>{materials.join(', ')}</Text>
+                                    </View>
+                                )}
+                            </View>
+
+                            {/* Collapsible Care Guide */}
+                            <View style={styles.collapsibleSection}>
+                                <TouchableOpacity
+                                    style={styles.collapsibleHeader}
+                                    onPress={() => this.toggleSection('expandedCareGuide')}
+                                >
+                                    <Text style={styles.collapsibleTitle}>Care Guide</Text>
+                                    <Text style={styles.collapseIcon}>{expandedCareGuide ? '▼' : '▶'}</Text>
+                                </TouchableOpacity>
+                                {expandedCareGuide && (
+                                    <View style={styles.collapsibleContent}>
+                                        <Text style={styles.description}>
+                                            • Machine wash cold with like colors{'\n'}
+                                            • Do not bleach{'\n'}
+                                            • Tumble dry low{'\n'}
+                                            • Cool iron if needed
+                                        </Text>
+                                    </View>
+                                )}
+                            </View>
 
                             {/* Key Features */}
-                            {keyFeatures.length > 0 && (
+                            {/* {keyFeatures.length > 0 && (
                                 <View style={styles.featuresContainer}>
                                     <Text style={styles.sectionTitle}>Key Features</Text>
                                     {keyFeatures.map((feature, index) => (
                                         <Text key={index} style={styles.featureItem}>• {feature}</Text>
                                     ))}
                                 </View>
-                            )}
+                            )} */}
+
+                            {/* Delivery Availability */}
+                            <View style={styles.deliverySection}>
+                                <View style={styles.deliveryInputContainer}>
+                                    <Text style={styles.deliveryPlaceholder}>Delivery Availability</Text>
+                                </View>
+                                <TouchableOpacity style={styles.checkButton}>
+                                    <Text style={styles.checkButtonText}>Check</Text>
+                                </TouchableOpacity>
+                            </View>
 
                             {/* Color Selection */}
                             {availableColors.length > 0 && (
@@ -544,11 +603,11 @@ class ItemDescription extends React.Component {
                             <View style={styles.additionalInfo}>
                                 <View style={styles.infoItem}>
                                     <Text style={styles.infoIcon}>🚚</Text>
-                                    <Text style={styles.infoText}>Free shipping on orders above ₹999</Text>
+                                    <Text style={styles.infoText}>Reduced rate express shipping on orders over ₹5000</Text>
                                 </View>
                                 <View style={styles.infoItem}>
                                     <Text style={styles.infoIcon}>↩️</Text>
-                                    <Text style={styles.infoText}>Easy 30-day returns</Text>
+                                    <Text style={styles.infoText}>Return within 15 days of purchase. Duties & taxes are non-refundable</Text>
                                 </View>
                                 <View style={styles.infoItem}>
                                     <Text style={styles.infoIcon}>✓</Text>
@@ -557,6 +616,55 @@ class ItemDescription extends React.Component {
                             </View>
                         </View>
                     </View>
+
+                    {/* Pair up with - Full Width Section */}
+                    <View style={styles.pairUpSection}>
+                        <Text style={styles.pairUpTitle}>Pair up with</Text>
+                        <View style={styles.pairUpGrid}>
+                            {/* Product 1 */}
+                            <View style={styles.pairUpItem}>
+                                <View style={styles.pairUpImageContainer}>
+                                    <View style={styles.pairUpPlaceholderImage}>
+                                        <Text style={styles.placeholderText}>Product Image</Text>
+                                    </View>
+                                    <TouchableOpacity style={styles.pairUpWishlist}>
+                                        <Text style={styles.pairUpWishlistIcon}>♡</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={styles.pairUpProductName}>Annalise Formal Pant</Text>
+                                <Text style={styles.pairUpPrice}>₹3,400.00</Text>
+                            </View>
+
+                            {/* Product 2 */}
+                            <View style={styles.pairUpItem}>
+                                <View style={styles.pairUpImageContainer}>
+                                    <View style={styles.pairUpPlaceholderImage}>
+                                        <Text style={styles.placeholderText}>Product Image</Text>
+                                    </View>
+                                    <TouchableOpacity style={styles.pairUpWishlist}>
+                                        <Text style={styles.pairUpWishlistIcon}>♡</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={styles.pairUpProductName}>Annalise Black Skirt</Text>
+                                <Text style={styles.pairUpPrice}>₹1,400.00</Text>
+                            </View>
+
+                            {/* Product 3 */}
+                            <View style={styles.pairUpItem}>
+                                <View style={styles.pairUpImageContainer}>
+                                    <View style={styles.pairUpPlaceholderImage}>
+                                        <Text style={styles.placeholderText}>Product Image</Text>
+                                    </View>
+                                    <TouchableOpacity style={styles.pairUpWishlist}>
+                                        <Text style={styles.pairUpWishlistIcon}>♡</Text>
+                                    </TouchableOpacity>
+                                </View>
+                                <Text style={styles.pairUpProductName}>White wrap blouse</Text>
+                                <Text style={styles.pairUpPrice}>₹1,200.00</Text>
+                            </View>
+                        </View>
+                    </View>
+
                     <Footer navigation={this.props.navigation} />
                 </ScrollView>
             </SafeAreaView>
@@ -700,6 +808,64 @@ const styles = StyleSheet.create({
         fontSize: 14,
         lineHeight: 22,
         color: '#666',
+    },
+    collapsibleSection: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+        marginBottom: 0,
+    },
+    collapsibleHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        paddingVertical: 14,
+    },
+    collapsibleTitle: {
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#2C2C2C',
+    },
+    collapseIcon: {
+        fontSize: 12,
+        color: '#666',
+    },
+    collapsibleContent: {
+        paddingBottom: 14,
+    },
+    deliverySection: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginTop: 18,
+        marginBottom: 18,
+    },
+    deliveryInputContainer: {
+        flex: 1,
+        borderWidth: 1,
+        borderColor: '#D0D0D0',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+        backgroundColor: '#FFFFFF',
+    },
+    deliveryPlaceholder: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        color: '#999',
+    },
+    checkButton: {
+        backgroundColor: '#FFFFFF',
+        borderWidth: 1,
+        borderColor: '#2C2C2C',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    checkButtonText: {
+        fontFamily: 'Roboto',
+        fontSize: 13,
+        fontWeight: '500',
+        color: '#2C2C2C',
+        textTransform: 'uppercase',
     },
     materialsContainer: {
         marginBottom: 16,
@@ -867,6 +1033,80 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
         fontSize: 13,
         color: '#666',
+    },
+    pairUpSection: {
+        paddingHorizontal: 50,
+        paddingVertical: 40,
+        backgroundColor: '#FFFFFF',
+        width: '100%',
+    },
+    pairUpTitle: {
+        fontFamily: 'Roboto',
+        fontSize: 20,
+        fontWeight: '500',
+        color: '#2C2C2C',
+        marginBottom: 24,
+        textAlign: 'left',
+    },
+    pairUpGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        gap: 20,
+        width: '100%',
+    },
+    pairUpItem: {
+        flex: 1,
+        maxWidth: 300,
+    },
+    pairUpImageContainer: {
+        position: 'relative',
+        width: '100%',
+        aspectRatio: 0.75,
+        marginBottom: 10,
+    },
+    pairUpPlaceholderImage: {
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#F0F0F0',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    placeholderText: {
+        fontSize: 12,
+        color: '#999',
+    },
+    pairUpWishlist: {
+        position: 'absolute',
+        top: 10,
+        right: 10,
+        width: 32,
+        height: 32,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        justifyContent: 'center',
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+    },
+    pairUpWishlistIcon: {
+        fontSize: 16,
+        color: '#2C2C2C',
+    },
+    pairUpProductName: {
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: '400',
+        color: '#2C2C2C',
+        marginBottom: 4,
+    },
+    pairUpPrice: {
+        fontFamily: 'Roboto',
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#2C2C2C',
     },
 });
 

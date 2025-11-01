@@ -49,7 +49,7 @@ const Header = (props) => {
 
   // Animation configuration
   const animationConfig = {
-    duration: 200,
+    duration: 150,
     useNativeDriver: false,
   };
 
@@ -322,7 +322,7 @@ const Header = (props) => {
     }
   };
 
-  // Dropdown items with animation
+  // Dropdown items with animation - ULTRA THIN DESIGN
   const renderDropdown = (category, animatedValue) => {
     const animatedStyle = {
       opacity: animatedValue,
@@ -330,13 +330,7 @@ const Header = (props) => {
         {
           translateY: animatedValue.interpolate({
             inputRange: [0, 1],
-            outputRange: [-10, 0],
-          }),
-        },
-        {
-          scaleY: animatedValue.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.95, 1],
+            outputRange: [-5, 0],
           }),
         },
       ],
@@ -382,10 +376,11 @@ const Header = (props) => {
               </Text>
             </TouchableOpacity>
 
-            {subCategoryList.slice(0, 6).map((subCat, index) => (
+            {subCategoryList.slice(0, 8).map((subCat, index) => (
               <TouchableOpacity
                 key={index}
                 onPress={() => navigateToSubCategory(subCat.subCategoryId, subCat.name)}
+                style={styles.dropdownItemWrapper}
               >
                 <Text style={styles.dropdownItem}>
                   {subCat.name}
@@ -412,12 +407,12 @@ const Header = (props) => {
                   </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity onPress={() => navigateToCategory(category)}>
+                <TouchableOpacity onPress={() => navigateToCategory(category)} style={styles.dropdownItemWrapper}>
                   <Text style={styles.dropdownItem}>
                     {category === "men" ? "T-Shirts" : "Tops"}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigateToCategory(category)}>
+                <TouchableOpacity onPress={() => navigateToCategory(category)} style={styles.dropdownItemWrapper}>
                   <Text style={styles.dropdownItem}>
                     {category === "men" ? "Pants" : "Dresses"}
                   </Text>
@@ -430,7 +425,7 @@ const Header = (props) => {
     );
   };
 
-  // Profile dropdown with animation
+  // Profile dropdown with animation - ULTRA THIN DESIGN
   const renderProfileDropdown = () => {
     let isAuthenticated = Store.getState().user.isAuthenticated;
     const animatedStyle = {
@@ -439,13 +434,7 @@ const Header = (props) => {
         {
           translateY: profileDropdownAnimation.interpolate({
             inputRange: [0, 1],
-            outputRange: [-10, 0],
-          }),
-        },
-        {
-          scaleY: profileDropdownAnimation.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0.95, 1],
+            outputRange: [-5, 0],
           }),
         },
       ],
@@ -460,17 +449,17 @@ const Header = (props) => {
         <TouchableOpacity style={styles.profileDropdownItem} onPress={() => {
             navigateToProfile( isAuthenticated ? 'profile': 'Login' );
           }}>
-          <AntDesign name="user" size={16} color="#333" style={styles.profileIcon} />
+          <AntDesign name="user" size={14} color="#1a1a1a" style={styles.profileIcon} />
           <Text style={styles.profileDropdownText}>Profile</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('orders')}>
-          <AntDesign name="filetext1" size={16} color="#333" style={styles.profileIcon} />
+          <AntDesign name="filetext1" size={14} color="#1a1a1a" style={styles.profileIcon} />
           <Text style={styles.profileDropdownText}>Order History</Text>
         </TouchableOpacity>
         
         { isAuthenticated && <TouchableOpacity style={styles.profileDropdownItem} onPress={() => navigateToProfile('logout')}>
-          <AntDesign name="logout" size={16} color="#333" style={styles.profileIcon} />
+          <AntDesign name="logout" size={14} color="#1a1a1a" style={styles.profileIcon} />
           <Text style={styles.profileDropdownText}>Log-out</Text>
         </TouchableOpacity>}
       </Animated.View>
@@ -496,7 +485,7 @@ const Header = (props) => {
                 onMouseEnter={() => setIsHoveringMenLink(true)}
                 onMouseLeave={() => setIsHoveringMenLink(false)}
               >
-                <Text style={styles.text}>Men</Text>
+                <Text style={[styles.text, isHoveringMenLink && styles.textHover]}>Men</Text>
               </Pressable>
               {menDropdownVisible && renderDropdown("men", menDropdownAnimation)}
             </View>
@@ -510,7 +499,7 @@ const Header = (props) => {
                 onMouseEnter={() => setIsHoveringWomenLink(true)}
                 onMouseLeave={() => setIsHoveringWomenLink(false)}
               >
-                <Text style={styles.text}>Women</Text>
+                <Text style={[styles.text, isHoveringWomenLink && styles.textHover]}>Women</Text>
               </Pressable>
               {womenDropdownVisible && renderDropdown("women", womenDropdownAnimation)}
             </View>
@@ -524,7 +513,7 @@ const Header = (props) => {
                 onMouseEnter={() => setIsHoveringSaleLink(true)}
                 onMouseLeave={() => setIsHoveringSaleLink(false)}
               >
-                <Text style={[styles.text, styles.saleText]}>Sale</Text>
+                <Text style={[styles.text, styles.saleText, isHoveringSaleLink && styles.textHover]}>Sale</Text>
               </Pressable>
               {saleDropdownVisible && renderDropdown("sale", saleDropdownAnimation)}
             </View>
@@ -583,8 +572,8 @@ const Header = (props) => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "#fff",
-    borderBottomColor: "#808080",
-    borderBottomWidth: 1,
+    borderBottomColor: "#e5e5e5",
+    borderBottomWidth: 0.5,
     position: "relative",
     zIndex: 1000,
   },
@@ -592,7 +581,6 @@ const styles = StyleSheet.create({
     width: "100%",
     display: "flex",
     flexDirection: "row",
-    // justifyContent: "center",
     justifyContent: isMobile() ? "flex-start" : "center",
     alignItems: "center",
     padding: 15,
@@ -619,60 +607,80 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   text: {
-    fontWeight: "bold",
+    fontWeight: "400",
     fontFamily: "Jura",
-    fontSize: 16
+    fontSize: 15,
+    letterSpacing: 0.3,
+    color: "#1a1a1a",
+    transition: "all 0.2s ease",
+  },
+  textHover: {
+    color: "#666",
   },
   dropdown: {
     position: "absolute",
-    top: 30,
-    left: 0,
+    top: 35,
+    left: "50%",
+    transform: [{ translateX: "-50%" }],
     zIndex: 999999,
-    width: 250,
-    backgroundColor: "#fff",
-    padding: 10,
-    borderRadius: 8,
-    shadowColor: "#000",
+    width: 180,
+    backgroundColor: "#ffffff",
+    padding: 0,
+    borderRadius: 0,
+    shadowColor: "transparent",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 0,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0,
+    shadowRadius: 0,
     elevation: 999,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    // Ensure dropdown appears above other content
+    borderWidth: 0.5,
+    borderColor: "#e5e5e5",
+    borderTopWidth: 0,
+    // Ultra-thin minimal design
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
         zIndex: 999999,
+        left: "50%",
+        transform: "translateX(-50%)",
       },
     }),
   },
   menDropdown: {
-    // Add any specific styles for men dropdown if needed
+    // Centered under Men link
   },
   womenDropdown: {
-    // Add any specific styles for women dropdown if needed
+    // Centered under Women link
   },
   saleDropdown: {
-    // Add any specific styles for sale dropdown if needed
+    // Centered under Sale link
+  },
+  dropdownItemWrapper: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#f0f0f0",
   },
   dropdownItem: {
-    padding: 12,
-    fontSize: 16,
-    color: "#333",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    fontSize: 13,
+    color: "#1a1a1a",
     fontFamily: "Jura",
-    borderRadius: 4,
-    marginVertical: 2,
+    fontWeight: "300",
+    letterSpacing: 0.5,
+    textAlign: "left",
+    backgroundColor: "transparent",
+    transition: "all 0.15s ease",
   },
   viewAllItem: {
-    fontWeight: "bold",
-    borderBottomWidth: 1,
-    borderBottomColor: "#e0e0e0",
+    fontWeight: "500",
+    borderBottomWidth: 0.5,
+    borderBottomColor: "#e5e5e5",
     paddingBottom: 10,
-    marginBottom: 5,
+    marginBottom: 0,
+    fontSize: 13,
+    letterSpacing: 0.3,
   },
   saleText: {
     color: "#b42124",
@@ -682,23 +690,25 @@ const styles = StyleSheet.create({
     top: 35,
     right: 0,
     zIndex: 999999,
-    width: 180,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    borderRadius: 8,
-    shadowColor: "#000",
+    width: 160,
+    backgroundColor: "#ffffff",
+    borderWidth: 0.5,
+    borderColor: "#e5e5e5",
+    borderTopWidth: 0,
+    borderRadius: 0,
+    shadowColor: "transparent",
     shadowOffset: {
       width: 0,
-      height: 4,
+      height: 0,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
+    shadowOpacity: 0,
+    shadowRadius: 0,
     elevation: 999,
-    // Ensure dropdown appears above other content
+    padding: 0,
+    // Ultra-thin minimal design
     ...Platform.select({
       web: {
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
+        boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
         zIndex: 999999,
       },
     }),
@@ -706,19 +716,23 @@ const styles = StyleSheet.create({
   profileDropdownItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
+    paddingVertical: 10,
     paddingHorizontal: 15,
-    borderBottomWidth: 1,
+    borderBottomWidth: 0.5,
     borderBottomColor: "#f0f0f0",
+    backgroundColor: "transparent",
+    transition: "all 0.15s ease",
   },
   profileIcon: {
-    width: 20,
-    marginRight: 12,
+    width: 18,
+    marginRight: 10,
   },
   profileDropdownText: {
-    fontSize: 14,
-    color: "#333",
+    fontSize: 13,
+    color: "#1a1a1a",
     fontFamily: "Jura",
+    fontWeight: "300",
+    letterSpacing: 0.3,
   },
   emptyDropdownContainer: {
     padding: 20,
@@ -726,18 +740,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emptyDropdownText: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: 14,
+    fontWeight: "400",
     color: "#333",
     fontFamily: "Jura",
     marginBottom: 8,
     textAlign: "center",
+    letterSpacing: 0.3,
   },
   emptyDropdownSubtext: {
-    fontSize: 14,
+    fontSize: 12,
     color: "#666",
     fontFamily: "Jura",
     textAlign: "center",
+    letterSpacing: 0.2,
   },
 });
 

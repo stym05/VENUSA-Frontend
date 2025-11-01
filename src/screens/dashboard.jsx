@@ -332,145 +332,67 @@ export default class Dashboard extends Component {
               textColor="#ffffff"
             />
 
-            {/* Render Dashboard Data or Skeleton */}
-            {isLoading ? (
-              <>
-                <DashboardProductSkeleton />
-                <DashboardProductSkeleton />
-              </>
-            ) : (
-              this.state.allCategoriesData && this.state.allCategoriesData.length > 0 &&
-              this.state.allCategoriesData.map((category, categoryIndex) => (
-                <View key={categoryIndex}>
-                  {/* Category Header */}
-                  <View style={{ marginVertical: 25, width: '100%', justifyContent: 'center', alignItems: 'center' }}>
-                    <Text style={{
-                      fontFamily: "Jura",
-                      fontSize: 32,
-                      fontWeight: '700',
-                      lineHeight: 42,
-                      color: '#1A1A1A'
-                    }}>{category.categoryName}</Text>
-                  </View>
+            {/* NEW ARRIVALS Section */}
+            <View style={styles(theme).newArrivalsSection}>
+              {/* Section Header */}
+              <View style={styles(theme).sectionHeader}>
+                <Text style={styles(theme).sectionTitle}>NEW ARRIVALS</Text>
+              </View>
 
-                  {/* Subcategories and Products */}
-                  {category.subcategories && category.subcategories.map((subcategory, subIndex) => (
-                    <View key={subIndex} style={{ marginBottom: 50 }}>
-                      {/* Subcategory Header */}
-                      <View style={{ marginVertical: 20, paddingHorizontal: isMobile() ? 15 : 50 }}>
-                        <Text style={{
-                          fontFamily: "Jura",
-                          fontSize: 24,
-                          fontWeight: '600',
-                          lineHeight: 32,
-                          color: '#333'
-                        }}>{subcategory.subCategoryName}</Text>
-                        <Text style={{
-                          fontFamily: "Roboto",
-                          fontSize: 16,
-                          fontWeight: '400',
-                          color: '#666',
-                          marginTop: 5
-                        }}>Collection: {subcategory.collectionName}</Text>
+              {/* Products Grid */}
+              {isLoading ? (
+                <DashboardProductSkeleton />
+              ) : (
+                <View style={styles(theme).productsGrid}>
+                  {this.state.newArrivals && this.state.newArrivals.slice(0, 4).map((product, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles(theme).gridProductCard}
+                      onPress={() => this.props.navigation.navigate("ItemDescription", {
+                        productId: product.productId,
+                        productName: product.productName
+                      })}
+                    >
+                      {/* Product Image */}
+                      <View style={styles(theme).gridProductImageContainer}>
+                        {product.images && product.images.length > 0 ? (
+                          <Image
+                            source={{ uri: product.images[0]?.image || product.images[0] }}
+                            style={styles(theme).gridProductImage}
+                            contentFit="cover"
+                          />
+                        ) : (
+                          <View style={[styles(theme).gridProductImage, { backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center' }]}>
+                            <Text style={{ color: '#999' }}>No Image</Text>
+                          </View>
+                        )}
                       </View>
 
-                      {/* Products Grid */}
-                      <ScrollView
-                        horizontal
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={{ paddingHorizontal: isMobile() ? 15 : 50 }}
-                      >
-                        {subcategory.products && subcategory.products.map((product, productIndex) => (
-                          <TouchableOpacity
-                            key={productIndex}
-                            style={styles(theme).productCard}
-                            onPress={() => this.props.navigation.navigate("ItemDescription", {
-                              productId: product.productId,
-                              productName: product.productName
-                            })}
-                          >
-                            {/* Product Image */}
-                            <View style={styles(theme).productImageContainer}>
-                              {product.images && product.images.length > 0 ? (
-                                <Image
-                                  source={{ uri: product.images[0]?.image || product.images[0] }}
-                                  style={styles(theme).productImage}
-                                  contentFit="cover"
-                                />
-                              ) : (
-                                <View style={[styles(theme).productImage, { backgroundColor: '#f0f0f0', justifyContent: 'center', alignItems: 'center' }]}>
-                                  <Text style={{ color: '#999' }}>No Image</Text>
-                                </View>
-                              )}
-
-                              {/* Discount Badge */}
-                              {product.hasDiscount && (
-                                <View style={styles(theme).discountBadge}>
-                                  <Text style={styles(theme).discountText}>
-                                    -{Math.round(product.discountPerc)}%
-                                  </Text>
-                                </View>
-                              )}
-                            </View>
-
-                            {/* Product Info */}
-                            <View style={styles(theme).productInfo}>
-                              <Text
-                                style={styles(theme).productName}
-                                numberOfLines={2}
-                              >
-                                {product.productName}
-                              </Text>
-
-                              <Text
-                                style={styles(theme).productDescription}
-                                numberOfLines={2}
-                              >
-                                {product.description}
-                              </Text>
-
-                              {/* Price Section */}
-                              <View style={styles(theme).priceContainer}>
-                                <Text style={styles(theme).currentPrice}>
-                                  ₹{Math.round(product.discountedPrice).toLocaleString('en-IN')}
-                                </Text>
-                                {product.hasDiscount && (
-                                  <Text style={styles(theme).originalPrice}>
-                                    ₹{Math.round(product.price).toLocaleString('en-IN')}
-                                  </Text>
-                                )}
-                              </View>
-
-                              {/* Tags */}
-                              {product.tags && product.tags.length > 0 && (
-                                <View style={styles(theme).tagsContainer}>
-                                  {product.tags.slice(0, 2).map((tag, tagIndex) => (
-                                    <View key={tagIndex} style={styles(theme).tag}>
-                                      <Text style={styles(theme).tagText}>{tag}</Text>
-                                    </View>
-                                  ))}
-                                </View>
-                              )}
-
-                              {/* Stock Info */}
-                              {product.totalStock > 0 ? (
-                                <Text style={styles(theme).stockText}>
-                                  In Stock ({product.totalStock} available)
-                                </Text>
-                              ) : (
-                                <Text style={[styles(theme).stockText, { color: '#d32f2f' }]}>
-                                  Out of Stock
-                                </Text>
-                              )}
-                            </View>
-                          </TouchableOpacity>
-                        ))}
-                      </ScrollView>
-                    </View>
+                      {/* Product Name Tag */}
+                      <View style={styles(theme).productNameTag}>
+                        <Text style={styles(theme).productNameTagText}>{product.productName}</Text>
+                      </View>
+                    </TouchableOpacity>
                   ))}
                 </View>
-              ))
-            )}
+              )}
+            </View>
+
+            {/* Newsletter Section */}
+            {/* <View style={styles(theme).newsletterSection}>
+              <Text style={styles(theme).newsletterTitle}>Join us in living, better. Every day.</Text>
+              <View style={styles(theme).newsletterForm}>
+                <View style={styles(theme).emailInputContainer}>
+                  <Text style={styles(theme).emailInputPlaceholder}>Enter your email address</Text>
+                </View>
+                <TouchableOpacity style={styles(theme).subscribeButton}>
+                  <Text style={styles(theme).subscribeButtonText}>Subscribe</Text>
+                </TouchableOpacity>
+              </View>
+              <Text style={styles(theme).newsletterDisclaimer}>
+                By signing up, you agree to our <Text style={styles(theme).linkText}>Privacy Policy</Text> and <Text style={styles(theme).linkText}>Terms of Service.</Text>
+              </Text>
+            </View> */}
           </View>
           <Footer navigation={this.props.navigation} />
         </ScrollView>
@@ -618,5 +540,123 @@ const styles = (theme) => StyleSheet.create({
     fontSize: 13,
     color: '#4caf50',
     fontWeight: '500',
+  },
+  // New Arrivals Section Styles
+  newArrivalsSection: {
+    paddingVertical: 50,
+    paddingHorizontal: isMobile() ? 20 : 50,
+    backgroundColor: '#fff',
+  },
+  sectionHeader: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  sectionTitle: {
+    fontFamily: "Jura",
+    fontSize: isMobile() ? 28 : 36,
+    fontWeight: '700',
+    color: '#1A1A1A',
+    letterSpacing: 2,
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: isMobile() ? 'space-between' : 'center',
+    gap: isMobile() ? 15 : 30,
+  },
+  gridProductCard: {
+    width: isMobile() ? '48%' : '45%',
+    maxWidth: isMobile() ? 200 : 500,
+    marginBottom: 20,
+    position: 'relative',
+  },
+  gridProductImageContainer: {
+    width: '100%',
+    height: isMobile() ? 250 : 500,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  gridProductImage: {
+    width: '100%',
+    height: '100%',
+  },
+  productNameTag: {
+    position: 'absolute',
+    bottom: 15,
+    left: 15,
+    backgroundColor: '#fff',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 4,
+  },
+  productNameTagText: {
+    fontFamily: 'Roboto',
+    fontSize: isMobile() ? 12 : 16,
+    fontWeight: '500',
+    color: '#1A1A1A',
+  },
+  // Newsletter Section Styles
+  newsletterSection: {
+    paddingVertical: isMobile() ? 40 : 60,
+    paddingHorizontal: isMobile() ? 20 : 50,
+    backgroundColor: '#F5F5F5',
+    alignItems: 'center',
+  },
+  newsletterTitle: {
+    fontFamily: 'Roboto',
+    fontSize: isMobile() ? 18 : 24,
+    fontWeight: '400',
+    color: '#1A1A1A',
+    marginBottom: 30,
+    textAlign: 'center',
+  },
+  newsletterForm: {
+    width: '100%',
+    maxWidth: 500,
+    marginBottom: 20,
+  },
+  emailInputContainer: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 4,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    justifyContent: 'center',
+  },
+  emailInputPlaceholder: {
+    fontFamily: 'Roboto',
+    fontSize: 14,
+    color: '#999',
+  },
+  subscribeButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#1A1A1A',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  subscribeButtonText: {
+    fontFamily: 'Roboto',
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  newsletterDisclaimer: {
+    fontFamily: 'Roboto',
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+    maxWidth: 400,
+  },
+  linkText: {
+    textDecorationLine: 'underline',
+    color: '#1A1A1A',
   },
 });
